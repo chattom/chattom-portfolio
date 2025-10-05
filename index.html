@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chris Chattom — Portfolio</title>
+  <meta name="description" content="Portfolio of Chris Chattom — designer & visual storyteller." />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#f7f8f9;
+      --fg:#222;
+      --muted:#5a5a5a;
+      --accent:#007f6e;
+      --rule:#d1d1d1;
+      --card:#ffffff;
+      --ring:#c9eae2;
+      --max: 980px;
+      --radius: 22px;
+      --shadow: 0 10px 25px rgba(0,0,0,.1);
+    }
+
+    /* NEW: prevent inputs from overflowing their container */
+    *,*::before,*::after{box-sizing:border-box}
+
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+    a{color:var(--accent); text-decoration: none}
+    a:hover{text-decoration: underline}
+    .wrap{max-width: var(--max); margin: 0 auto; padding: 48px 20px 120px}
+
+    header{display:grid; grid-template-columns: clamp(140px, 22vw, 280px) 1fr; gap:32px; align-items:center; margin-top:14px}
+
+    .headshot-frame{
+      position: relative;
+      width: clamp(140px, 22vw, 280px);
+      height: clamp(140px, 22vw, 280px);
+      border-radius: var(--radius);
+      background: var(--card);
+      box-shadow: var(--shadow);
+      display:flex; align-items:center; justify-content:center;
+      overflow:hidden;
+      isolation:isolate;
+    }
+    .headshot-frame::before{
+      content:""; position:absolute; inset:-8px; border-radius: calc(var(--radius) + 10px);
+      background: radial-gradient(100% 100% at 50% 50%, var(--ring) 0%, transparent 70%);
+      z-index: -1;
+    }
+    .headshot{
+      width:100%; height:100%; object-fit:contain;
+      border-radius: calc(var(--radius) - 6px); display:block;
+    }
+
+    .intro h1{font-size: clamp(28px, 4vw, 40px); line-height:1.15; margin:0 0 10px 0; font-weight:700}
+    .intro p{font-size: clamp(16px, 2vw, 18px); color: var(--muted); margin: 10px 0 0 0}
+
+    .fade{opacity:0; transform: translateY(10px); transition: opacity .7s ease, transform .7s ease}
+    .fade.revealed{opacity:1; transform:none}
+
+    .cta-row{display:flex; flex-wrap:wrap; gap:14px; margin: 24px 0 10px}
+    .btn{
+      display:inline-flex; align-items:center; gap:10px; padding:12px 16px;
+      background:var(--accent); color:white; border:none; border-radius: 14px;
+      font-weight:600; box-shadow: 0 4px 12px rgba(0,0,0,.15);
+      cursor:pointer;
+    }
+    .btn:hover{background:#006b5d; text-decoration:none}
+
+    hr.rule{border:none; height:1px; background: var(--rule); margin: 30px 0 22px}
+
+    .gallery{display:grid; gap: 28px; margin-top: 28px; justify-items:center}
+
+    figure.work{
+      margin:0; background: var(--card); border:1px solid var(--rule); border-radius: var(--radius);
+      box-shadow: var(--shadow); overflow:hidden; width:min(80vw, 900px);
+    }
+
+    .media{display:flex; align-items:center; justify-content:center; width:100%; background:#f7f8f9}
+    .media img, .media video{display:block; max-width:100%; height:auto; object-fit:contain; max-height:80vh}
+
+    /* Responsive square embed for hosted content (safe across browsers) */
+    .embed-square{position:relative; width:100%;}
+    .embed-square::before{content:""; display:block; padding-top:100%;}
+    .embed-square > iframe{position:absolute; inset:0; width:100%; height:100%; border:0;}
+
+    /* Slightly smaller size for #15 only */
+    .work-15 .embed-square { width: 88%; margin: 0 auto; }
+    @media (max-width: 800px) {
+      .work-15 .embed-square { width: 92%; }
+    }
+
+    figcaption{
+      padding:16px 18px 18px; font-size:15px; color: var(--muted);
+      text-align:center; /* centered titles */
+    }
+    figcaption strong{color: var(--fg); font-weight:600; display:block; margin-bottom:4px}
+
+    /* CONTACT — minimal card & toast */
+    .contact-card{
+      width:min(80vw, 900px);
+      background:var(--card);
+      border:1px solid var(--rule);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding:20px;
+      /* NEW: center the card so it matches figure.work */
+      margin:34px auto 0;
+    }
+    .contact-card h2{
+      margin:0 0 12px 0; font-size:18px; font-weight:700;
+    }
+    .contact-grid{display:grid; gap:12px}
+    .contact-grid label{font-size:14px; color:var(--muted)}
+    .contact-grid input, .contact-grid textarea{
+      width:100%; padding:12px 12px; border:1px solid var(--rule); border-radius:12px;
+      font: inherit; background:#fff; color:var(--fg);
+      /* with global box-sizing, this keeps fields inside the card */
+    }
+    .contact-grid textarea{min-height:120px; resize:vertical}
+    .contact-actions{display:flex; justify-content:flex-end; margin-top:8px}
+    .flash{
+      position:fixed; left:50%; bottom:18px; transform:translateX(-50%);
+      background:var(--accent); color:#fff; padding:10px 14px; border-radius:12px;
+      box-shadow:0 6px 20px rgba(0,0,0,.2); opacity:0; pointer-events:none;
+      transition:opacity .25s ease;
+    }
+    .flash.show{opacity:1}
+    .flash.error{background:#b54141}
+
+    /* /CONTACT */
+
+    footer{margin-top: 64px; color: var(--muted); font-size: 14px}
+    footer .small{opacity:.8}
+
+    @media (max-width: 800px){
+      header{grid-template-columns: 1fr; text-align:center;}
+      .headshot-frame{margin:0 auto 20px; width: clamp(140px, 45vw, 220px); height: clamp(140px, 45vw, 220px);}
+      .intro h1{font-size:clamp(24px,6vw,34px)}
+      .intro p{font-size:clamp(15px,4vw,17px)}
+      figure.work{width:94vw}
+      .media img, .media video{max-height:72vh}
+      .contact-card{width:94vw}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="headshot-frame fade" style="--delay:0s">
+        <img class="headshot" src="assets/cc4-square.jpg" alt="Headshot of Chris Chattom" loading="eager" />
+      </div>
+
+      <div class="intro">
+        <h1 class="fade" style="--delay:.05s;">Hi, I’m Chris.<br>I’m a designer, storyteller, and someone who still believes good work speaks louder than buzzwords.</h1>
+        <p class="fade" style="--delay:.15s;">I’ve worked with brands you know — and poured just as much heart into the ones you don’t. At this simple site you will find some of my work and a little glimpse into the way I think. Welcome.</p>
+
+        <div class="cta-row fade" style="--delay:.25s;">
+          <a class="btn" href="https://drive.google.com/file/d/1BYoCKL1mMZfabGkFh2aHq80HDbEwDT28/view?usp=sharing" target="_blank" rel="noopener">Download Résumé (PDF)</a>
+        </div>
+      </div>
+    </header>
+
+    <hr class="rule" />
+
+    <section class="gallery" aria-label="Selected Works">
+      <!-- Portfolio pieces (14 items) -->
+      <figure class="work fade" style="--delay:.05s"><div class="media"><video src="assets/01-Chattom-Design-Logomotion.mp4" autoplay muted loop playsinline preload="metadata"></video></div><figcaption><strong>Chattom Design Animated Logo</strong></figcaption></figure>
+      <figure class="work fade" style="--delay:.08s"><div class="media"><img src="assets/02-Cactus-Gospel-Album-Cover.png" alt="Cactus Gospel — Album Cover" loading="lazy" /></div><figcaption><strong>Cactus Gospel Album Cover</strong></figcaption></figure>
+      <figure class="work fade" style="--delay:.11s"><div class="media"><img src="assets/03-Paloma-Picasso.jpg" alt="Paloma Picasso — Advertising/Design" loading="lazy" /></div><figcaption><strong>Paloma Picasso Catalog Cover</strong></figcaption></figure>
+      <figure class="work fade" style="--delay:.14s"><div class="media"><img src="assets/04-El-Camino-del-Sol-Cover.png" alt="El Camino del Sol — Cover" loading="lazy" /></div><figcaption><strong>El Camino del Sol Album Cover</strong></figcaption></figure>
+      <figure class="work fade" style="--delay:.17s"><div class="media"><img src="assets/05-Gestalt-Cats.jpg" alt="Gestalt Cats" loading="lazy" /></div><figcaption><strong>Gestalt Cats</strong></figcaption></figure>
+      <figure class="work fade" style="--delay:.20s"><div class="media"><img src="assets/06-Absolut-Hyakutake-Ad.png" alt="Absolut Hyakutake — Ad" loading="lazy" /></div><figcaption><strong>Absolut Vodka 'Absolut Hyakutake' Ad</strong></figcaption></figure>
+      <figure class="work fade" style="--delay:.23s"><div class="media"><video src="assets/07-Canary-Tape-Logomotion.mp4" autoplay muted loop playsinline preload="metadata"></video></div><figcaption><strong>Canary Tape Records Animated Logo</strong></figcaption></figure>
+      <figure class="work fade" style="--delay:.26s"><div class="media"><img src="assets/08-Barry-Goldwater-Spread.jpg" alt="Barry Goldwater — Spread" loading="lazy" /></div><figcaption><strong>Barry Goldwater feature for Times Media Group</strong></figcaption></figure>
+      <figure class="work fade" style="--delay:.29s"><div class="media"><img src="assets/09-Honkytonk-Nebula-Album-Cover.png" alt="Honkytonk Nebula — Album Cover" loading="lazy" /></div><figcaption><strong>Honkytonk Nebula Album Cover</strong></figcaption></figure>
+      <figure class="work fade" style="--delay:.32s"><div class="media"><img src="assets/10-Mon-Sablé-Logo.png" alt="Mon Sablé — Logo" loading="lazy" /></div><figcaption><strong>Mon Sablé Logo</strong></figcaption></figure>
+      <figure class="work fade" style="--delay:.35s"><div class="media"><img src="assets/11-Cliffline-Logo.png" alt="Cliffline — Logo" loading="lazy" /></div><figcaption><strong>Cliffline Retailers Logo</strong></figcaption></figure>
+      <figure class="work fade" style="--delay:.38s"><div class="media"><video src="assets/12%20Bauhaus-Face-Loop.mov" autoplay muted loop playsinline preload="metadata"></video></div><figcaption><strong>Bauhaus Face Animated Loop</strong></figcaption></figure>
+      <figure class="work fade" style="--delay:.41s"><div class="media"><img src="assets/13-SCC-Vig-Program.png" alt="SCC Vig Program" loading="lazy" /></div><figcaption><strong>Scottsdale Community College Alex Ketley Program Announcement</strong></figcaption></figure>
+      <figure class="work fade" style="--delay:.44s"><div class="media"><img src="assets/14-Soft-Science-Album-Cover.png" alt="Soft Science — Album Cover" loading="lazy" /></div><figcaption><strong>Soft Science Album Cover</strong></figcaption></figure>
+
+      <!-- 15 -->
+      <figure class="work work-15 fade" style="--delay:.47s">
+        <div class="media">
+          <div class="embed-square">
+            <iframe src="https://fastidious-malabi-cc7032.netlify.app" title="Tru Infusion — In-store Animation" loading="lazy"></iframe>
+          </div>
+        </div>
+        <figcaption><strong>Tru Infusion in-store Animation</strong></figcaption>
+      </figure>
+
+      <!-- 16 -->
+      <figure class="work fade" style="--delay:.50s">
+        <div class="media">
+          <img src="assets/16-CFH.jpg" alt="CFH" loading="lazy" />
+        </div>
+        <figcaption><strong>Cookies from Home Logos and Tin Designs</strong></figcaption>
+      </figure>
+
+      <!-- 17 -->
+      <figure class="work fade" style="--delay:.53s">
+        <div class="media">
+          <video src="assets/17-Fibonacci-Curve.mp4" autoplay muted loop playsinline preload="metadata"></video>
+        </div>
+        <figcaption><strong>Fibonacci Curve Animated Loop</strong></figcaption>
+      </figure>
+
+      <!-- 18 -->
+      <figure class="work fade" style="--delay:.56s">
+        <div class="media">
+          <img src="assets/18-The-Firefly's-Arrival.jpg" alt="The Firefly's Arrival" loading="lazy" />
+        </div>
+        <figcaption><strong>"The Firefly’s Arrival" Hand Illustration using Wax, Charcoal, and Graphite</strong></figcaption>
+      </figure>
+    </section>
+
+    <!-- CONTACT: minimal form -->
+    <section class="contact-card" aria-label="Contact Chris">
+      <h2>Get in touch</h2>
+      <form id="contactForm" class="contact-grid" autocomplete="on" novalidate>
+        <!-- Honeypot to reduce spam -->
+        <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
+        <label>Name
+          <input type="text" name="name" placeholder="Your name" required />
+        </label>
+        <label>Subject
+          <input type="text" name="subject" placeholder="Subject" required />
+        </label>
+        <label>Message
+          <textarea name="message" placeholder="Say hello…" required minlength="5"></textarea>
+        </label>
+        <div class="contact-actions">
+          <button class="btn" type="submit" id="sendBtn">Send message</button>
+        </div>
+      </form>
+    </section>
+    <!-- /CONTACT -->
+
+    <footer>
+      <hr class="rule" />
+      <div>© <span id="y"></span> Chris Chattom • <span class="small">Phoenix, AZ</span></div>
+    </footer>
+  </div>
+
+  <!-- CONTACT toast -->
+  <div id="flash" class="flash" role="status" aria-live="polite"></div>
+
+  <script>
+    document.getElementById('y').textContent = new Date().getFullYear();
+    const revealEls=document.querySelectorAll('.fade');
+    const io=new IntersectionObserver((entries)=>{entries.forEach(e=>{if(e.isIntersecting){const el=e.target;const d=el.style.getPropertyValue('--delay')||'0s';el.style.transitionDelay=d;el.classList.add('revealed');io.unobserve(el);}});},{rootMargin:'0px 0px -10% 0px',threshold:0.05});
+    revealEls.forEach(el=>io.observe(el));
+
+    // CONTACT: AJAX submission to FormSubmit (no reload)
+    const form = document.getElementById('contactForm');
+    const flash = document.getElementById('flash');
+    const sendBtn = document.getElementById('sendBtn');
+
+    function showFlash(msg, ok=true){
+      flash.textContent = msg;
+      flash.classList.remove('error','show');
+      if(!ok) flash.classList.add('error');
+      requestAnimationFrame(()=>{ flash.classList.add('show'); });
+      setTimeout(()=> flash.classList.remove('show'), 2800);
+    }
+
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fd = new FormData(form);
+      // simple client-side validation
+      if(!fd.get('name') || !fd.get('subject') || !fd.get('message')){
+        showFlash('Please fill in all fields.', false);
+        return;
+      }
+      sendBtn.disabled = true; sendBtn.textContent = 'Sending…';
+
+      try {
+        const res = await fetch('https://formsubmit.co/ajax/chattom@gmail.com', {
+          method: 'POST',
+          headers: { 'Accept': 'application/json' },
+          body: fd
+        });
+        if(!res.ok){ throw new Error('Network response was not ok'); }
+        form.reset();
+        showFlash('Message sent — thanks!');
+      } catch (err){
+        showFlash('Hmm, something went wrong. Try again?', false);
+      } finally {
+        sendBtn.disabled = false; sendBtn.textContent = 'Send message';
+      }
+    });
+    // /CONTACT
+  </script>
+</body>
+</html>
