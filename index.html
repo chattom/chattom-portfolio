@@ -150,6 +150,33 @@
       .media img, .media video{max-height:72vh}
       .contact-card{width:94vw}
     }
+/* === APPEND ONLY: equal side gutters + perfect centering on all devices === */
+:root{
+  /* adaptive gutter used for left/right padding */
+  --gutter: clamp(12px, 4vw, 24px);
+}
+
+/* keep your existing top/bottom padding; just equalize the sides and respect safe area */
+.wrap{
+  padding-left:  calc(var(--gutter) + env(safe-area-inset-left));
+  padding-right: calc(var(--gutter) + env(safe-area-inset-right));
+}
+
+/* on narrow viewports, let cards use the full content width rather than fixed vw values */
+@media (max-width: 800px){
+  figure.work,
+  .contact-card{
+    width: 100%;        /* content width is already controlled by .wrap padding */
+  }
+}
+
+/* make sure media always fit neatly */
+img, video, canvas, svg{
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
   </style>
 </head>
 <body>
