@@ -195,24 +195,42 @@
 
       <figure class="work fade" style="--delay:.35s"><div class="media"><img src="assets/11-Cliffline-Logo.png" alt="Cliffline — Logo" loading="lazy" /></div><figcaption><strong>Cliffline Retailers Logo</strong></figcaption></figure>
 
-     <!-- Bauhaus Face Animated Loop -->
+     <!-- your other figures above -->
+
+<!-- Bauhaus Face Animated Loop (MP4 only) -->
 <figure class="work fade" style="--delay:.38s">
   <div class="media">
     <video
-      autoplay
+      id="bauhaus"
+      src="./assets/12-Bauhaus-Face-Loop.mp4?v=5"
       muted
       loop
       playsinline
-      preload="metadata"
-      onerror="this.outerHTML='';"   <!-- hide tile if the MOV can’t play -->
-    >
-      <source src="assets/12-Bauhaus-Face-Loop.mov?v=1" type="video/quicktime" />
-      <!-- Optional: if you later export an MP4, add it ABOVE the MOV for widest support -->
-      <!-- <source src="assets/12-Bauhaus-Face-Loop.mp4?v=1" type="video/quicktime" /> -->
+      autoplay
+      preload="auto"
+      controls
+      style="display:block; max-width:100%; height:auto; background:#f7f8f9">
+      Sorry, your browser can’t play this video.
     </video>
   </div>
   <figcaption><strong>Bauhaus Face Animated Loop</strong></figcaption>
 </figure>
+
+<script>
+  // Give autoplay a gentle push in case the browser hesitates
+  (function () {
+    const v = document.getElementById('bauhaus');
+    if (!v) return;
+    v.muted = true; // required for autoplay everywhere
+    const tryPlay = () => v.play().catch(() => {});
+    v.addEventListener('loadedmetadata', tryPlay, { once: true });
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) tryPlay();
+    });
+  })();
+</script>
+
+<!-- next figure continues -->
 
       <figure class="work fade" style="--delay:.41s"><div class="media"><img src="assets/13-SCC-Vig-Program.png" alt="SCC Vig Program" loading="lazy" /></div><figcaption><strong>Scottsdale Community College Alex Ketley Program Announcement</strong></figcaption></figure>
       <figure class="work fade" style="--delay:.44s"><div class="media"><img src="assets/14-Soft-Science-Album-Cover.png" alt="Soft Science — Album Cover" loading="lazy" /></div><figcaption><strong>Soft Science Album Cover</strong></figcaption></figure>
