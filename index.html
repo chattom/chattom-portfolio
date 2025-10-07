@@ -197,19 +197,12 @@
 
      <!-- your other figures above -->
 
-<!-- Bauhaus Face Animated Loop (MP4 only) -->
+<!-- Bauhaus Face Animated Loop — robust single block -->
 <figure class="work fade" style="--delay:.38s">
   <div class="media">
-    <video
-      id="bauhaus"
-      src="./assets/12-Bauhaus-Face-Loop.mp4?v=5"
-      muted
-      loop
-      playsinline
-      autoplay
-      preload="auto"
-      controls
-      style="display:block; max-width:100%; height:auto; background:#f7f8f9">
+    <video id="bauhaus" muted loop playsinline autoplay preload="metadata"
+           poster="./assets/13-SCC-Vig-Program.png"
+           style="display:block; max-width:100%; height:auto; background:#f7f8f9">
       Sorry, your browser can’t play this video.
     </video>
   </div>
@@ -217,17 +210,39 @@
 </figure>
 
 <script>
-  // Give autoplay a gentle push in case the browser hesitates
-  (function () {
-    const v = document.getElementById('bauhaus');
-    if (!v) return;
+(() => {
+  const v = document.getElementById('bauhaus');
+  if (!v) return;
+
+  // Candidate filenames to try (MP4 preferred), with cache-bust
+  const q = 'v=7';
+  const candidates = [
+    './assets/12-Bauhaus-Face-Loop.mp4?' + q,         // mp4 (hyphens)
+    './assets/12%20Bauhaus-Face-Loop.mp4?' + q,       // mp4 (space encoded – just in case)
+    './assets/12-Bauhaus-Face-Loop.mov?' + q,         // mov (hyphens)
+    './assets/12%20Bauhaus-Face-Loop.mov?' + q        // mov (space encoded)
+  ];
+
+  let i = 0;
+
+  // try next source on error
+  function tryNext() {
+    if (i >= candidates.length) { return; }
+    const url = candidates[i++];
+    // swap source cleanly
+    v.src = url;
+    v.load();
+  }
+
+  v.addEventListener('error', tryNext);
+  v.addEventListener('loadedmetadata', () => {
     v.muted = true; // required for autoplay everywhere
-    const tryPlay = () => v.play().catch(() => {});
-    v.addEventListener('loadedmetadata', tryPlay, { once: true });
-    document.addEventListener('visibilitychange', () => {
-      if (!document.hidden) tryPlay();
-    });
-  })();
+    v.play().catch(() => {});
+  }, { once: true });
+
+  // kick off first attempt
+  tryNext();
+})();
 </script>
 
 <!-- next figure continues -->
