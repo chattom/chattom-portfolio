@@ -99,6 +99,8 @@
   .ph-close{ top:8px; right:8px; transform:none }
   .ph-prev{ left:-4px } .ph-next{ right:-4px }
   .ph-close:hover, .ph-prev:hover, .ph-next:hover{ background:#fff }
+  /* ensure hash jumps land with a little breathing room */
+#contact { scroll-margin-top: 24px; }
 </style>
 </head>
 <body id="top">
@@ -502,6 +504,25 @@
   overlay.addEventListener('touchmove',  (e)=>{ const t=e.touches[0]; dx=t.clientX-sx; dy=t.clientY-sy; }, {passive:true});
   overlay.addEventListener('touchend',   ()=>{ if(Math.abs(dx)>40 && Math.abs(dx)>Math.abs(dy)){ dx<0 ? next() : prev(); } }, {passive:true});
 })();
+  <script>
+  // ...your existing JS above...
+
+  // --- Ensure #contact is in view after images/lazy loads settle ---
+  (function ensureAnchorVisible(){
+    function jump(){
+      if (location.hash === '#contact') {
+        const el = document.getElementById('contact');
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+    // Try at different phases to beat layout shifts
+    document.addEventListener('DOMContentLoaded', () => setTimeout(jump, 0));
+    window.addEventListener('load', () => setTimeout(jump, 0));
+    // One more nudge a moment later in case late assets shift layout
+    setTimeout(jump, 600);
+  })();
+</script>
+
 </script>
 </body>
 </html>
