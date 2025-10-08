@@ -101,6 +101,11 @@
   .ph-close:hover, .ph-prev:hover, .ph-next:hover{ background:#fff }
   /* ensure hash jumps land with a little breathing room */
 #contact { scroll-margin-top: 24px; }
+  @media (hover: none) and (pointer: coarse) {
+  .mason img {
+    -webkit-touch-callout: none; /* disable iOS long press menu */
+  }
+}
 </style>
 </head>
 <body id="top">
