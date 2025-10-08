@@ -8,6 +8,60 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
+/* Smooth anchor scrolling */
+html { scroll-behavior: smooth; }
+
+/* NAVBAR STYLES */
+.site-nav {
+  display: flex;
+  justify-content: center;
+  gap: 2.2rem;
+  margin-top: 2rem;
+  font-weight: 500;
+}
+
+.site-nav a {
+  color: var(--fg);
+  text-decoration: none;
+  position: relative;
+  padding-bottom: 4px;
+  transition: color 0.3s ease;
+}
+
+.site-nav a::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 0%;
+  height: 2px;
+  background-color: var(--accent);
+  border-radius: 2px;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateX(-50%);
+}
+
+/* Hover underline animation */
+.site-nav a:hover::after { width: 100%; }
+
+/* Active page underline (Home here) */
+.site-nav [aria-current="page"] { color: var(--accent); }
+.site-nav [aria-current="page"]::after { width: 100%; }
+
+/* Mobile tweaks for the navbar */
+@media (max-width: 640px){
+  .site-nav{
+    gap: 1.2rem;
+    margin-top: 1rem;
+    font-size: 15px;
+    flex-wrap: wrap;                 /* wrap links if tight */
+  }
+  .site-nav a{
+    padding-bottom: 6px;             /* bigger tap target */
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+  }
+}
+
     :root{
       --bg:#f7f8f9;
       --fg:#222;
@@ -116,9 +170,31 @@
     .contact-grid input, .contact-grid textarea{
       width:100%; padding:12px 12px; border:1px solid var(--rule); border-radius:12px;
       font: inherit; background:#fff; color:var(--fg);
+      min-height:44px; /* comfy tap size */
     }
     .contact-grid textarea{min-height:120px; resize:vertical}
     .contact-actions{display:flex; justify-content:flex-end; margin-top:8px}
+    .btn{ min-height:44px; padding:12px 18px; }
+
+.contact-foot {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.back-top {
+  color: #111;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 6px 2px;
+  border-radius: 8px;
+}
+
+.back-top:hover {
+  text-decoration: underline;
+}
+
+
     .flash{
       position:fixed; left:50%; bottom:18px; transform:translateX(-50%);
       background:var(--accent); color:#fff; padding:10px 14px; border-radius:12px;
@@ -150,9 +226,42 @@
       figure.work, .contact-card{ width: 100%; }
     }
     img, video, canvas, svg{ display:block; max-width:100%; height:auto; }
+
+/* --- Lightbox (homepage) --- */
+.lb-overlay{
+  position: fixed; inset: 0; background: rgba(0,0,0,.75);
+  display: none; align-items: center; justify-content: center; z-index: 9999;
+  padding: clamp(12px, 4vw, 28px);
+}
+.lb-overlay.show{ display:flex; animation: lbFade .18s ease-out }
+@keyframes lbFade{from{opacity:0} to{opacity:1}}
+.lb-frame{
+  max-width: min(96vw, 1200px); max-height: 90vh; position: relative;
+  background:#fff; border-radius:16px; box-shadow: 0 20px 60px rgba(0,0,0,.35);
+  overflow:hidden;
+}
+.lb-frame img{ display:block; max-width:100%; height:auto }
+.lb-cap{
+  position:absolute; left:0; right:48px; bottom:0;
+  padding:10px 14px; background:linear-gradient(transparent, rgba(0,0,0,.55));
+  color:#fff; font-size:14px;
+}
+.lb-close{
+  position:absolute; top:8px; right:8px; width:36px; height:36px;
+  display:grid; place-items:center; border:0; border-radius:10px;
+  background:rgba(255,255,255,.9); cursor:pointer;
+}
+.lb-close:hover{ background:#fff }
   </style>
 </head>
-<body>
+<body id="top">
+<!-- NAVBAR -->
+<nav class="site-nav" aria-label="Main">
+  <a href="/" aria-current="page">Home</a>
+  <a href="photography.html">Photography</a>
+  <a href="#contact">Contact</a>
+</nav>
+
   <div class="wrap">
     <header>
       <div class="headshot-frame fade" style="--delay:0s">
@@ -168,6 +277,7 @@
             Download Résumé (PDF)
           </a>
         </div>
+      </div> <!-- close .intro -->
     </header>
 
     <hr class="rule" />
@@ -182,70 +292,62 @@
       <figure class="work fade" style="--delay:.20s"><div class="media"><img src="assets/06-Absolut-Hyakutake-Ad.png" alt="Absolut Hyakutake — Ad" loading="lazy" /></div><figcaption><strong>Absolut Vodka 'Absolut Hyakutake' Ad</strong></figcaption></figure>
       <figure class="work fade" style="--delay:.23s"><div class="media"><video src="assets/07-Canary-Tape-Logomotion.mp4" autoplay muted loop playsinline preload="metadata"></video></div><figcaption><strong>Canary Tape Records Animated Logo</strong></figcaption></figure>
       <figure class="work fade" style="--delay:.26s"><div class="media"><img src="assets/08-Barry-Goldwater-Spread.jpg" alt="Barry Goldwater — Spread" loading="lazy" /></div><figcaption><strong>Barry Goldwater feature for Times Media Group</strong></figcaption></figure>
-      <figure class="work fade" style="--delay:.29s"><div class="media"><img src="assets/09-Honkytonk-Nebula-Album-Cover.png" alt="Honkytonk Nebula — Album Cover" loading="lazy" /></div><figcaption><strong>Honkytonk Nebula Album Cover</strong></figcaption></figure>
+      <figure class="work fade" style="--delay:.29s" data-lightbox data-caption="Honkytonk Nebula Album Cover"><div class="media"><img src="assets/09-Honkytonk-Nebula-Album-Cover.png" alt="Honkytonk Nebula — Album Cover" loading="lazy" /></div><figcaption><strong>Honkytonk Nebula Album Cover</strong></figcaption></figure>
 
-     <!-- Mon Sablé -->
-<figure class="work fade" style="--delay:.32s">
-  <div class="media">
-    <img src="./assets/10-Mon-Sable-Logo.jpg?v=1"
-         alt="Mon Sablé — Logo" loading="lazy" />
-  </div>
-  <figcaption><strong>Mon Sablé Logo</strong></figcaption>
-</figure>
+      <!-- Mon Sablé -->
+      <figure class="work fade" style="--delay:.32s" data-lightbox data-caption="Mon Sablé Logo">
+        <div class="media">
+          <img src="./assets/10-Mon-Sable-Logo.jpg?v=1" alt="Mon Sablé — Logo" loading="lazy" />
+        </div>
+        <figcaption><strong>Mon Sablé Logo</strong></figcaption>
+      </figure>
 
       <figure class="work fade" style="--delay:.35s"><div class="media"><img src="assets/11-Cliffline-Logo.png" alt="Cliffline — Logo" loading="lazy" /></div><figcaption><strong>Cliffline Retailers Logo</strong></figcaption></figure>
 
-     <!-- your other figures above -->
+      <!-- Bauhaus Face Animated Loop — robust single block -->
+      <figure class="work fade" style="--delay:.38s">
+        <div class="media">
+          <video id="bauhaus" muted loop playsinline autoplay preload="metadata"
+                 poster="./assets/13-SCC-Vig-Program.png"
+                 style="display:block; max-width:100%; height:auto; background:#f7f8f9">
+            Sorry, your browser can’t play this video.
+          </video>
+        </div>
+        <figcaption><strong>Bauhaus Face Animated Loop</strong></figcaption>
+      </figure>
 
-<!-- Bauhaus Face Animated Loop — robust single block -->
-<figure class="work fade" style="--delay:.38s">
-  <div class="media">
-    <video id="bauhaus" muted loop playsinline autoplay preload="metadata"
-           poster="./assets/13-SCC-Vig-Program.png"
-           style="display:block; max-width:100%; height:auto; background:#f7f8f9">
-      Sorry, your browser can’t play this video.
-    </video>
-  </div>
-  <figcaption><strong>Bauhaus Face Animated Loop</strong></figcaption>
-</figure>
+      <script>
+      (() => {
+        const v = document.getElementById('bauhaus');
+        if (!v) return;
 
-<script>
-(() => {
-  const v = document.getElementById('bauhaus');
-  if (!v) return;
+        // Candidate filenames to try (MP4 preferred), with cache-bust
+        const q = 'v=7';
+        const candidates = [
+          './assets/12-Bauhaus-Face-Loop.mp4?' + q,         // mp4 (hyphens)
+          './assets/12%20Bauhaus-Face-Loop.mp4?' + q,       // mp4 (space encoded – just in case)
+          './assets/12-Bauhaus-Face-Loop.mov?' + q,         // mov (hyphens)
+          './assets/12%20Bauhaus-Face-Loop.mov?' + q        // mov (space encoded)
+        ];
 
-  // Candidate filenames to try (MP4 preferred), with cache-bust
-  const q = 'v=7';
-  const candidates = [
-    './assets/12-Bauhaus-Face-Loop.mp4?' + q,         // mp4 (hyphens)
-    './assets/12%20Bauhaus-Face-Loop.mp4?' + q,       // mp4 (space encoded – just in case)
-    './assets/12-Bauhaus-Face-Loop.mov?' + q,         // mov (hyphens)
-    './assets/12%20Bauhaus-Face-Loop.mov?' + q        // mov (space encoded)
-  ];
+        let i = 0;
 
-  let i = 0;
+        function tryNext() {
+          if (i >= candidates.length) { return; }
+          const url = candidates[i++];
+          v.src = url;
+          v.load();
+        }
 
-  // try next source on error
-  function tryNext() {
-    if (i >= candidates.length) { return; }
-    const url = candidates[i++];
-    // swap source cleanly
-    v.src = url;
-    v.load();
-  }
+        v.addEventListener('error', tryNext);
+        v.addEventListener('loadedmetadata', () => {
+          v.muted = true; // required for autoplay everywhere
+          v.play().catch(() => {});
+        }, { once: true });
 
-  v.addEventListener('error', tryNext);
-  v.addEventListener('loadedmetadata', () => {
-    v.muted = true; // required for autoplay everywhere
-    v.play().catch(() => {});
-  }, { once: true });
-
-  // kick off first attempt
-  tryNext();
-})();
-</script>
-
-<!-- next figure continues -->
+        tryNext();
+      })();
+      </script>
 
       <figure class="work fade" style="--delay:.41s"><div class="media"><img src="assets/13-SCC-Vig-Program.png" alt="SCC Vig Program" loading="lazy" /></div><figcaption><strong>Scottsdale Community College Alex Ketley Program Announcement</strong></figcaption></figure>
       <figure class="work fade" style="--delay:.44s"><div class="media"><img src="assets/14-Soft-Science-Album-Cover.png" alt="Soft Science — Album Cover" loading="lazy" /></div><figcaption><strong>Soft Science Album Cover</strong></figcaption></figure>
@@ -286,22 +388,35 @@
     </section>
 
     <!-- CONTACT: minimal form -->
-    <section class="contact-card" aria-label="Contact Chris">
+    <section class="contact-card" aria-label="Contact Chris" id="contact">
       <h2>Get in touch</h2>
+
       <form id="contactForm" class="contact-grid" autocomplete="on" novalidate>
+        <!-- Honeypot to reduce spam -->
         <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
+
         <label>Name
-          <input type="text" name="name" placeholder="Your name" required />
+          <input type="text" name="name" placeholder="Your name" required
+                 autocapitalize="words" autocomplete="name" />
         </label>
+
         <label>Subject
-          <input type="text" name="subject" placeholder="Subject" required />
+          <input type="text" name="subject" placeholder="Subject" required
+                 autocomplete="subject" />
         </label>
+
         <label>Message
-          <textarea name="message" placeholder="Say hello…" required minlength="5"></textarea>
+          <textarea name="message" placeholder="Say hello…" required minlength="5"
+                    autocomplete="off"></textarea>
         </label>
+
         <div class="contact-actions">
           <button class="btn" type="submit" id="sendBtn">Send message</button>
         </div>
+<div class="contact-foot">
+  <a class="back-top" href="#top" aria-label="Back to top">Back to top ↑</a>
+</div>
+
       </form>
     </section>
     <!-- /CONTACT -->
@@ -312,8 +427,57 @@
     </footer>
   </div>
 
+  <!-- CONTACT toast -->
   <div id="flash" class="flash" role="status" aria-live="polite"></div>
 
+  <!-- Lightbox overlay (homepage) -->
+  <div class="lb-overlay" id="lb">
+    <div class="lb-frame">
+      <button class="lb-close" id="lbClose" aria-label="Close">✕</button>
+      <img id="lbImg" alt="">
+      <div class="lb-cap" id="lbCap" aria-live="polite"></div>
+    </div>
+  </div>
+
+  <!-- Homepage lightbox script (opens figures marked data-lightbox) -->
+  <script>
+  (function(){
+    const overlay = document.getElementById('lb');
+    const img = document.getElementById('lbImg');
+    const cap = document.getElementById('lbCap');
+    const btn = document.getElementById('lbClose');
+
+    function openLB(src, caption, alt){
+      img.src = src; img.alt = alt || caption || '';
+      cap.textContent = caption || '';
+      overlay.classList.add('show');
+      document.body.style.overflow = 'hidden';
+      btn.focus();
+    }
+    function closeLB(){
+      overlay.classList.remove('show');
+      img.src = '';
+      document.body.style.overflow = '';
+    }
+
+    document.addEventListener('click', (e)=>{
+      const fig = e.target.closest('figure[data-lightbox]');
+      if(fig){
+        const displayImg = fig.querySelector('img');
+        const src = fig.dataset.full || (displayImg ? displayImg.getAttribute('src') : '');
+        const caption = fig.dataset.caption || fig.querySelector('figcaption')?.innerText || '';
+        const alt = displayImg?.alt || '';
+        if(src){ openLB(src, caption, alt); }
+      }
+    });
+
+    btn.addEventListener('click', closeLB);
+    overlay.addEventListener('click', (e)=>{ if(e.target === overlay) closeLB(); });
+    window.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeLB(); });
+  })();
+  </script>
+
+  <!-- Existing page script (unchanged) -->
   <script>
     document.getElementById('y').textContent = new Date().getFullYear();
     const revealEls=document.querySelectorAll('.fade');
