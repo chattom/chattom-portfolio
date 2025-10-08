@@ -521,6 +521,43 @@ html { scroll-behavior: smooth; }
         sendBtn.disabled = false; sendBtn.textContent = 'Send message';
       }
     });
+    (function robustAnchorScroll(){
+  if (location.hash !== '#contact') return;
+  const contactEl = document.getElementById('contact');
+  if (!contactEl) return;
+
+  const qTop = el => el.getBoundingClientRect().top + window.scrollY;
+  const limitY = qTop(contactEl);
+
+  const mediaAbove = Array.from(document.querySelectorAll('img, video'))
+    .filter(el => (el.offsetParent !== null) && qTop(el) < limitY);
+
+  const wait = el => {
+    if ((el.tagName === 'IMG' || el.tagName === 'VIDEO') && el.complete) return Promise.resolve();
+    return new Promise(res => {
+      const done = () => res();
+      el.addEventListener('load', done, { once:true });
+      el.addEventListener('error', done, { once:true });
+      if (el.tagName === 'VIDEO') {
+        el.addEventListener('loadedmetadata', done, { once:true });
+        el.addEventListener('loadeddata', done, { once:true });
+      }
+    });
+  };
+
+  const scrollNow = () => contactEl.scrollIntoView({ behavior:'smooth', block:'start' });
+
+  // initial nudge
+  scrollNow();
+
+  Promise.allSettled(mediaAbove.map(wait)).then(() => {
+    scrollNow();
+    setTimeout(scrollNow, 250);
+    setTimeout(scrollNow, 900);
+  });
+
+  window.addEventListener('load', () => setTimeout(scrollNow, 0));
+})();
   </script>
 </body>
 </html>
