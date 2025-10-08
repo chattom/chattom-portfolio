@@ -471,11 +471,22 @@
 
   // ---- Touch/mobile: disable lightbox entirely
   if (isTouchLike) {
-  // Do nothing: no listeners, no overlay usage. Taps just scroll the page.
-  // (We also ensure overlay is hidden in case it was left open somehow.)
+  // Prevent long-press saving and disable link behavior on mobile
+  items.forEach(a => {
+    const img = a.querySelector('img');
+    a.removeAttribute('href'); // disable the file href so no download/save prompt
+    if (img) {
+      // disable right-click / long-press saving
+      img.setAttribute('draggable', 'false');
+      img.setAttribute('oncontextmenu', 'return false');
+      img.setAttribute('onmousedown', 'return false');
+      img.style.pointerEvents = 'none';
+    }
+  });
   if (overlay) overlay.classList.remove('show');
   return;
 }
+
 
   // ---- Desktop lightbox ----
   function show(k){
