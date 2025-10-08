@@ -466,6 +466,22 @@
   let items = Array.from(grid.querySelectorAll('a.mason'));
   let i = -1;
 
+  // Detect mobile / tablet width
+  const isMobile = window.matchMedia("(max-width: 768px)").matches;
+
+  // If on mobile, disable lightbox behavior completely
+  if (isMobile) {
+    items.forEach(a => {
+      a.addEventListener('click', e => {
+        e.stopPropagation();
+        // Allow normal click-through (no preventDefault)
+      });
+    });
+    overlay.remove(); // Remove lightbox overlay entirely to save memory
+    return;
+  }
+
+  // --- Desktop lightbox only ---
   function show(k){
     i = (k + items.length) % items.length;
     const a = items[i];
@@ -498,14 +514,8 @@
     if(e.key === 'ArrowRight') next();
     if(e.key === 'ArrowLeft') prev();
   });
-
-  // Simple swipe support
-  let sx=0, sy=0, dx=0, dy=0;
-  overlay.addEventListener('touchstart', (e)=>{ const t=e.touches[0]; sx=t.clientX; sy=t.clientY; dx=dy=0; }, {passive:true});
-  overlay.addEventListener('touchmove',  (e)=>{ const t=e.touches[0]; dx=t.clientX-sx; dy=t.clientY-sy; }, {passive:true});
-  overlay.addEventListener('touchend',   ()=>{ if(Math.abs(dx)>40 && Math.abs(dx)>Math.abs(dy)){ dx<0 ? next() : prev(); } }, {passive:true});
 })();
-  <script>
+</script>
   // ...your existing JS above...
 
   // --- Ensure #contact is in view after images/lazy loads settle ---
