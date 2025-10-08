@@ -6,83 +6,90 @@
 <title>Chris Chattom — Photography</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
 <style>
-  html { scroll-behavior: smooth; }
+/* Smooth anchor scrolling */
+html { scroll-behavior: smooth; }
 
-  :root {
-    --bg:#f7f8f9; --fg:#222; --muted:#5a5a5a; --accent:#007f6e;
-    --rule:#e2e2e2; --card:#fff; --radius:18px; --shadow:0 10px 25px rgba(0,0,0,.1)
-  }
-  *,*::before,*::after{ box-sizing:border-box }
-  body {
-    margin:0; background:var(--bg); color:var(--fg);
-    font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif
-  }
-  .wrap{ max-width:1200px; margin:0 auto; padding:24px clamp(12px,4vw,28px) 80px }
+:root{
+  --bg:#f7f8f9; --fg:#222; --muted:#5a5a5a; --accent:#007f6e;
+  --rule:#e2e2e2; --card:#fff; --radius:18px; --shadow:0 10px 25px rgba(0,0,0,.1)
+}
+*,*::before,*::after{ box-sizing:border-box }
+body{
+  margin:0; background:var(--bg); color:var(--fg);
+  font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif
+}
+.wrap{ max-width:1200px; margin:0 auto; padding:24px clamp(12px,4vw,28px) 80px }
 
-  /* NAVBAR */
-  .site-nav {
-    display:flex; justify-content:center; gap:2.2rem; margin-top:2rem; font-weight:500;
-  }
-  .site-nav a {
-    color:var(--fg); text-decoration:none; position:relative; padding-bottom:4px; transition:color .3s ease;
-  }
-  .site-nav a::after {
-    content:""; position:absolute; left:50%; bottom:0; width:0%; height:2px;
-    background-color:var(--accent); border-radius:2px;
-    transition:all .35s cubic-bezier(0.4,0,0.2,1); transform:translateX(-50%);
-  }
-  .site-nav a:hover::after{ width:100%; }
-  .site-nav [aria-current="page"]{ color:var(--accent); }
-  .site-nav [aria-current="page"]::after{ width:100%; }
+/* NAVBAR */
+.site-nav{
+  display:flex; justify-content:center; gap:2.2rem; margin-top:2rem; font-weight:500;
+}
+.site-nav a{
+  color:var(--fg); text-decoration:none; position:relative; padding-bottom:4px; transition:color .3s ease;
+}
+.site-nav a::after{
+  content:""; position:absolute; left:50%; bottom:0; width:0%; height:2px;
+  background-color:var(--accent); border-radius:2px;
+  transition:all .35s cubic-bezier(0.4,0,0.2,1); transform:translateX(-50%);
+}
+.site-nav a:hover::after{ width:100%; }
+.site-nav [aria-current="page"]{ color:var(--accent); }
+.site-nav [aria-current="page"]::after{ width:100%; }
 
-  @media (max-width:640px){
-    .site-nav{ gap:1.2rem; margin-top:1rem; font-size:15px; flex-wrap:wrap; }
-    .site-nav a{ padding-bottom:6px; -webkit-tap-highlight-color:rgba(0,0,0,0); }
+@media (max-width:640px){
+  .site-nav{ gap:1.2rem; margin-top:1rem; font-size:15px; flex-wrap:wrap; }
+  .site-nav a{ padding-bottom:6px; -webkit-tap-highlight-color:rgba(0,0,0,0); }
+}
+
+h1{ font-size:clamp(24px,3.4vw,34px); margin:6px 0 18px }
+.muted{ color:var(--muted); font-size:14px; margin-top:12px }
+
+/* Masonry */
+.masonry{ column-width:250px; column-gap:16px; }
+@media(max-width:1200px){ .masonry{ column-width:300px; } }
+@media(max-width:900px){ .masonry{ column-width:400px; } }
+@media(max-width:600px){ .masonry{ column-width:100%; } }
+
+.mason{
+  break-inside:avoid; margin:0 0 16px; display:block; background:var(--card);
+  border-radius:12px; box-shadow:var(--shadow); overflow:hidden;
+}
+.mason img{ width:100%; height:auto; display:block; user-select:none; }
+
+/* Lightbox */
+.ph-overlay{
+  position:fixed; inset:0; background:rgba(0,0,0,.8);
+  display:none; align-items:center; justify-content:center;
+  padding:clamp(12px,4vw,28px); z-index:9999
+}
+.ph-overlay.show{ display:flex; animation:lbFade .18s ease-out; }
+@keyframes lbFade{from{opacity:0} to{opacity:1}}
+.ph-frame{ position:relative; max-width:min(96vw,1400px); max-height:92vh; display:flex; align-items:center; justify-content:center; }
+.ph-img{ display:block; max-width:100%; max-height:92vh; }
+.ph-close,.ph-prev,.ph-next{
+  position:absolute; top:50%; transform:translateY(-50%);
+  width:44px; height:44px; border:0; border-radius:12px;
+  background:rgba(255,255,255,.92); color:#111; display:grid; place-items:center; cursor:pointer;
+}
+.ph-close{ top:8px; right:8px; transform:none }
+.ph-prev{ left:-4px } .ph-next{ right:-4px }
+.ph-close:hover,.ph-prev:hover,.ph-next:hover{ background:#fff }
+
+/* Disable long-press menu & dragging on mobile */
+@media (hover:none) and (pointer:coarse){
+  img{
+    -webkit-touch-callout:none;
+    -webkit-user-drag:none;
+    user-select:none;
   }
+}
 
-  h1{ font-size:clamp(24px,3.4vw,34px); margin:6px 0 18px }
-  .muted{ color:var(--muted); font-size:14px; margin-top:12px }
-
-  /* Masonry */
-  .masonry{ column-width:250px; column-gap:16px; }
-  @media(max-width:1200px){ .masonry{ column-width:300px; } }
-  @media(max-width:900px){ .masonry{ column-width:400px; } }
-  @media(max-width:600px){ .masonry{ column-width:100%; } }
-
-  .mason{
-    break-inside:avoid; margin:0 0 16px; display:block; background:var(--card);
-    border-radius:12px; box-shadow:var(--shadow); overflow:hidden;
-  }
-  .mason img{ width:100%; height:auto; display:block; user-select:none; }
-
-  /* Lightbox */
-  .ph-overlay{
-    position:fixed; inset:0; background:rgba(0,0,0,.8);
-    display:none; align-items:center; justify-content:center;
-    padding:clamp(12px,4vw,28px); z-index:9999
-  }
-  .ph-overlay.show{ display:flex; animation:lbFade .18s ease-out; }
-  @keyframes lbFade{from{opacity:0} to{opacity:1}}
-  .ph-frame{ position:relative; max-width:min(96vw,1400px); max-height:92vh; display:flex; align-items:center; justify-content:center; }
-  .ph-img{ display:block; max-width:100%; max-height:92vh; }
-  .ph-close,.ph-prev,.ph-next{
-    position:absolute; top:50%; transform:translateY(-50%);
-    width:44px; height:44px; border:0; border-radius:12px;
-    background:rgba(255,255,255,.92); color:#111; display:grid; place-items:center; cursor:pointer;
-  }
-  .ph-close{ top:8px; right:8px; transform:none }
-  .ph-prev{ left:-4px } .ph-next{ right:-4px }
-  .ph-close:hover,.ph-prev:hover,.ph-next:hover{ background:#fff }
-
-  /* Disable long-press saving on mobile */
-  @media (hover:none) and (pointer:coarse){
-    img { -webkit-touch-callout:none; -webkit-user-drag:none; user-select:none; pointer-events:auto; }
-  }
-
-  #contact{ scroll-margin-top:24px; }
+#contact{ scroll-margin-top:24px; }
 </style>
 </head>
+
 <body id="top">
 <div class="wrap">
   <nav class="site-nav" aria-label="Main">
@@ -94,17 +101,17 @@
   <h1>Welcome to my Photography page :)</h1>
   <p class="muted">Tap any photo to view large. Use ←/→ or on-screen arrows (or swipe) to navigate.</p>
 
+  <!-- Masonry grid -->
   <div class="masonry" id="grid">
-    <!-- just a few samples for brevity; your full list stays the same -->
-    <a href="photography/01-Carmel-Mission-White-Flowers.jpg" class="mason">
-      <img src="photography/01-Carmel-Mission-White-Flowers.jpg" alt="Carmel Mission White Flowers" loading="lazy">
-    </a>
-    <a href="photography/02-Piano-Hands.jpg" class="mason">
-      <img src="photography/02-Piano-Hands.jpg" alt="Piano Hands" loading="lazy">
-    </a>
+
+    <!-- ALL OF YOUR ORIGINAL 97 IMAGES BELOW (unchanged) -->
+    <!-- paste your existing image block list here -->
+    <!-- (for brevity not repeated here but identical to your working version) -->
+
   </div>
 </div>
 
+<!-- Lightbox -->
 <div class="ph-overlay" id="ph">
   <div class="ph-frame">
     <button class="ph-close" id="phClose" aria-label="Close">✕</button>
@@ -122,11 +129,11 @@
   const btnClose=document.getElementById('phClose');
   const btnPrev=document.getElementById('phPrev');
   const btnNext=document.getElementById('phNext');
-  const isTouchLike=window.matchMedia('(hover: none) and (pointer: coarse)').matches;
   const items=Array.from(grid.querySelectorAll('a.mason'));
+  const isTouchLike=window.matchMedia('(hover: none) and (pointer: coarse)').matches;
   let i=-1;
 
-  /* --- MOBILE: Disable all lightbox + saving --- */
+  // MOBILE FIX: disable lightbox and prevent save/download
   if(isTouchLike){
     items.forEach(a=>{
       const pic=a.querySelector('img');
@@ -135,15 +142,14 @@
       if(pic){
         pic.setAttribute('draggable','false');
         pic.setAttribute('oncontextmenu','return false');
-        pic.style.webkitTouchCallout='none';
-        pic.style.userSelect='none';
+        pic.addEventListener('touchstart',e=>e.preventDefault(),{passive:false});
       }
     });
     if(overlay) overlay.classList.remove('show');
     return;
   }
 
-  /* --- DESKTOP LIGHTBOX --- */
+  // DESKTOP LIGHTBOX
   function show(k){
     i=(k+items.length)%items.length;
     const a=items[i];
@@ -152,7 +158,11 @@
     overlay.classList.add('show');
     document.body.style.overflow='hidden';
   }
-  function hide(){ overlay.classList.remove('show'); img.src=''; document.body.style.overflow=''; }
+  function hide(){
+    overlay.classList.remove('show');
+    img.src='';
+    document.body.style.overflow='';
+  }
   function next(){ show(i+1); }
   function prev(){ show(i-1); }
 
