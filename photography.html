@@ -456,32 +456,28 @@
 
 <script>
 (function(){
-  const grid = document.getElementById('grid');
-  const overlay = document.getElementById('ph');
-  const img = document.getElementById('phImg');
+  const grid     = document.getElementById('grid');
+  const overlay  = document.getElementById('ph');
+  const img      = document.getElementById('phImg');
   const btnClose = document.getElementById('phClose');
-  const btnPrev = document.getElementById('phPrev');
-  const btnNext = document.getElementById('phNext');
+  const btnPrev  = document.getElementById('phPrev');
+  const btnNext  = document.getElementById('phNext');
 
-  let items = Array.from(grid.querySelectorAll('a.mason'));
+  // Use input capability, not width, to decide behavior
+  const isTouchLike = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+
+  const items = Array.from(grid.querySelectorAll('a.mason'));
   let i = -1;
 
-  // Detect mobile / tablet width
-  const isMobile = window.matchMedia("(max-width: 768px)").matches;
-
-  // If on mobile, disable lightbox behavior completely
-  if (isMobile) {
-    items.forEach(a => {
-      a.addEventListener('click', e => {
-        e.stopPropagation();
-        // Allow normal click-through (no preventDefault)
-      });
-    });
-    overlay.remove(); // Remove lightbox overlay entirely to save memory
+  // ---- Touch/mobile: disable lightbox entirely
+  if (isTouchLike) {
+    // Do nothing: no listeners, no overlay usage. Taps just scroll the page.
+    // (We also ensure overlay is hidden in case it was left open somehow.)
+    if (overlay) overlay.classList.remove('show');
     return;
   }
 
-  // --- Desktop lightbox only ---
+  // ---- Desktop lightbox ----
   function show(k){
     i = (k + items.length) % items.length;
     const a = items[i];
@@ -495,24 +491,31 @@
     img.src = '';
     document.body.style.overflow = '';
   }
-  function next(){ show(i+1) }
-  function prev(){ show(i-1) }
+  function next(){ show(i+1); }
+  function prev(){ show(i-1); }
 
+  // Open on click
   grid.addEventListener('click', (e)=>{
     const a = e.target.closest('a.mason');
-    if(!a) return;
+    if (!a) return;
     e.preventDefault();
     show(items.indexOf(a));
   });
+
+  // Controls
   btnClose.addEventListener('click', hide);
-  btnNext.addEventListener('click', next);
-  btnPrev.addEventListener('click', prev);
-  overlay.addEventListener('click', (e)=>{ if(e.target === overlay) hide(); });
+  btnNext .addEventListener('click', next);
+  btnPrev .addEventListener('click', prev);
+
+  // Click outside to close
+  overlay.addEventListener('click', (e)=>{ if (e.target === overlay) hide(); });
+
+  // Keyboard
   window.addEventListener('keydown', (e)=>{
-    if(!overlay.classList.contains('show')) return;
-    if(e.key === 'Escape') hide();
-    if(e.key === 'ArrowRight') next();
-    if(e.key === 'ArrowLeft') prev();
+    if (!overlay.classList.contains('show')) return;
+    if (e.key === 'Escape')     hide();
+    if (e.key === 'ArrowRight') next();
+    if (e.key === 'ArrowLeft')  prev();
   });
 })();
 </script>
