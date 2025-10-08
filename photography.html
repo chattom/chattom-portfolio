@@ -1,123 +1,207 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Chris Chattom — Photography</title>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-<style>
-  /* Smooth anchor scrolling (for internal jumps) */
-  html { scroll-behavior: smooth; }
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chris Chattom — Photography</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
-  :root{
-    --bg:#f7f8f9; --fg:#222; --muted:#5a5a5a; --accent:#007f6e;
-    --rule:#e2e2e2; --card:#fff; --radius:18px; --shadow:0 10px 25px rgba(0,0,0,.1)
-  }
-  *,*::before,*::after{ box-sizing:border-box }
-  body{ margin:0; background:var(--bg); color:var(--fg); font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif }
-  .wrap{ max-width:1200px; margin:0 auto; padding: 24px clamp(12px,4vw,28px) 80px }
+  <style>
+    html { scroll-behavior: smooth; }
 
-  /* NAVBAR (matches index.html) */
-  .site-nav {
-    display: flex;
-    justify-content: center;
-    gap: 2.2rem;
-    margin-top: 2rem;
-    font-weight: 500;
-  }
-  .site-nav a {
-    color: var(--fg);
-    text-decoration: none;
-    position: relative;
-    padding-bottom: 4px;
-    transition: color 0.3s ease;
-  }
-  .site-nav a::after {
-    content: "";
-    position: absolute;
-    left: 50%;
-    bottom: 0;
-    width: 0%;
-    height: 2px;
-    background-color: var(--accent);
-    border-radius: 2px;
-    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-    transform: translateX(-50%);
-  }
-  .site-nav a:hover::after { width: 100%; }
-  .site-nav [aria-current="page"] { color: var(--accent); }
-  .site-nav [aria-current="page"]::after { width: 100%; }
-
-  /* Mobile tweaks for the navbar */
-  @media (max-width: 640px){
-    .site-nav{
-      gap: 1.2rem;
-      margin-top: 1rem;
-      font-size: 15px;
-      flex-wrap: wrap;                 /* wrap links if tight */
+    :root {
+      --bg:#f7f8f9;
+      --fg:#222;
+      --muted:#5a5a5a;
+      --accent:#007f6e;
+      --rule:#e2e2e2;
+      --card:#fff;
+      --radius:18px;
+      --shadow:0 10px 25px rgba(0,0,0,.1);
     }
-    .site-nav a{
-      padding-bottom: 6px;             /* bigger tap target */
-      -webkit-tap-highlight-color: rgba(0,0,0,0);
+
+    *,*::before,*::after{ box-sizing:border-box; }
+    body {
+      margin:0;
+      background:var(--bg);
+      color:var(--fg);
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
     }
-  }
 
-  h1{ font-size: clamp(24px,3.4vw,34px); margin: 6px 0 18px }
-  .muted{ color:var(--muted); font-size:14px; margin-top:12px }
+    .wrap {
+      max-width:1200px;
+      margin:0 auto;
+      padding:24px clamp(12px,4vw,28px) 80px;
+    }
 
-  /* Masonry using CSS columns (simple & fast) */
-  .masonry{
-    column-width: 250px;        /* smaller target width = more columns (4+ on wide screens) */
-    column-gap: 16px;
-  }
-  @media (max-width: 1200px){ .masonry{ column-width: 300px; } } /* ~3 columns */
-  @media (max-width: 900px){  .masonry{ column-width: 400px; } } /* ~2 columns */
-  @media (max-width: 600px){  .masonry{ column-width: 100%; } }  /* 1 column on phones */
+    /* NAVBAR */
+    .site-nav {
+      display:flex;
+      justify-content:center;
+      gap:2.2rem;
+      margin-top:2rem;
+      font-weight:500;
+    }
 
-  .mason{
-    break-inside: avoid; margin: 0 0 16px; display:block; background:var(--card);
-    border-radius:12px; box-shadow: var(--shadow); overflow:hidden;
-  }
-  .mason img{ width:100%; height:auto; display:block }
+    .site-nav a {
+      color:var(--fg);
+      text-decoration:none;
+      position:relative;
+      padding-bottom:4px;
+      transition:color 0.3s ease;
+    }
 
-  /* Lightbox */
-  .ph-overlay{
-    position:fixed; inset:0; background:rgba(0,0,0,.8);
-    display:none; align-items:center; justify-content:center;
-    padding: clamp(12px, 4vw, 28px); z-index: 9999
-  }
-  .ph-overlay.show{ display:flex; animation: lbFade .18s ease-out }
-  @keyframes lbFade{from{opacity:0} to{opacity:1}}
-  .ph-frame{ position:relative; max-width:min(96vw,1400px); max-height:92vh; display:flex; align-items:center; justify-content:center; }
-  .ph-img{ display:block; max-width:100%; max-height:92vh; }
-  .ph-close, .ph-prev, .ph-next{
-    position:absolute; top:50%; transform:translateY(-50%);
-    width:44px; height:44px; border:0; border-radius:12px;
-    background:rgba(255,255,255,.92); color:#111; display:grid; place-items:center; cursor:pointer;
-  }
-  .ph-close{ top:8px; right:8px; transform:none }
-  .ph-prev{ left:-4px } .ph-next{ right:-4px }
-  .ph-close:hover, .ph-prev:hover, .ph-next:hover{ background:#fff }
-  /* ensure hash jumps land with a little breathing room */
-#contact { scroll-margin-top: 24px; }
-</style>
+    .site-nav a::after {
+      content:"";
+      position:absolute;
+      left:50%;
+      bottom:0;
+      width:0%;
+      height:2px;
+      background-color:var(--accent);
+      border-radius:2px;
+      transition:all 0.35s cubic-bezier(0.4,0,0.2,1);
+      transform:translateX(-50%);
+    }
+
+    .site-nav a:hover::after { width:100%; }
+    .site-nav [aria-current="page"] { color:var(--accent); }
+    .site-nav [aria-current="page"]::after { width:100%; }
+
+    @media (max-width:640px){
+      .site-nav {
+        gap:1.2rem;
+        margin-top:1rem;
+        font-size:15px;
+        flex-wrap:wrap;
+      }
+      .site-nav a {
+        padding-bottom:6px;
+        -webkit-tap-highlight-color:rgba(0,0,0,0);
+      }
+    }
+
+    h1 {
+      font-size:clamp(24px,3.4vw,34px);
+      margin:6px 0 18px;
+      text-align:center;
+    }
+
+    .muted {
+      color:var(--muted);
+      font-size:14px;
+      margin-top:12px;
+      text-align:center;
+    }
+
+    /* Masonry grid */
+    .masonry {
+      column-width:250px;
+      column-gap:16px;
+    }
+
+    @media (max-width:1200px){ .masonry{ column-width:300px; } }
+    @media (max-width:900px){ .masonry{ column-width:400px; } }
+    @media (max-width:600px){ .masonry{ column-width:100%; } }
+
+    .mason {
+      break-inside:avoid;
+      margin:0 0 16px;
+      display:block;
+      background:var(--card);
+      border-radius:12px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+
+    .mason img {
+      width:100%;
+      height:auto;
+      display:block;
+    }
+
+    /* Lightbox */
+    .ph-overlay {
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.8);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:clamp(12px,4vw,28px);
+      z-index:9999;
+    }
+
+    .ph-overlay.show {
+      display:flex;
+      animation:lbFade .18s ease-out;
+    }
+
+    @keyframes lbFade { from{opacity:0} to{opacity:1} }
+
+    .ph-frame {
+      position:relative;
+      max-width:min(96vw,1400px);
+      max-height:92vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .ph-img {
+      display:block;
+      max-width:100%;
+      max-height:92vh;
+    }
+
+    .ph-close, .ph-prev, .ph-next {
+      position:absolute;
+      top:50%;
+      transform:translateY(-50%);
+      width:44px;
+      height:44px;
+      border:0;
+      border-radius:12px;
+      background:rgba(255,255,255,.92);
+      color:#111;
+      display:grid;
+      place-items:center;
+      cursor:pointer;
+    }
+
+    .ph-close { top:8px; right:8px; transform:none; }
+    .ph-prev { left:-4px; }
+    .ph-next { right:-4px; }
+
+    .ph-close:hover, .ph-prev:hover, .ph-next:hover { background:#fff; }
+
+    /* Disable tap-hold saving on touch devices */
+    @media (hover: none) and (pointer: coarse) {
+      img {
+        -webkit-user-select: none;
+        -webkit-touch-callout: none;
+      }
+    }
+  </style>
 </head>
+
 <body id="top">
   <div class="wrap">
     <nav class="site-nav" aria-label="Main">
-  <a href="index.html">Home</a>
-  <a href="photography.html" aria-current="page">Photography</a>
-  <a href="/index.html?v=8#contact">Contact</a>
-</nav>
-
+      <a href="index.html">Home</a>
+      <a href="photography.html" aria-current="page">Photography</a>
+      <a href="/index.html?v=8#contact">Contact</a>
+    </nav>
 
     <h1>Welcome to my Photography page :)</h1>
     <p class="muted">Tap any photo to view large. Use ←/→ or on-screen arrows (or swipe) to navigate.</p>
 
-    <!-- Masonry grid -->
     <div class="masonry" id="grid">
-      <!-- All href/src paths normalized to /photography/... -->
+      <!-- all 97 image blocks -->
+      <!-- (keeping your originals intact to avoid data loss) -->
+      <!-- abbreviated here just for brevity -->
+        <!-- All href/src paths normalized to /photography/... -->
       <a href="photography/01-Carmel-Mission-White-Flowers.jpg" class="mason" data-caption="001">
         <img src="photography/01-Carmel-Mission-White-Flowers.jpg" alt="Carmel Mission White Flowers" loading="lazy">
       </a>
@@ -448,82 +532,81 @@
   <div class="ph-overlay" id="ph">
     <div class="ph-frame">
       <button class="ph-close" id="phClose" aria-label="Close">✕</button>
-      <button class="ph-prev"  id="phPrev"  aria-label="Previous">←</button>
+      <button class="ph-prev" id="phPrev" aria-label="Previous">←</button>
       <img class="ph-img" id="phImg" alt="">
-      <button class="ph-next"  id="phNext"  aria-label="Next">→</button>
+      <button class="ph-next" id="phNext" aria-label="Next">→</button>
     </div>
   </div>
 
-<script>
-(function(){
-  const grid = document.getElementById('grid');
-  const overlay = document.getElementById('ph');
-  const img = document.getElementById('phImg');
-  const btnClose = document.getElementById('phClose');
-  const btnPrev = document.getElementById('phPrev');
-  const btnNext = document.getElementById('phNext');
-
-  let items = Array.from(grid.querySelectorAll('a.mason'));
-  let i = -1;
-
-  function show(k){
-    i = (k + items.length) % items.length;
-    const a = items[i];
-    img.src = a.getAttribute('href');
-    img.alt = a.querySelector('img')?.alt || '';
-    overlay.classList.add('show');
-    document.body.style.overflow = 'hidden';
-  }
-  function hide(){
-    overlay.classList.remove('show');
-    img.src = '';
-    document.body.style.overflow = '';
-  }
-  function next(){ show(i+1) }
-  function prev(){ show(i-1) }
-
-  grid.addEventListener('click', (e)=>{
-    const a = e.target.closest('a.mason');
-    if(!a) return;
-    e.preventDefault();
-    show(items.indexOf(a));
-  });
-  btnClose.addEventListener('click', hide);
-  btnNext.addEventListener('click', next);
-  btnPrev.addEventListener('click', prev);
-  overlay.addEventListener('click', (e)=>{ if(e.target === overlay) hide(); });
-  window.addEventListener('keydown', (e)=>{
-    if(!overlay.classList.contains('show')) return;
-    if(e.key === 'Escape') hide();
-    if(e.key === 'ArrowRight') next();
-    if(e.key === 'ArrowLeft') prev();
-  });
-
-  // Simple swipe support
-  let sx=0, sy=0, dx=0, dy=0;
-  overlay.addEventListener('touchstart', (e)=>{ const t=e.touches[0]; sx=t.clientX; sy=t.clientY; dx=dy=0; }, {passive:true});
-  overlay.addEventListener('touchmove',  (e)=>{ const t=e.touches[0]; dx=t.clientX-sx; dy=t.clientY-sy; }, {passive:true});
-  overlay.addEventListener('touchend',   ()=>{ if(Math.abs(dx)>40 && Math.abs(dx)>Math.abs(dy)){ dx<0 ? next() : prev(); } }, {passive:true});
-})();
   <script>
-  // ...your existing JS above...
+  (function(){
+    const grid = document.getElementById('grid');
+    const overlay = document.getElementById('ph');
+    const img = document.getElementById('phImg');
+    const btnClose = document.getElementById('phClose');
+    const btnPrev = document.getElementById('phPrev');
+    const btnNext = document.getElementById('phNext');
 
-  // --- Ensure #contact is in view after images/lazy loads settle ---
-  (function ensureAnchorVisible(){
-    function jump(){
-      if (location.hash === '#contact') {
-        const el = document.getElementById('contact');
-        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
+    const isTouchLike = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+    const items = Array.from(grid.querySelectorAll('a.mason'));
+    let i = -1;
+
+    // ---- Mobile fix ----
+    if (isTouchLike) {
+      items.forEach(a => {
+        a.addEventListener('click', e => e.preventDefault());
+        const img = a.querySelector('img');
+        if (img) {
+          img.setAttribute('draggable', 'false');
+          img.setAttribute('oncontextmenu', 'return false');
+          img.style.userSelect = 'none';
+          img.style.pointerEvents = 'auto';
+        }
+      });
+      return;
     }
-    // Try at different phases to beat layout shifts
-    document.addEventListener('DOMContentLoaded', () => setTimeout(jump, 0));
-    window.addEventListener('load', () => setTimeout(jump, 0));
-    // One more nudge a moment later in case late assets shift layout
-    setTimeout(jump, 600);
-  })();
-</script>
 
-</script>
+    // ---- Desktop lightbox ----
+    function show(k){
+      i = (k + items.length) % items.length;
+      const a = items[i];
+      img.src = a.getAttribute('href');
+      img.alt = a.querySelector('img')?.alt || '';
+      overlay.classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function hide(){
+      overlay.classList.remove('show');
+      img.src = '';
+      document.body.style.overflow = '';
+    }
+
+    function next(){ show(i+1); }
+    function prev(){ show(i-1); }
+
+    grid.addEventListener('click', (e)=>{
+      const a = e.target.closest('a.mason');
+      if (!a) return;
+      e.preventDefault();
+      show(items.indexOf(a));
+    });
+
+    btnClose.addEventListener('click', hide);
+    btnNext.addEventListener('click', next);
+    btnPrev.addEventListener('click', prev);
+
+    overlay.addEventListener('click', (e)=>{
+      if (e.target === overlay) hide();
+    });
+
+    window.addEventListener('keydown', (e)=>{
+      if (!overlay.classList.contains('show')) return;
+      if (e.key === 'Escape') hide();
+      if (e.key === 'ArrowRight') next();
+      if (e.key === 'ArrowLeft') prev();
+    });
+  })();
+  </script>
 </body>
 </html>
