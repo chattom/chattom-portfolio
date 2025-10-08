@@ -471,11 +471,11 @@
 
   // ---- Touch/mobile: disable lightbox entirely
   if (isTouchLike) {
-    // Do nothing: no listeners, no overlay usage. Taps just scroll the page.
-    // (We also ensure overlay is hidden in case it was left open somehow.)
-    if (overlay) overlay.classList.remove('show');
-    return;
-  }
+  // Do nothing: no listeners, no overlay usage. Taps just scroll the page.
+  // (We also ensure overlay is hidden in case it was left open somehow.)
+  if (overlay) overlay.classList.remove('show');
+  return;
+}
 
   // ---- Desktop lightbox ----
   function show(k){
