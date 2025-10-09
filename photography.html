@@ -154,6 +154,19 @@
       max-width:100%;
       max-height:92vh;
     }
+    /* make tiles feel clickable */
+.mason { cursor: zoom-in; }
+
+/* reduce drag/save on thumbs and the lightbox image */
+.mason img,
+.ph-img {
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+/* in the lightbox, ignore pointer events on the image itself
+   (prevents drag-to-desktop in Safari) */
+.ph-img { pointer-events: none; }
 
     .ph-close, .ph-prev, .ph-next {
       position:absolute;
@@ -575,6 +588,10 @@
     const grid = document.getElementById('grid');
     const overlay = document.getElementById('ph');
     const img = document.getElementById('phImg');
+    // prevent saving the lightbox image via drag/right-click
+img.setAttribute('draggable', 'false');
+img.addEventListener('dragstart',  e => e.preventDefault());
+img.addEventListener('contextmenu', e => e.preventDefault());
     const btnClose = document.getElementById('phClose');
     const btnPrev = document.getElementById('phPrev');
     const btnNext = document.getElementById('phNext');
