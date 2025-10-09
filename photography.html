@@ -641,13 +641,14 @@ items.forEach(a => {
 
     // ---- Desktop lightbox ----
     function show(k){
-      i = (k + items.length) % items.length;
-      const a = items[i];
-      img.src = a.dataset.full;
-      img.alt = a.querySelector('img')?.alt || '';
-      overlay.classList.add('show');
-      document.body.style.overflow = 'hidden';
-    }
+  i = (k + items.length) % items.length;
+  const a = items[i];
+  const full = a.dataset.full;
+  img.style.backgroundImage = `url("${full}")`;
+  img.setAttribute('aria-hidden', 'false');
+  overlay.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
 
     function hide(){
       overlay.classList.remove('show');
