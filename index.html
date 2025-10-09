@@ -257,6 +257,17 @@ html { scroll-behavior: smooth; }
   scroll-margin-top: 24px;
   margin-bottom: 28vh;   /* gives enough space to scroll the whole form into view */
 }
+    /* Deterrents: reduce long-press/drag/context-menu on images */
+img, picture, figure {
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none; /* iOS long-press menu */
+  user-select: none;
+}
+
+/* Keep links clickable on desktop while still deterring saves */
+.mason img {
+  pointer-events: auto; /* keep lightbox clicks working on desktop */
+}
   </style>
 </head>
 <body id="top">
