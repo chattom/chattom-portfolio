@@ -561,5 +561,18 @@ html { scroll-behavior: smooth; }
   window.addEventListener('load', () => setTimeout(scrollNow, 0));
 })();
   </script>
+  <script>
+(function ensureAnchorVisible(){
+  function jump(){
+    if (location.hash === '#contact') {
+      const el = document.getElementById('contact');
+      if (el) el.scrollIntoView({ behavior: 'instant', block: 'start' });
+    }
+  }
+  document.addEventListener('DOMContentLoaded', () => setTimeout(jump, 0));
+  window.addEventListener('load', () => setTimeout(jump, 0));
+  setTimeout(jump, 500);
+})();
+</script>
 </body>
 </html>
