@@ -651,10 +651,11 @@ items.forEach(a => {
 }
 
     function hide(){
-      overlay.classList.remove('show');
-      img.src = '';
-      document.body.style.overflow = '';
-    }
+  overlay.classList.remove('show');
+  img.style.backgroundImage = '';
+  img.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+}
 
     function next(){ show(i+1); }
     function prev(){ show(i-1); }
