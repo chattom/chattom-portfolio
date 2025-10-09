@@ -183,6 +183,37 @@
         -webkit-touch-callout: none;
       }
     }
+    /* Floating Back To Top */
+.back-to-top {
+  position: fixed;
+  right: clamp(12px, 3vw, 22px);
+  bottom: clamp(12px, 3vw, 22px);
+  z-index: 10000;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: #111;          /* black as requested */
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  box-shadow: 0 10px 25px rgba(0,0,0,.22);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(8px);
+  transition: opacity .25s ease, transform .25s ease;
+}
+.back-to-top.show {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+.back-to-top:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+
   </style>
 </head>
 
