@@ -583,6 +583,25 @@
     const items = Array.from(grid.querySelectorAll('a.mason'));
     let i = -1;
 
+    // --- Remove real hrefs to prevent drag-download; keep value in data-full ---
+items.forEach(a => {
+  const full = a.getAttribute('href');
+  if (full) {
+    a.dataset.full = full;        // remember the real file path
+    a.removeAttribute('href');    // remove the direct link so it can't be dragged/saved
+  }
+  a.setAttribute('role','button');
+  a.setAttribute('tabindex','0');
+
+  // stop any drag gesture on the tile or its image
+  a.addEventListener('dragstart', e => e.preventDefault(), {capture:true});
+  const im = a.querySelector('img');
+  if (im) {
+    im.draggable = false;
+    im.addEventListener('dragstart', e => e.preventDefault(), {capture:true});
+  }
+});
+    
     // ---- Mobile fix ----
     if (isTouchLike) {
       items.forEach(a => {
@@ -602,7 +621,7 @@
     function show(k){
       i = (k + items.length) % items.length;
       const a = items[i];
-      img.src = a.getAttribute('href');
+      img.src = a.dataset.full;
       img.alt = a.querySelector('img')?.alt || '';
       overlay.classList.add('show');
       document.body.style.overflow = 'hidden';
