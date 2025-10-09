@@ -156,6 +156,10 @@
     }
     /* make tiles feel clickable */
 .mason { cursor: zoom-in; }
+    /* make tiles feel clickable everywhere (including over the <img>) */
+.mason,
+.mason * { cursor: pointer; }   /* or use cursor: pointer; if you prefer the hand */
+
 
 /* reduce drag/save on thumbs and the lightbox image */
 .mason img,
@@ -578,7 +582,7 @@
     <div class="ph-frame">
       <button class="ph-close" id="phClose" aria-label="Close">✕</button>
       <button class="ph-prev" id="phPrev" aria-label="Previous">←</button>
-      <img class="ph-img" id="phImg" alt="">
+      <div class="ph-img" id="phImg" aria-hidden="true"></div>
       <button class="ph-next" id="phNext" aria-label="Next">→</button>
     </div>
   </div>
