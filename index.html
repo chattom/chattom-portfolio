@@ -526,43 +526,49 @@ img, picture, figure {
     </div>
   </div>
 
-  <!-- Homepage lightbox script (opens figures marked data-lightbox) -->
-  <script>
-  (function(){
-    const overlay = document.getElementById('lb');
-    const img = document.getElementById('lbImg');
-    const cap = document.getElementById('lbCap');
-    const btn = document.getElementById('lbClose');
+  <!-- Homepage lightbox script (desktop only) -->
+<script>
+(function(){
+  const overlay = document.getElementById('lb');
+  const img = document.getElementById('lbImg');
+  const cap = document.getElementById('lbCap');
+  const btn = document.getElementById('lbClose');
 
-    function openLB(src, caption, alt){
-      img.src = src; img.alt = alt || caption || '';
-      cap.textContent = caption || '';
-      overlay.classList.add('show');
-      document.body.style.overflow = 'hidden';
-      btn.focus();
+  function openLB(src, caption, alt){
+    img.src = src; 
+    img.alt = alt || caption || '';
+    cap.textContent = caption || '';
+    overlay.classList.add('show');
+    document.body.style.overflow = 'hidden';
+    btn.focus();
+  }
+
+  function closeLB(){
+    overlay.classList.remove('show');
+    img.src = '';
+    document.body.style.overflow = '';
+  }
+
+  // ✅ Only enable lightbox on devices with hover + fine pointer (desktop)
+  const allowLightbox = matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+  document.addEventListener('click', (e)=>{
+    if (!allowLightbox) return; // disables lightbox on phones/tablets
+    const fig = e.target.closest('figure[data-lightbox]');
+    if(fig){
+      const displayImg = fig.querySelector('img');
+      const src = fig.dataset.full || (displayImg ? displayImg.getAttribute('src') : '');
+      const caption = fig.dataset.caption || fig.querySelector('figcaption')?.innerText || '';
+      const alt = displayImg?.alt || '';
+      if(src){ openLB(src, caption, alt); }
     }
-    function closeLB(){
-      overlay.classList.remove('show');
-      img.src = '';
-      document.body.style.overflow = '';
-    }
+  });
 
-    document.addEventListener('click', (e)=>{
-      const fig = e.target.closest('figure[data-lightbox]');
-      if(fig){
-        const displayImg = fig.querySelector('img');
-        const src = fig.dataset.full || (displayImg ? displayImg.getAttribute('src') : '');
-        const caption = fig.dataset.caption || fig.querySelector('figcaption')?.innerText || '';
-        const alt = displayImg?.alt || '';
-        if(src){ openLB(src, caption, alt); }
-      }
-    });
-
-    btn.addEventListener('click', closeLB);
-    overlay.addEventListener('click', (e)=>{ if(e.target === overlay) closeLB(); });
-    window.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeLB(); });
-  })();
-  </script>
+  btn.addEventListener('click', closeLB);
+  overlay.addEventListener('click', (e)=>{ if(e.target === overlay) closeLB(); });
+  window.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeLB(); });
+})();
+</script>
 
   <!-- Existing page script (unchanged) -->
   <script>
