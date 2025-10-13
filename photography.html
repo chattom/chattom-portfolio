@@ -609,49 +609,6 @@
   document.querySelectorAll('img').forEach(img => img.setAttribute('draggable', 'false'));
 })();
 </script>
-<!-- Step 2: Safe lightbox handling -->
-<script>
-(function(){
-  const overlay = document.getElementById('ph');
-  const img = document.getElementById('phImg');
-  const btnClose = document.getElementById('phClose');
-  const btnPrev = document.getElementById('phPrev');
-  const btnNext = document.getElementById('phNext');
-
-  // Helper functions
-  function openLB(src){
-    img.style.backgroundImage = `url("${src}")`;
-    overlay.classList.add('show');
-    document.body.style.overflow = 'hidden';
-    btnClose.focus();
-  }
-
-  function closeLB(){
-    overlay.classList.remove('show');
-    img.style.backgroundImage = '';
-    document.body.style.overflow = '';
-  }
-
-  // Click to open
-  document.addEventListener('click', e=>{
-    const tile = e.target.closest('a.mason');
-    if(tile){
-      e.preventDefault();
-      const full = tile.dataset.full || tile.querySelector('img')?.src;
-      if(full) openLB(full);
-    }
-  });
-
-  // Controls
-  btnClose.addEventListener('click', closeLB);
-  overlay.addEventListener('click', e=>{ if(e.target === overlay) closeLB(); });
-  window.addEventListener('keydown', e=>{
-    if(e.key === 'Escape') closeLB();
-  });
-})();
-</script>
-
-
   <script>
   (function(){
     const grid = document.getElementById('grid');
