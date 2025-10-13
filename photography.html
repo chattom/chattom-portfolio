@@ -231,7 +231,12 @@
   outline: 3px solid var(--accent);
   outline-offset: 3px;
 }
-
+ /* Step 3: smoother touch scrolling on phones/tablets */
+  @media (hover: none) and (pointer: coarse) {
+    img, picture {
+      pointer-events: none; /* lets touches scroll instead of selecting the image */
+    }
+  }
   </style>
 </head>
 
@@ -587,6 +592,65 @@
       <button class="ph-next" id="phNext" aria-label="Next">→</button>
     </div>
   </div>
+  <!-- Step 1: Touch-safe no-save deterrents -->
+<script>
+(function () {
+  // Block right-click / long-press menu on images and the lightbox surface
+  document.addEventListener('contextmenu', e => {
+    if (e.target.closest('img, picture, figure, .ph-img')) e.preventDefault();
+  }, { capture: true });
+
+  // Stop native drag-start on images
+  document.addEventListener('dragstart', e => {
+    if (e.target.closest('img, picture, figure, .ph-img')) e.preventDefault();
+  }, { capture: true });
+
+  // Make all <img> non-draggable
+  document.querySelectorAll('img').forEach(img => img.setAttribute('draggable', 'false'));
+})();
+</script>
+<!-- Step 2: Safe lightbox handling -->
+<script>
+(function(){
+  const overlay = document.getElementById('ph');
+  const img = document.getElementById('phImg');
+  const btnClose = document.getElementById('phClose');
+  const btnPrev = document.getElementById('phPrev');
+  const btnNext = document.getElementById('phNext');
+
+  // Helper functions
+  function openLB(src){
+    img.style.backgroundImage = `url("${src}")`;
+    overlay.classList.add('show');
+    document.body.style.overflow = 'hidden';
+    btnClose.focus();
+  }
+
+  function closeLB(){
+    overlay.classList.remove('show');
+    img.style.backgroundImage = '';
+    document.body.style.overflow = '';
+  }
+
+  // Click to open
+  document.addEventListener('click', e=>{
+    const tile = e.target.closest('a.mason');
+    if(tile){
+      e.preventDefault();
+      const full = tile.dataset.full || tile.querySelector('img')?.src;
+      if(full) openLB(full);
+    }
+  });
+
+  // Controls
+  btnClose.addEventListener('click', closeLB);
+  overlay.addEventListener('click', e=>{ if(e.target === overlay) closeLB(); });
+  window.addEventListener('keydown', e=>{
+    if(e.key === 'Escape') closeLB();
+  });
+})();
+</script>
+
 
   <script>
   (function(){
@@ -633,8 +697,7 @@ items.forEach(a => {
           img.setAttribute('draggable', 'false');
           img.setAttribute('oncontextmenu', 'return false');
           img.style.userSelect = 'none';
-          img.style.pointerEvents = 'auto';
-        }
+          }
       });
       return;
     }
