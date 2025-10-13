@@ -269,14 +269,23 @@ img, picture, figure {
   pointer-events: auto; /* keep lightbox clicks working on desktop */
 }
     /* --- Mini slider (auto-fade) --- */
+/* --- Mini slider (stabilized, prevents jump) --- */
 .media.slider { position: relative; overflow: hidden; }
-.media.slider img{
-  position: absolute; inset: 0;
-  width: 100%; height: auto;
-  opacity: 0; transition: opacity 800ms ease;
-  object-fit: contain;           /* keeps your current look */
+
+.media.slider img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0;
+  transition: opacity 800ms ease;
 }
-.media.slider img.active{ opacity: 1; position: relative; }  /* active slide defines height */
+
+/* Active image simply fades in — no reflow */
+.media.slider img.active {
+  opacity: 1;
+}
 
 /* Dots (optional) */
 .slider-dots{
@@ -735,6 +744,13 @@ img, picture, figure {
 
     // init
     imgs[0].classList.add('active');
+    // Maintain container height based on first image ratio
+const slider = s.querySelector('.media.slider');
+if (slider && imgs[0].naturalWidth && imgs[0].naturalHeight) {
+  const ratio = imgs[0].naturalHeight / imgs[0].naturalWidth;
+  slider.style.aspectRatio = `${imgs[0].naturalWidth}/${imgs[0].naturalHeight}`;
+  slider.style.minHeight = `${slider.offsetWidth * ratio}px`;
+}
 
     slider.addEventListener('mouseenter', stop);
     slider.addEventListener('mouseleave', start);
