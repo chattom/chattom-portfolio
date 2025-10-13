@@ -296,6 +296,12 @@ img, picture, figure {
     padding:3px 6px; border-radius:6px;
   }
 }
+    /* Step 3: smoother touch scrolling on phones/tablets */
+  @media (hover: none) and (pointer: coarse) {
+    img, picture {
+      pointer-events: none; /* lets touches scroll instead of selecting the image */
+    }
+  }
   </style>
 </head>
 <body id="top">
