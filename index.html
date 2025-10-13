@@ -744,13 +744,29 @@ img, picture, figure {
 
     // init
     imgs[0].classList.add('active');
-    // Maintain container height based on first image ratio
-const slider = s.querySelector('.media.slider');
-if (slider && imgs[0].naturalWidth && imgs[0].naturalHeight) {
-  const ratio = imgs[0].naturalHeight / imgs[0].naturalWidth;
-  slider.style.aspectRatio = `${imgs[0].naturalWidth}/${imgs[0].naturalHeight}`;
-  slider.style.minHeight = `${slider.offsetWidth * ratio}px`;
-}
+   /* --- Lock container aspect ratio to the first image (prevents vertical jump) --- */
+(function lockAspect() {
+  const sliderEl = slider; // use the existing slider variable
+  if (!sliderEl || !imgs[0]) return;
+
+  function setAR(w, h) {
+    if (!w || !h) return;
+    if ('aspectRatio' in document.documentElement.style) {
+      sliderEl.style.aspectRatio = `${w} / ${h}`;
+    } else {
+      const apply = () => { sliderEl.style.height = (sliderEl.clientWidth * (h / w)) + 'px'; };
+      apply();
+      window.addEventListener('resize', apply, { passive: true });
+    }
+  }
+
+  if (imgs[0].complete && imgs[0].naturalWidth) {
+    setAR(imgs[0].naturalWidth, imgs[0].naturalHeight);
+  } else {
+    imgs[0].addEventListener('load', () => setAR(imgs[0].naturalWidth, imgs[0].naturalHeight), { once: true });
+    imgs[0].addEventListener('error', () => setAR(1200, 1200), { once: true });
+  }
+})();
 
     slider.addEventListener('mouseenter', stop);
     slider.addEventListener('mouseleave', start);
