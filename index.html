@@ -268,6 +268,34 @@ img, picture, figure {
 .mason img {
   pointer-events: auto; /* keep lightbox clicks working on desktop */
 }
+    /* --- Mini slider (auto-fade) --- */
+.media.slider { position: relative; overflow: hidden; }
+.media.slider img{
+  position: absolute; inset: 0;
+  width: 100%; height: auto;
+  opacity: 0; transition: opacity 800ms ease;
+  object-fit: contain;           /* keeps your current look */
+}
+.media.slider img.active{ opacity: 1; position: relative; }  /* active slide defines height */
+
+/* Dots (optional) */
+.slider-dots{
+  position: absolute; left:0; right:0; bottom:8px;
+  display:flex; justify-content:center; gap:6px; pointer-events:none;
+}
+.slider-dot{ width:6px; height:6px; border-radius:50%;
+  background: rgba(255,255,255,.55); outline:1px solid rgba(0,0,0,.2); }
+.slider-dot.active{ background: rgba(255,255,255,.95); }
+
+/* Hover pause hint (desktop only) */
+@media (hover:hover) and (pointer:fine){
+  .media.slider:hover::after{
+    content:"▐▐"; position:absolute; top:8px; right:10px;
+    font:600 11px/1 Inter,system-ui,sans-serif;
+    color:rgba(255,255,255,.85); background:rgba(0,0,0,.35);
+    padding:3px 6px; border-radius:6px;
+  }
+}
   </style>
 </head>
 <body id="top">
@@ -301,7 +329,15 @@ img, picture, figure {
     <section class="gallery" aria-label="Selected Works">
       <!-- Portfolio pieces -->
       <figure class="work fade" style="--delay:.05s"><div class="media"><video src="assets/01-Chattom-Design-Logomotion.mp4" autoplay muted loop playsinline preload="metadata"></video></div><figcaption><strong>Chattom Design Animated Logo</strong></figcaption></figure>
-      <figure class="work fade" style="--delay:.08s"><div class="media"><img src="assets/02-Cactus-Gospel-Album-Cover.png" alt="Cactus Gospel — Album Cover" loading="lazy" /></div><figcaption><strong>Cactus Gospel Album Cover</strong></figcaption></figure>
+      <figure class="work fade" style="--delay:.08s">
+  <div class="media slider" data-interval="5400">
+    <img src="assets/02-Cactus-Gospel-Album-Cover.png?v=1" alt="Cactus Gospel — Front cover" loading="lazy">
+    <img data-src="assets/02-Cactus-Gospel-Back.png?v=1" alt="">
+    <img data-src="assets/02-Cactus-Gospel-Swatches.png?v=1" alt="">
+  </div>
+  <figcaption><strong>Cactus Gospel Album Cover</strong></figcaption>
+</figure>
+
       <figure class="work fade" style="--delay:.11s"><div class="media"><img src="assets/03-Paloma-Picasso.jpg" alt="Paloma Picasso — Advertising/Design" loading="lazy" /></div><figcaption><strong>Paloma Picasso Catalog Cover</strong></figcaption></figure>
       <figure class="work fade" style="--delay:.14s"><div class="media"><img src="assets/04-El-Camino-del-Sol-Cover.png" alt="El Camino del Sol — Cover" loading="lazy" /></div><figcaption><strong>El Camino del Sol Album Cover</strong></figcaption></figure>
       <figure class="work fade" style="--delay:.17s"><div class="media"><img src="assets/05-Gestalt-Cats.jpg" alt="Gestalt Cats" loading="lazy" /></div><figcaption><strong>Gestalt Cats</strong></figcaption></figure>
@@ -621,6 +657,52 @@ img, picture, figure {
       }
     }, { passive: false, capture: true });
   }
+})();
+</script>
+  <script>
+/* Tiny auto-fade slider (honors reduced motion) */
+(function(){
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  document.querySelectorAll('.media.slider').forEach(slider => {
+    const imgs = Array.from(slider.querySelectorAll('img'));
+    if (imgs.length <= 1) return;
+
+    // dots
+    const dots = document.createElement('div');
+    dots.className = 'slider-dots';
+    imgs.forEach((_, n) => {
+      const d = document.createElement('div');
+      d.className = 'slider-dot' + (n===0 ? ' active' : '');
+      dots.appendChild(d);
+    });
+    slider.appendChild(dots);
+
+    let i = 0, timer = null;
+    const interval = parseInt(slider.dataset.interval, 10) || 5200;
+
+    function show(n){
+      imgs[i].classList.remove('active');
+      dots.children[i]?.classList.remove('active');
+      i = (n + imgs.length) % imgs.length;
+
+      if (imgs[i].dataset.src && !imgs[i].src) imgs[i].src = imgs[i].dataset.src;
+      imgs[i].classList.add('active');
+      dots.children[i]?.classList.add('active');
+    }
+    function start(){ if (!reduce){ stop(); timer = setInterval(()=>show(i+1), interval); } }
+    function stop(){ if (timer){ clearInterval(timer); timer = null; } }
+
+    // init
+    imgs[0].classList.add('active');
+
+    slider.addEventListener('mouseenter', stop);
+    slider.addEventListener('mouseleave', start);
+    slider.addEventListener('focusin', stop);
+    slider.addEventListener('focusout', start);
+
+    start();
+  });
 })();
 </script>
 </body>
