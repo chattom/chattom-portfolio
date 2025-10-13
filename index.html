@@ -660,7 +660,7 @@ img, picture, figure {
 })();
 </script>
   <script>
-/* Global “no-save” deterrents */
+/* Global “no-save” deterrents (scroll-safe on touch) */
 (function () {
   // 1) Block right-click / long-press context menu on images
   document.addEventListener('contextmenu', function (e) {
@@ -681,17 +681,10 @@ img, picture, figure {
     img.setAttribute('draggable', 'false');
   });
 
-  // 4) Extra iOS nudge: cancel long-press by preventing default touchstart
-  //    (only on touch devices; won’t affect desktop)
-  const isTouch = matchMedia('(hover: none) and (pointer: coarse)').matches;
-  if (isTouch) {
-    document.addEventListener('touchstart', function (e) {
-      if (e.target.closest('img, picture, figure')) {
-        // prevent the OS long-press callout without harming normal scroll
-        if (e.touches && e.touches.length === 1) e.preventDefault();
-      }
-    }, { passive: false, capture: true });
-  }
+  // IMPORTANT:
+  // Do NOT preventDefault on touchstart — that breaks normal scrolling
+  // on phones/tablets. The contextmenu handler above already cancels
+  // long-press “Save Image” menus, so scrolling remains smooth.
 })();
 </script>
   <script>
