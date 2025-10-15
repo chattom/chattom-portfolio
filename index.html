@@ -295,16 +295,16 @@ img, picture, figure {
   opacity: 1;
 }
 
-/* ✨ Animated figure intro line */
+/* ✨ Animated figure intro line (improved timing and motion) */
 .figure-intro {
   text-align: center;
   font-size: 1.1rem;
   line-height: 1.5;
   color: #444;
-  margin: 12px 0 18px;
+  margin: 16px 0 20px;
   opacity: 0;
-  transform: translateY(10px);
-  animation: fadeUp 1.8s ease forwards 1.2s;
+  transform: translateY(25px);
+  animation: fadeUp 2.2s cubic-bezier(0.25, 0.1, 0.25, 1) forwards 1.6s;
 }
 
 @keyframes fadeUp {
@@ -313,6 +313,7 @@ img, picture, figure {
     transform: translateY(0);
   }
 }
+
 
 /* Dots (optional) */
 .slider-dots {
