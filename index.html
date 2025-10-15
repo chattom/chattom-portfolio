@@ -270,7 +270,13 @@ img, picture, figure {
 }
     /* --- Mini slider (auto-fade) --- */
 /* --- Mini slider (stabilized, prevents jump) --- */
-.media.slider { position: relative; overflow: hidden; }
+.media.slider {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 1 / 1;   /* lock box before JS runs */
+  min-height: 320px;     /* keeps visible box even before load */
+  background: #fff;
+}
 
 .media.slider img {
   position: absolute;
@@ -849,6 +855,7 @@ img, picture, figure {
 
     // init
     imgs[0].classList.add('active');
+if (!imgs[0].src) { imgs[0].src = imgs[0].dataset.src || ''; }
    /* --- Lock container aspect ratio to the first image (prevents vertical jump) --- */
 (function lockAspect() {
   const sliderEl = slider; // use the existing slider variable
