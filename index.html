@@ -295,7 +295,7 @@ img, picture, figure {
   opacity: 1;
 }
 
-/* ✨ Animated figure intro line (improved timing and motion) */
+  /* ✨ CoralStation intro line: stays hidden until scrolled into view */
 .figure-intro {
   text-align: center;
   font-size: 1.1rem;
@@ -303,15 +303,23 @@ img, picture, figure {
   color: #444;
   margin: 16px 0 20px;
   opacity: 0;
-  transform: translateY(25px);
-  animation: fadeUp 2.2s cubic-bezier(0.25, 0.1, 0.25, 1) forwards 1.6s;
+  transform: translateY(24px);
+  will-change: opacity, transform;
+}
+
+/* Revealed state gets animated */
+.figure-intro.reveal {
+  animation: fadeUp 900ms cubic-bezier(0.25,0.1,0.25,1) forwards;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .figure-intro { opacity: 1; transform: none; }
+  .figure-intro.reveal { animation: none; }
 }
 
 @keyframes fadeUp {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 
@@ -915,6 +923,28 @@ if (!imgs[0].src) { imgs[0].src = imgs[0].dataset.src || ''; }
 
     start();
   });
+})();
+</script>
+  <script>
+(function(){
+  const el = document.querySelector('.figure-intro');
+  if (!el) return;
+
+  if (!('IntersectionObserver' in window)) {
+    el.classList.add('reveal');
+    return;
+  }
+
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        el.classList.add('reveal');
+        io.unobserve(entry.target);
+      }
+    });
+  }, { root: null, rootMargin: '0px 0px -20% 0px', threshold: 0.25 });
+
+  io.observe(el);
 })();
 </script>
 </body>
