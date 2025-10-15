@@ -290,26 +290,53 @@ img, picture, figure {
   transition: opacity 800ms ease;
 }
 
-/* Active image simply fades in — no reflow */
+/* Active image simply fades in – no reflow */
 .media.slider img.active {
   opacity: 1;
 }
-    .figure-intro {
+
+/* ✨ Animated figure intro line */
+.figure-intro {
   text-align: center;
   font-size: 1.1rem;
   line-height: 1.5;
   color: #444;
-  margin: 10px 0 14px;
+  margin: 12px 0 18px;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fadeUp 1.8s ease forwards 1.2s;
+}
+
+@keyframes fadeUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Dots (optional) */
-.slider-dots{
-  position: absolute; left:0; right:0; bottom:8px;
-  display:flex; justify-content:center; gap:6px; pointer-events:none;
+.slider-dots {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 8px;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  pointer-events: none;
 }
-.slider-dot{ width:6px; height:6px; border-radius:50%;
-  background: rgba(255,255,255,.55); outline:1px solid rgba(0,0,0,.2); }
-.slider-dot.active{ background: rgba(255,255,255,.95); }
+
+.slider-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.55);
+  outline: 1px solid rgba(0,0,0,.2);
+}
+
+.slider-dot.active {
+  background: rgba(255,255,255,.95);
+}
 
 /* Hover pause hint (desktop only) */
 @media (hover:hover) and (pointer:fine){
