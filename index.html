@@ -942,7 +942,8 @@ if (!imgs[0].src) { imgs[0].src = imgs[0].dataset.src || ''; }
         io.unobserve(entry.target);
       }
     });
-  }, { root: null, rootMargin: '0px 0px -20% 0px', threshold: 0.25 });
+  }, { root: null, rootMargin: '0px 0px -10% 0px', threshold: 0.3 }
+);
 
   io.observe(el);
 })();
