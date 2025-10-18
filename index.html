@@ -910,6 +910,27 @@ img, picture, figure {
       dots.appendChild(d);
     });
     slider.appendChild(dots);
+    // ADD — arrow buttons
+const nav = document.createElement('div');
+nav.className = 'slider-nav';
+const prevBtn = document.createElement('button');
+prevBtn.className = 'slider-btn prev';
+prevBtn.type = 'button';
+prevBtn.setAttribute('aria-label', 'Previous image');
+prevBtn.innerHTML = '‹';
+
+const nextBtn = document.createElement('button');
+nextBtn.className = 'slider-btn next';
+nextBtn.type = 'button';
+nextBtn.setAttribute('aria-label', 'Next image');
+nextBtn.innerHTML = '›';
+
+nav.append(prevBtn, nextBtn);
+slider.appendChild(nav);
+
+// make slider focusable for keyboard arrows
+slider.setAttribute('tabindex', '0');
+
 
     let i = 0, timer = null;
     const interval = parseInt(slider.dataset.interval, 10) || 5200;
@@ -957,6 +978,19 @@ if (!imgs[0].src) { imgs[0].src = imgs[0].dataset.src || ''; }
     slider.addEventListener('mouseleave', start);
     slider.addEventListener('focusin', stop);
     slider.addEventListener('focusout', start);
+
+    // ADD — click/keyboard handlers
+function goPrev(){ stop(); show(i - 1); setTimeout(start, 1600); }
+function goNext(){ stop(); show(i + 1); setTimeout(start, 1600); }
+
+prevBtn.addEventListener('click', goPrev);
+nextBtn.addEventListener('click', goNext);
+
+slider.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowLeft') { e.preventDefault(); goPrev(); }
+  if (e.key === 'ArrowRight'){ e.preventDefault(); goNext(); }
+});
+
 
     start();
   });
