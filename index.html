@@ -339,12 +339,14 @@ img, picture, figure {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: rgba(255,255,255,.55);
-  outline: 1px solid rgba(0,0,0,.2);
+  background: rgba(255,255,255,.7);   /* white by default */
+  outline: 1px solid rgba(0,0,0,.25); /* subtle edge */
+  transition: background 0.2s ease, transform 0.2s ease;
 }
 
 .slider-dot.active {
-  background: rgba(255,255,255,.95);
+  background: #000;   /* solid black when active */
+  transform: scale(1.2); /* slight pop for feedback */
 }
     /* Arrow nav */
 .slider-nav {
