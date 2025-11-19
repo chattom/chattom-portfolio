@@ -1130,7 +1130,7 @@ function formatTime(sec) {
 }
 
 // Audio-reactive tube level using Web Audio API
-function useAudioLevel(audioRef, isPlaying) {
+function useAudioLevel(audioElement, isPlaying) {
   const [level, setLevel] = useState(0.15);
   const ctxRef = useRef(null);
   const analyserRef = useRef(null);
@@ -1138,15 +1138,14 @@ function useAudioLevel(audioRef, isPlaying) {
   const sourceRef = useRef(null);
   const rafRef = useRef(null);
 
-  // Wire audio element to analyser once
+  // Wire the *actual* HTMLAudioElement to an analyser
   useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    if (ctxRef.current) return; // already wired
+    if (!audioElement) return;           // nothing to wire yet
+    if (ctxRef.current) return;          // already wired
 
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     if (!AudioCtx) {
-      // browser doesn't support Web Audio
+      // Browser doesn’t support Web Audio → tubes will stay at idle level
       return;
     }
 
@@ -1156,7 +1155,7 @@ function useAudioLevel(audioRef, isPlaying) {
     const bufferLength = analyser.frequencyBinCount;
     const dataArray = new Uint8Array(bufferLength);
 
-    const source = ctx.createMediaElementSource(audio);
+    const source = ctx.createMediaElementSource(audioElement);
     source.connect(analyser);
     analyser.connect(ctx.destination);
 
@@ -1169,9 +1168,11 @@ function useAudioLevel(audioRef, isPlaying) {
       cancelAnimationFrame(rafRef.current);
       if (sourceRef.current) sourceRef.current.disconnect();
       if (analyserRef.current) analyserRef.current.disconnect();
-      if (ctxRef.current && ctxRef.current.state !== "closed") ctxRef.current.close();
+      if (ctxRef.current && ctxRef.current.state !== "closed") {
+        ctxRef.current.close();
+      }
     };
-  }, [audioRef]);
+  }, [audioElement]);
 
   // Animate level while playing
   useEffect(() => {
@@ -1179,7 +1180,11 @@ function useAudioLevel(audioRef, isPlaying) {
     const ctx = ctxRef.current;
     const dataArray = dataRef.current;
 
-    if (!analyser || !ctx || !dataArray) return;
+    if (!analyser || !ctx || !dataArray) {
+      // no analyser (older browser) → keep a gentle idle glow
+      if (!isPlaying) setLevel(0.12);
+      return;
+    }
 
     if (!isPlaying) {
       cancelAnimationFrame(rafRef.current);
@@ -1192,12 +1197,10 @@ function useAudioLevel(audioRef, isPlaying) {
     const tick = () => {
       analyser.getByteFrequencyData(dataArray);
       let sum = 0;
-      for (let i = 0; i < bufferLength; i++) {
-        sum += dataArray[i];
-      }
-      const avg = sum / bufferLength;   // 0–255
-      const norm = avg / 255;           // 0–1
-      const next = 0.1 + norm * 0.9;
+      for (let i = 0; i < bufferLength; i++) sum += dataArray[i];
+      const avg = sum / bufferLength;        // 0–255
+      const norm = avg / 255;                // 0–1
+      const next = 0.1 + norm * 0.9;         // 0.1–1.0
       setLevel(next);
       rafRef.current = requestAnimationFrame(tick);
     };
@@ -1213,6 +1216,7 @@ function useAudioLevel(audioRef, isPlaying) {
 
   return level;
 }
+
 
 // ----------------- Components -----------------
 
@@ -1428,14 +1432,17 @@ function MusicApp() {
   const [duration, setDuration] = useState(0);
 
   const audioRef = useRef(null);
+  const [audioEl, setAudioEl] = useState(null);
 
-  const level = useAudioLevel(audioRef, isPlaying);
+  const level = useAudioLevel(audioEl, isPlaying);
+
 
   // create audio element once
-  useEffect(() => {
+    useEffect(() => {
     if (!audioRef.current) {
       const audio = new Audio();
       audioRef.current = audio;
+      setAudioEl(audio);   // 🔑 give the hook the real element
 
       audio.addEventListener("timeupdate", () => {
         setCurrentTime(audio.currentTime || 0);
@@ -1455,6 +1462,7 @@ function MusicApp() {
       audio.load();
     }
   }, []);
+
 
   // when track index changes
   useEffect(() => {
