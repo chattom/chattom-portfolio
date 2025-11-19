@@ -10,9 +10,19 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
+  <!-- Tailwind for the Figma styles (good) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- ❓ EITHER keep these React CDN scripts OR bundle React into music-player.js.
+       If you bundle with esbuild/webpack, you can REMOVE these 2 lines. -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+
   <style>
     :root{
-      --accent:#00f5d4; /* you can tweak this */
+      --accent:#00f5d4;
     }
 
     *{box-sizing:border-box;}
@@ -117,7 +127,458 @@
     <div id="root"></div>
   </div>
 
-  <!-- Your compiled React bundle goes here -->
-  <script type="module" src="music-player.js"></script>
+  <!-- ❗ Only ONE script tag for your bundle -->
+  <!-- If you put the built file at /assets/music-player.js, do this: -->
+
+  <!-- and REMOVE this other one:
+       <script type="module" src="music-player.js"></script> -->
+  <script type="text/babel">
+const { useState, useRef, useEffect } = React;
+
+/** Simple inline icons (instead of lucide-react) */
+function MusicIcon({ className = "" }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M9 18V5l9-2v13" />
+      <circle cx="7" cy="18" r="2.2" />
+      <circle cx="17" cy="16" r="2.2" />
+    </svg>
+  );
+}
+
+function GripIcon({ className = "" }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      fill="currentColor"
+    >
+      <circle cx="9" cy="7" r="0.9" />
+      <circle cx="15" cy="7" r="0.9" />
+      <circle cx="9" cy="12" r="0.9" />
+      <circle cx="15" cy="12" r="0.9" />
+      <circle cx="9" cy="17" r="0.9" />
+      <circle cx="15" cy="17" r="0.9" />
+    </svg>
+  );
+}
+
+function XIcon({ className = "" }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M6 6l12 12M18 6L6 18" />
+    </svg>
+  );
+}
+
+/** Theme tokens from your TSX */
+const themeColors = {
+  "nite life": {
+    bg: "from-slate-800/90 to-slate-950/90",
+    border: "border-slate-600",
+    text: "text-slate-100",
+    textSecondary: "text-slate-300",
+    accent: "text-cyan-400",
+    accentDim: "text-cyan-400/70",
+    activeBg: "bg-cyan-500/20",
+    activeBorder: "border-cyan-500/50",
+    activeShadow: "shadow-cyan-500/20",
+    hoverBorder: "hover:border-slate-500/50",
+    itemBg: "bg-black/40",
+    itemBorder: "border-slate-600/30",
+  },
+  "day break": {
+    bg: "from-orange-100/90 to-amber-200/90",
+    border: "border-orange-400",
+    text: "text-slate-900",
+    textSecondary: "text-orange-900",
+    accent: "text-orange-600",
+    accentDim: "text-orange-600/70",
+    activeBg: "bg-orange-400/30",
+    activeBorder: "border-orange-500/70",
+    activeShadow: "shadow-orange-400/30",
+    hoverBorder: "hover:border-orange-400/50",
+    itemBg: "bg-white/40",
+    itemBorder: "border-orange-400/30",
+  },
+  fantasy: {
+    bg: "from-purple-800/90 to-fuchsia-950/90",
+    border: "border-purple-500",
+    text: "text-purple-50",
+    textSecondary: "text-purple-200",
+    accent: "text-fuchsia-400",
+    accentDim: "text-fuchsia-400/70",
+    activeBg: "bg-fuchsia-500/20",
+    activeBorder: "border-fuchsia-500/50",
+    activeShadow: "shadow-fuchsia-500/20",
+    hoverBorder: "hover:border-purple-400/50",
+    itemBg: "bg-black/40",
+    itemBorder: "border-purple-500/30",
+  },
+};
+
+/** Playlist component — converted from your TSX to JSX */
+function Playlist({
+  tracks,
+  currentTrackIndex,
+  onTrackSelect,
+  onReorder,
+  onDeleteTrack,
+  theme,
+}) {
+  const [draggedIndex, setDraggedIndex] = useState(null);
+  const [dragOverIndex, setDragOverIndex] = useState(null);
+
+  const colors = themeColors[theme];
+
+  const handleDragStart = (e, index) => {
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = "move";
+    if (e.dataTransfer.setData) {
+      e.dataTransfer.setData("text/html", "");
+    }
+  };
+
+  const handleDragOver = (e, index) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    setDragOverIndex(index);
+  };
+
+  const handleDragLeave = () => {
+    setDragOverIndex(null);
+  };
+
+  const handleDrop = (e, dropIndex) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === dropIndex) {
+      setDraggedIndex(null);
+      setDragOverIndex(null);
+      return;
+    }
+    const newTracks = [...tracks];
+    const [draggedTrack] = newTracks.splice(draggedIndex, 1);
+    newTracks.splice(dropIndex, 0, draggedTrack);
+    onReorder(newTracks);
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+  };
+
+  // Touch events
+  const handleTouchStart = (e, index) => {
+    setDraggedIndex(index);
+  };
+
+  const handleTouchMove = (e) => {
+    if (draggedIndex === null) return;
+    const touch = e.touches[0];
+    const el = document.elementFromPoint(touch.clientX, touch.clientY);
+    const trackElement = el && el.closest("[data-track-index]");
+    if (trackElement) {
+      const index = parseInt(trackElement.getAttribute("data-track-index") || "0", 10);
+      setDragOverIndex(index);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (
+      draggedIndex === null ||
+      dragOverIndex === null ||
+      draggedIndex === dragOverIndex
+    ) {
+      setDraggedIndex(null);
+      setDragOverIndex(null);
+      return;
+    }
+    const newTracks = [...tracks];
+    const [draggedTrack] = newTracks.splice(draggedIndex, 1);
+    newTracks.splice(dragOverIndex, 0, draggedTrack);
+    onReorder(newTracks);
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+  };
+
+  return (
+    <div
+      className={
+        "bg-gradient-to-b " +
+        colors.bg +
+        " rounded-lg p-4 md:p-6 shadow-2xl border-2 md:border-4 " +
+        colors.border +
+        " backdrop-blur-sm h-72 lg:h-[calc(100vh-6rem)] flex flex-col"
+      }
+    >
+      <div className="mb-3 md:mb-4">
+        <h3
+          className={
+            colors.textSecondary +
+            " tracking-widest text-xs md:text-sm mb-1"
+          }
+        >
+          PLAYLIST
+        </h3>
+        <p className={colors.accentDim + " text-xs"}>
+          {tracks.length} {tracks.length === 1 ? "Track" : "Tracks"}
+        </p>
+      </div>
+
+      <div className="flex-1 overflow-y-auto space-y-2 pr-1 md:pr-2">
+        {tracks.length === 0 ? (
+          <div
+            className={
+              "flex flex-col items-center justify-center h-full " +
+              colors.textSecondary +
+              " opacity-50"
+            }
+          >
+            <MusicIcon className="w-10 h-10 md:w-12 md:h-12 mb-2" />
+            <p className="text-xs md:text-sm">No tracks added</p>
+            <p className="text-xs mt-1 hidden sm:block">
+              Enjoy the silence (for now)
+            </p>
+          </div>
+        ) : (
+          tracks.map((track, index) => (
+            <div
+              key={track.id}
+              data-track-index={index}
+              draggable
+              onDragStart={(e) => handleDragStart(e, index)}
+              onDragOver={(e) => handleDragOver(e, index)}
+              onDragLeave={handleDragLeave}
+              onDrop={(e) => handleDrop(e, index)}
+              onDragEnd={handleDragEnd}
+              onTouchStart={(e) => handleTouchStart(e, index)}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+              className={
+                [
+                  "group relative flex items-center gap-2 md:gap-3 p-2 md:p-3 rounded-lg border transition-all cursor-pointer",
+                  currentTrackIndex === index
+                    ? colors.activeBg +
+                      " " +
+                      colors.activeBorder +
+                      " " +
+                      colors.activeShadow +
+                      " border-2"
+                    : colors.itemBg +
+                      " " +
+                      colors.itemBorder +
+                      " " +
+                      colors.hoverBorder,
+                  draggedIndex === index ? "opacity-50" : "",
+                  dragOverIndex === index && draggedIndex !== index
+                    ? "border-cyan-400 scale-105"
+                    : "",
+                ].join(" ")
+              }
+              onClick={() => onTrackSelect(index)}
+            >
+              <GripIcon
+                className={
+                  "w-3 h-3 md:w-4 md:h-4 " +
+                  colors.textSecondary +
+                  " opacity-60 flex-shrink-0"
+                }
+              />
+
+              <div className="flex items-center gap-1 md:gap-2 flex-1 min-w-0">
+                <MusicIcon
+                  className={
+                    "w-3 h-3 md:w-4 md:h-4 " +
+                    colors.accentDim +
+                    " flex-shrink-0"
+                  }
+                />
+                <div className="flex-1 min-w-0">
+                  <p
+                    className={
+                      colors.text + " text-xs md:text-sm truncate"
+                    }
+                  >
+                    {track.name}
+                  </p>
+                  <p className={colors.accentDim + " text-xs"}>
+                    Track {index + 1}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDeleteTrack(index);
+                }}
+                className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-red-500/20 rounded flex-shrink-0"
+              >
+                <XIcon className="w-3 h-3 md:w-4 md:h-4 text-red-400" />
+              </button>
+            </div>
+          ))
+        )}
+      </div>
+
+      <div
+        className={
+          "mt-3 md:mt-4 pt-3 md:pt-4 border-t " +
+          colors.border +
+          " border-opacity-50"
+        }
+      >
+        <p
+          className={
+            colors.textSecondary + " opacity-70 text-xs text-center"
+          }
+        >
+          Drag tracks to reorder
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/** Your tracks in the exact order you specified */
+const initialTracks = [
+  { id: "01", name: "The Copycat",             url: "/assets/The_Copycat.mp3" },
+  { id: "02", name: "Moving Forward",          url: "/assets/Moving_Forward.mp3" },
+  { id: "03", name: "Fleetwood National",      url: "/assets/Fleetwood_National.mp3" },
+  { id: "04", name: "Ashes and Aurora",        url: "/assets/Ashes_and_Aurora.mp3" },
+  { id: "05", name: "Sugartrain Voyage",       url: "/assets/Sugartrain_Voyage.mp3" },
+  { id: "06", name: "Car Crash in Cardiff",    url: "/assets/Car_Crash_in_Cardiff.mp3" },
+  { id: "07", name: "Dune Audio",              url: "/assets/Dune_Audio.mp3" },
+  { id: "08", name: "Slow Roast",              url: "/assets/Slow_Roast.mp3" },
+  { id: "09", name: "Bayou Moon",              url: "/assets/Bayou_Moon.mp3" },
+  { id: "10", name: "Lonely Carbon Lifeforms", url: "/assets/Lonely_Carbon_Lifeforms.mp3" },
+  { id: "11", name: "The Magical Third",       url: "/assets/The_Magical_Third.mp3" },
+  { id: "12", name: "Up and Down",             url: "/assets/Up_and_Down.mp3" },
+  { id: "13", name: "Arcadia Drive",           url: "/assets/Arcadia_Drive.mp3" },
+  { id: "14", name: "Ocean Post",              url: "/assets/Ocean_Post.mp3" },
+  { id: "15", name: "Covert Company",          url: "/assets/Covert_Company.mp3" },
+  { id: "16", name: "Too Many Lights",         url: "/assets/Too_Many_Lights.mp3" },
+  { id: "17", name: "American Sword",          url: "/assets/American_Sword.mp3" },
+  { id: "18", name: "Go Driving Fast",         url: "/assets/Go_Driving_Fast.mp3" },
+];
+
+function MusicApp() {
+  const [tracks, setTracks] = useState(initialTracks);
+  const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
+  const audioRef = useRef(null);
+
+  // Whenever the current track changes, update the audio src and play
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio || !tracks[currentTrackIndex]) return;
+    audio.src = tracks[currentTrackIndex].url;
+    audio.play().catch(() => {});
+  }, [currentTrackIndex, tracks]);
+
+  const currentTrack = tracks[currentTrackIndex];
+
+  const handleNext = () => {
+    setCurrentTrackIndex((prev) =>
+      tracks.length === 0 ? 0 : (prev + 1) % tracks.length
+    );
+  };
+
+  const handlePrev = () => {
+    setCurrentTrackIndex((prev) =>
+      tracks.length === 0 ? 0 : (prev - 1 + tracks.length) % tracks.length
+    );
+  };
+
+  return (
+    <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(260px,2fr)] items-start">
+      <Playlist
+        tracks={tracks}
+        currentTrackIndex={currentTrackIndex}
+        onTrackSelect={setCurrentTrackIndex}
+        onReorder={setTracks}
+        onDeleteTrack={(index) =>
+          setTracks((prev) => prev.filter((_, i) => i !== index))
+        }
+        theme="nite life"
+      />
+
+      <div className="bg-slate-900/80 border border-slate-700/70 rounded-xl p-4 md:p-5 shadow-2xl flex flex-col gap-3">
+        <h2 className="text-xs tracking-[0.2em] text-slate-400 uppercase">
+          Now Playing
+        </h2>
+
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-cyan-400/80 to-emerald-500/80 flex items-center justify-center shadow-lg shadow-cyan-500/40">
+            <MusicIcon className="w-6 h-6 text-slate-950" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm font-semibold truncate">
+              {currentTrack ? currentTrack.name : "—"}
+            </p>
+            <p className="text-xs text-slate-400">
+              {currentTrack ? `Track ${currentTrackIndex + 1}` : "Select a track"}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={handlePrev}
+            className="px-3 py-2 rounded-full bg-slate-800 hover:bg-slate-700 text-xs text-slate-100"
+          >
+            ◀ Prev
+          </button>
+          <button
+            type="button"
+            onClick={handleNext}
+            className="px-3 py-2 rounded-full bg-slate-800 hover:bg-slate-700 text-xs text-slate-100"
+          >
+            Next ▶
+          </button>
+        </div>
+
+        <audio
+          ref={audioRef}
+          controls
+          className="w-full mt-1 accent-cyan-400"
+          onEnded={handleNext}
+        >
+          Your browser does not support the audio element.
+        </audio>
+      </div>
+    </div>
+  );
+}
+
+/** Mount React into #root */
+const rootEl = document.getElementById("root");
+if (rootEl) {
+  const root = ReactDOM.createRoot(rootEl);
+  root.render(<MusicApp />);
+}
+</script>
+
 </body>
 </html>
