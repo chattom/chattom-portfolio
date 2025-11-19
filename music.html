@@ -213,7 +213,7 @@
   <script type="text/babel">
 const { useState, useRef, useEffect } = React;
 
-/** Simple inline icons instead of lucide-react */
+/* Simple inline icons instead of lucide-react */
 function MusicIcon({ className = "" }) {
   return (
     <svg
@@ -268,7 +268,7 @@ function XIcon({ className = "" }) {
   );
 }
 
-/** Theme tokens from your TSX */
+/* Theme tokens (same as Figma export) */
 const themeColors = {
   "nite life": {
     bg: "from-slate-800/90 to-slate-950/90",
@@ -314,7 +314,7 @@ const themeColors = {
   },
 };
 
-/** Your playlist (unchanged) */
+/* Playlist component (from your TSX) */
 function Playlist({
   tracks,
   currentTrackIndex,
@@ -537,33 +537,68 @@ function Playlist({
   );
 }
 
-/** Top retro panel with tubes + knobs */
-function RetroPanel({ currentTrack, audioRef, theme, isPlaying }) {
+/* Top retro deck with tubes + custom transport */
+function RetroPanel({
+  currentTrack,
+  audioRef,
+  theme,
+  isPlaying,
+  levels,
+  currentTime,
+  duration,
+  onPlay,
+  onPause,
+  onStop,
+  onPrev,
+  onNext,
+  onSeek,
+}) {
   const colors = themeColors[theme];
+  const themeKey = theme === "nite life" ? "nite" : theme === "day break" ? "day" : "fantasy";
+
+  const formatTime = (t) => {
+    if (!t || !isFinite(t)) return "0:00";
+    const m = Math.floor(t / 60);
+    const s = Math.floor(t % 60);
+    return m + ":" + (s < 10 ? "0" + s : s);
+  };
 
   return (
     <div
       className={
-        "rounded-2xl border-2 shadow-2xl px-6 py-5 md:px-8 md:py-6 mx-auto max-w-3xl bg-gradient-to-b " +
+        "rounded-2xl border-2 shadow-2xl px-6 py-5 md:px-8 md:py-6 mx-auto w-full max-w-3xl bg-gradient-to-b " +
         colors.bg +
         " " +
         colors.border
       }
     >
-      <div className="tube-row">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className={"tube" + (isPlaying ? " playing" : "")}>
-            <div className="tube-inner" />
-          </div>
-        ))}
+      {/* Housings + tubes */}
+      <div className="tube-row mb-6">
+        {Array.from({ length: 5 }).map((_, i) => {
+          const level = levels[i] ?? 0.3;
+          const scale = 0.25 + level * 0.75;
+          const opacity = 0.35 + level * 0.6;
+          return (
+            <div key={i} className="tube">
+              <div
+                className="tube-inner"
+                style={{
+                  transform: "scaleY(" + scale.toFixed(2) + ")",
+                  opacity: opacity,
+                  boxShadow:
+                    "0 0 " +
+                    (6 + level * 10).toFixed(1) +
+                    "px rgba(56,189,248," +
+                    (0.35 + level * 0.45).toFixed(2) +
+                    ")",
+                }}
+              />
+            </div>
+          );
+        })}
       </div>
 
-      <div className="knob-row">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="knob" />
-        ))}
-      </div>
-
+      {/* Track label */}
       <div className="mt-2 text-center">
         <p
           className={
@@ -582,20 +617,87 @@ function RetroPanel({ currentTrack, audioRef, theme, isPlaying }) {
         </p>
       </div>
 
-      <div className="mt-4">
-        <audio
-          ref={audioRef}
-          controls
-          className="w-full accent-cyan-400"
-        >
-          Your browser does not support the audio element.
-        </audio>
+      {/* Time bar */}
+      <div className="time-row">
+        <span>{formatTime(currentTime)}</span>
+        <input
+          type="range"
+          min="0"
+          max={duration || 0}
+          value={duration ? currentTime : 0}
+          onChange={(e) => onSeek(parseFloat(e.target.value || "0"))}
+        />
+        <span>{formatTime(duration)}</span>
       </div>
+
+      {/* Transport controls */}
+      <div className="transport-row">
+        <button
+          type="button"
+          className={"transport-btn " + themeKey}
+          onClick={onPrev}
+          aria-label="Previous track"
+        >
+          <div className="transport-icon chevrons prev">
+            <span></span>
+            <span></span>
+          </div>
+        </button>
+
+        <button
+          type="button"
+          className={"transport-btn " + themeKey}
+          onClick={onStop}
+          aria-label="Stop"
+        >
+          <div className="transport-icon stop" />
+        </button>
+
+        <button
+          type="button"
+          className={
+            "transport-btn " +
+            themeKey +
+            (isPlaying ? " transport-btn--active" : "")
+          }
+          onClick={isPlaying ? onPause : onPlay}
+          aria-label={isPlaying ? "Pause" : "Play"}
+        >
+          {isPlaying ? (
+            <div className="transport-icon pause">
+              <span></span>
+              <span></span>
+            </div>
+          ) : (
+            <div className="transport-icon play" />
+          )}
+        </button>
+
+        <button
+          type="button"
+          className={"transport-btn " + themeKey}
+          onClick={onNext}
+          aria-label="Next track"
+        >
+          <div className="transport-icon chevrons next">
+            <span></span>
+            <span></span>
+          </div>
+        </button>
+      </div>
+
+      {/* Hidden audio element; controlled via buttons */}
+      <audio
+        ref={audioRef}
+        className="hidden"
+      >
+        Your browser does not support the audio element.
+      </audio>
     </div>
   );
 }
 
-/** Track data in your chosen order */
+/* Tracks (in your specified order) */
 const initialTracks = [
   { id: "01", name: "The Copycat",             url: "/assets/The_Copycat.mp3" },
   { id: "02", name: "Moving Forward",          url: "/assets/Moving_Forward.mp3" },
@@ -617,49 +719,180 @@ const initialTracks = [
   { id: "18", name: "Go Driving Fast",         url: "/assets/Go_Driving_Fast.mp3" },
 ];
 
-/** Main app: theme toggles + top player + centered playlist */
+/* Main app: theme buttons, retro deck, centered playlist, Web Audio tubes */
 function MusicApp() {
   const [tracks, setTracks] = useState(initialTracks);
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
   const [theme, setTheme] = useState("nite life");
   const [isPlaying, setIsPlaying] = useState(false);
+  const [levels, setLevels] = useState([0.35, 0.4, 0.38, 0.42, 0.39]);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+
   const audioRef = useRef(null);
+
+  const audioCtxRef = useRef(null);
+  const analyserRef = useRef(null);
+  const dataArrayRef = useRef(null);
+  const sourceRef = useRef(null);
+  const rafRef = useRef(null);
 
   const currentTrack = tracks[currentTrackIndex];
   const colors = themeColors[theme];
 
-  // autoload / play on track change
+  /* Load current track into audio element whenever index changes */
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio || !currentTrack) return;
     audio.src = currentTrack.url;
-    audio.play().catch(() => {});
-  }, [currentTrack]);
+    audio.load();
+    setCurrentTime(0);
+    // auto-play on track change if we were already playing
+    if (isPlaying) {
+      audio
+        .play()
+        .then(() => audioCtxRef.current && audioCtxRef.current.resume())
+        .catch(() => {});
+    }
+  }, [currentTrackIndex, currentTrack, isPlaying]);
 
-  // keep isPlaying in sync with the audio element (for tubes)
+  /* Wire Web Audio analyser once and animate tube levels */
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
 
-    const handlePlay = () => setIsPlaying(true);
-    const handlePause = () => setIsPlaying(false);
-    const handleEnded = () => setIsPlaying(false);
+    let ctx = audioCtxRef.current;
+    if (!ctx) {
+      const AudioCtx =
+        window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      ctx = new AudioCtx();
+      audioCtxRef.current = ctx;
+    }
 
-    audio.addEventListener("play", handlePlay);
-    audio.addEventListener("pause", handlePause);
-    audio.addEventListener("ended", handleEnded);
+    let analyser = analyserRef.current;
+    if (!analyser) {
+      analyser = ctx.createAnalyser();
+      analyser.fftSize = 256;
+      analyserRef.current = analyser;
+      dataArrayRef.current = new Uint8Array(analyser.frequencyBinCount);
+    }
+
+    if (!sourceRef.current) {
+      const src = ctx.createMediaElementSource(audio);
+      src.connect(analyser);
+      analyser.connect(ctx.destination);
+      sourceRef.current = src;
+    }
+
+    const dataArray = dataArrayRef.current;
+
+    const tick = () => {
+      if (!analyser || !dataArray) return;
+
+      analyser.getByteFrequencyData(dataArray);
+      let sum = 0;
+      for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
+      const avg = sum / dataArray.length || 0;
+      const norm = avg / 255; // 0–1
+
+      const base = Math.max(0.1, norm * 1.2);
+      const arr = [
+        base * 1.0,
+        base * 1.15,
+        base * 0.95,
+        base * 1.05,
+        base * 0.9,
+      ].map((v) => Math.min(v, 1));
+
+      // Ease a bit so tubes don’t jitter
+      setLevels((prev) =>
+        prev.map((p, i) => p + (arr[i] - p) * 0.4)
+      );
+
+      rafRef.current = requestAnimationFrame(tick);
+    };
+
+    rafRef.current = requestAnimationFrame(tick);
 
     return () => {
-      audio.removeEventListener("play", handlePlay);
-      audio.removeEventListener("pause", handlePause);
-      audio.removeEventListener("ended", handleEnded);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
   }, []);
 
+  /* Sync time + duration */
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const onTime = () => setCurrentTime(audio.currentTime || 0);
+    const onMeta = () => setDuration(audio.duration || 0);
+    const onEnd = () => setIsPlaying(false);
+
+    audio.addEventListener("timeupdate", onTime);
+    audio.addEventListener("loadedmetadata", onMeta);
+    audio.addEventListener("ended", onEnd);
+
+    return () => {
+      audio.removeEventListener("timeupdate", onTime);
+      audio.removeEventListener("loadedmetadata", onMeta);
+      audio.removeEventListener("ended", onEnd);
+    };
+  }, []);
+
+  const handlePlay = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio
+      .play()
+      .then(() => {
+        if (audioCtxRef.current && audioCtxRef.current.state === "suspended") {
+          audioCtxRef.current.resume();
+        }
+        setIsPlaying(true);
+      })
+      .catch(() => {});
+  };
+
+  const handlePause = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.pause();
+    setIsPlaying(false);
+  };
+
+  const handleStop = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.pause();
+    audio.currentTime = 0;
+    setCurrentTime(0);
+    setIsPlaying(false);
+  };
+
+  const handlePrev = () => {
+    setCurrentTrackIndex((prev) =>
+      (prev - 1 + tracks.length) % tracks.length
+    );
+  };
+
+  const handleNext = () => {
+    setCurrentTrackIndex((prev) =>
+      (prev + 1) % tracks.length
+    );
+  };
+
+  const handleSeek = (t) => {
+    const audio = audioRef.current;
+    if (!audio || !isFinite(t)) return;
+    audio.currentTime = t;
+    setCurrentTime(t);
+  };
+
   const themeLabel = {
-    "nite life": "Nite Life",
-    "day break": "Day Break",
-    fantasy: "Fantasy",
+    "nite life": "NITE LIFE",
+    "day break": "DAY BREAK",
+    fantasy: "FANTASY",
   };
 
   const themeColorPreview = {
@@ -679,7 +912,7 @@ function MusicApp() {
 
   return (
     <div className="mt-6 flex flex-col items-center gap-6 lg:gap-8">
-      {/* THEME BUTTONS — centered & colored like their themes */}
+      {/* Theme buttons */}
       <div className="flex flex-wrap justify-center gap-2 text-[11px]">
         {["nite life", "day break", "fantasy"].map((t) => {
           const active = t === theme;
@@ -701,20 +934,29 @@ function MusicApp() {
         })}
       </div>
 
-      {/* TOP: retro player panel */}
+      {/* Top retro deck */}
       <RetroPanel
         currentTrack={currentTrack}
         audioRef={audioRef}
         theme={theme}
         isPlaying={isPlaying}
+        levels={levels}
+        currentTime={currentTime}
+        duration={duration}
+        onPlay={handlePlay}
+        onPause={handlePause}
+        onStop={handleStop}
+        onPrev={handlePrev}
+        onNext={handleNext}
+        onSeek={handleSeek}
       />
 
-      {/* BOTTOM: centered playlist */}
+      {/* Centered playlist matching width */}
       <div className="w-full max-w-3xl">
         <Playlist
           tracks={tracks}
           currentTrackIndex={currentTrackIndex}
-          onTrackSelect={setCurrentTrackIndex}
+          onTrackSelect={(i) => setCurrentTrackIndex(i)}
           onReorder={setTracks}
           onDeleteTrack={(index) =>
             setTracks((prev) => prev.filter((_, i) => i !== index))
@@ -726,13 +968,14 @@ function MusicApp() {
   );
 }
 
-/** Mount React into #root */
+/* Mount into #root */
 const rootEl = document.getElementById("root");
 if (rootEl) {
   const root = ReactDOM.createRoot(rootEl);
   root.render(<MusicApp />);
 }
 </script>
+
 
 
 </body>
