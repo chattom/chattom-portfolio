@@ -10,15 +10,13 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
-  <!-- Tailwind for the Figma styles (good) -->
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- ❓ EITHER keep these React CDN scripts OR bundle React into music-player.js.
-       If you bundle with esbuild/webpack, you can REMOVE these 2 lines. -->
+  <!-- React + Babel (for in-page JSX) -->
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
 
   <style>
     :root{
@@ -102,175 +100,9 @@
       color:#94a3b8;
     }
 
-    /* Root for React player */
     #root{
       margin-top:24px;
     }
-    /* --- Retro player tubes / knobs --- */
-.tube-row {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  margin-bottom: 18px;
-}
-
-.tube {
-  width: 26px;
-  height: 80px;
-  border-radius: 999px;
-  background: linear-gradient(to bottom, #020617, #020617 35%, #111827 100%);
-  box-shadow: 0 0 20px rgba(15,23,42,.8), inset 0 0 4px rgba(148,163,184,.3);
-  position: relative;
-  overflow: hidden;
-}
-
-.tube-inner {
-  position: absolute;
-  left: 4px;
-  right: 4px;
-  bottom: 4px;
-  border-radius: 999px;
-  background: linear-gradient(to top, rgba(56,189,248,.95), rgba(224,242,254,.85));
-  transform-origin: bottom;
-  transform: scaleY(.3);
-  opacity: .85;
-}
-
-.tube.playing .tube-inner {
-  animation: tubePulse .9s ease-in-out infinite alternate;
-}
-
-.tube:nth-child(2).playing .tube-inner { animation-duration: .7s; }
-.tube:nth-child(3).playing .tube-inner { animation-duration: 1.05s; }
-.tube:nth-child(4).playing .tube-inner { animation-duration: .8s; }
-.tube:nth-child(5).playing .tube-inner { animation-duration: 1.2s; }
-
-@keyframes tubePulse {
-  from { transform: scaleY(.35); }
-  to   { transform: scaleY(1); }
-}
-
-.knob-row {
-  display: flex;
-  justify-content: center;
-  gap: 18px;
-  margin: 4px 0 16px;
-}
-
-.knob {
-  width: 40px;
-  height: 40px;
-  border-radius: 999px;
-  background:
-    radial-gradient(circle at 25% 20%, rgba(255,255,255,.28), transparent 60%),
-    radial-gradient(circle at 70% 80%, #020617, #020617);
-  box-shadow:
-    0 2px 5px rgba(0,0,0,.7),
-    inset 0 1px 2px rgba(255,255,255,.22);
-  position: relative;
-}
-
-.knob::after {
-  content: "";
-  position: absolute;
-  width: 3px;
-  height: 12px;
-  border-radius: 999px;
-  background: #e5e7eb;
-  left: 50%;
-  top: 6px;
-  transform-origin: center bottom;
-  transform: translateX(-50%) rotate(18deg);
-  box-shadow: 0 0 2px rgba(0,0,0,.7);
-}
-/* --- Carbon deck custom bits --- */
-
-.carbon-player {
-  --accent: #00f5d4; /* default; overridden per theme from React */
-}
-
-/* make the scrubber feel more hi-fi */
-.carbon-player input.carbon-range {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 100%;
-  height: 6px;
-  border-radius: 999px;
-  background: rgba(15,23,42,0.9);
-  outline: none;
-  cursor: pointer;
-}
-.carbon-player input.carbon-range::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 18px;
-  height: 18px;
-  border-radius: 999px;
-  background: #fff;
-  border: 2px solid rgba(15,23,42,1);
-  box-shadow: 0 0 14px var(--accent);
-}
-.carbon-player input.carbon-range::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
-  border-radius: 999px;
-  background: #fff;
-  border: 2px solid rgba(15,23,42,1);
-  box-shadow: 0 0 14px var(--accent);
-}
-
-/* vintage transport buttons */
-.carbon-btn {
-  position: relative;
-  border-radius: 999px;
-  padding: 0;
-  width: 52px;
-  height: 52px;
-  display: grid;
-  place-items: center;
-  border: 1px solid rgba(148,163,184,0.6);
-  background: radial-gradient(circle at 30% 20%, #f9fafb, #cbd5f5 35%, #020617 100%);
-  box-shadow:
-    0 2px 3px rgba(0,0,0,0.6),
-    inset 0 2px 3px rgba(255,255,255,0.4);
-  transition: box-shadow 150ms ease, transform 120ms ease, background 150ms ease;
-}
-.carbon-btn-icon {
-  filter: drop-shadow(0 1px 1px rgba(0,0,0,0.7));
-}
-.carbon-btn:hover {
-  box-shadow:
-    0 0 24px var(--accent),
-    0 4px 12px rgba(0,0,0,0.6),
-    inset 0 2px 4px rgba(255,255,255,0.55);
-  transform: translateY(-1px);
-}
-.carbon-btn:active {
-  transform: translateY(1px) scale(0.97);
-  box-shadow:
-    0 2px 8px rgba(0,0,0,0.9),
-    inset 0 1px 2px rgba(0,0,0,0.7);
-}
-
-/* tubes */
-.carbon-tube-shell {
-  border-radius: 999px;
-  background: radial-gradient(circle at 20% 10%, rgba(255,255,255,0.16), transparent 55%),
-              linear-gradient(to bottom, #0f172a, #020617);
-  border: 1px solid rgba(148,163,184,0.5);
-  box-shadow:
-    inset 0 2px 6px rgba(15,23,42,0.9),
-    0 10px 30px rgba(0,0,0,0.9);
-}
-.carbon-tube-foot {
-  height: 6px;
-  border-radius: 999px;
-  background: linear-gradient(to right, #020617, #1e293b, #020617);
-  box-shadow:
-    inset 0 1px 2px rgba(255,255,255,0.1),
-    0 3px 8px rgba(0,0,0,0.9);
-}
-
   </style>
 </head>
 <body>
@@ -283,1289 +115,522 @@
   </nav>
 
   <div class="wrap">
-    <header>
-      <h1>Music</h1>
-      <p class="lead">Selections by Chris Chattom.</p>
+    <header class="text-center mb-6">
+      <h1>Original Audio Works</h1>
+      <p class="lead">Instrumental tracks written &amp; produced by Chris Chattom.</p>
     </header>
 
-    <!-- React player will mount here -->
     <div id="root"></div>
   </div>
 
-
+  <!-- Single React app -->
   <script type="text/babel">
-const { useState, useRef, useEffect } = React;
+    const { useState, useEffect, useRef } = React;
 
-/* Simple inline icons instead of lucide-react */
-function MusicIcon({ className = "" }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      aria-hidden="true"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.6"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M9 18V5l9-2v13" />
-      <circle cx="7" cy="18" r="2.2" />
-      <circle cx="17" cy="16" r="2.2" />
-    </svg>
-  );
-}
+    // ----------------- Track data -----------------
+    const TRACKS = [
+      { id: 'copycat',          name: 'The Copycat',             file: 'The_Copycat.mp3' },
+      { id: 'moving-forward',   name: 'Moving Forward',          file: 'Moving_Forward.mp3' },
+      { id: 'fleetwood',        name: 'Fleetwood National',      file: 'Fleetwood_National.mp3' },
+      { id: 'ashes',            name: 'Ashes and Aurora',        file: 'Ashes_and_Aurora.mp3' },
+      { id: 'sugartrain',       name: 'Sugartrain Voyage',       file: 'Sugartrain_Voyage.mp3' },
+      { id: 'cardiff',          name: 'Car Crash in Cardiff',    file: 'Car_Crash_in_Cardiff.mp3' },
+      { id: 'dune',             name: 'Dune Audio',              file: 'Dune_Audio.mp3' },
+      { id: 'slow-roast',       name: 'Slow Roast',              file: 'Slow_Roast.mp3' },
+      { id: 'bayou-moon',       name: 'Bayou Moon',              file: 'Bayou_Moon.mp3' },
+      { id: 'lonely-carbon',    name: 'Lonely Carbon Lifeforms', file: 'Lonely_Carbon_Lifeforms.mp3' },
+      { id: 'magical-third',    name: 'The Magical Third',       file: 'The_Magical_Third.mp3' },
+      { id: 'up-down',          name: 'Up and Down',             file: 'Up_and_Down.mp3' },
+      { id: 'arcadia',          name: 'Arcadia Drive',           file: 'Arcadia_Drive.mp3' },
+      { id: 'ocean-post',       name: 'Ocean Post',              file: 'Ocean_Post.mp3' },
+      { id: 'covert-company',   name: 'Covert Company',          file: 'Covert_Company.mp3' },
+      { id: 'too-many-lights',  name: 'Too Many Lights',         file: 'Too_Many_Lights.mp3' },
+      { id: 'american-sword',   name: 'American Sword',          file: 'American_Sword.mp3' },
+      { id: 'go-driving-fast',  name: 'Go Driving Fast',         file: 'Go_Driving_Fast.mp3' },
+    ];
 
-function GripIcon({ className = "" }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      aria-hidden="true"
-      fill="currentColor"
-    >
-      <circle cx="9" cy="7" r="0.9" />
-      <circle cx="15" cy="7" r="0.9" />
-      <circle cx="9" cy="12" r="0.9" />
-      <circle cx="15" cy="12" r="0.9" />
-      <circle cx="9" cy="17" r="0.9" />
-      <circle cx="15" cy="17" r="0.9" />
-    </svg>
-  );
-}
+    const AUDIO_BASE = "assets/";
 
-function XIcon({ className = "" }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      aria-hidden="true"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.6"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M6 6l12 12M18 6L6 18" />
-    </svg>
-  );
-}
-
-/* Theme tokens (same as Figma export) */
-const themeColors = {
-  "nite life": {
-    bg: "from-slate-800/90 to-slate-950/90",
-    border: "border-slate-600",
-    text: "text-slate-100",
-    textSecondary: "text-slate-300",
-    accent: "text-cyan-400",
-    accentDim: "text-cyan-400/70",
-    activeBg: "bg-cyan-500/20",
-    activeBorder: "border-cyan-500/50",
-    activeShadow: "shadow-cyan-500/20",
-    hoverBorder: "hover:border-slate-500/50",
-    itemBg: "bg-black/40",
-    itemBorder: "border-slate-600/30",
-  },
-  "day break": {
-    bg: "from-orange-100/90 to-amber-200/90",
-    border: "border-orange-400",
-    text: "text-slate-900",
-    textSecondary: "text-orange-900",
-    accent: "text-orange-600",
-    accentDim: "text-orange-600/70",
-    activeBg: "bg-orange-400/30",
-    activeBorder: "border-orange-500/70",
-    activeShadow: "shadow-orange-400/30",
-    hoverBorder: "hover:border-orange-400/50",
-    itemBg: "bg-white/40",
-    itemBorder: "border-orange-400/30",
-  },
-  fantasy: {
-    bg: "from-purple-800/90 to-fuchsia-950/90",
-    border: "border-purple-500",
-    text: "text-purple-50",
-    textSecondary: "text-purple-200",
-    accent: "text-fuchsia-400",
-    accentDim: "text-fuchsia-400/70",
-    activeBg: "bg-fuchsia-500/20",
-    activeBorder: "border-fuchsia-500/50",
-    activeShadow: "shadow-fuchsia-500/20",
-    hoverBorder: "hover:border-purple-400/50",
-    itemBg: "bg-black/40",
-    itemBorder: "border-purple-500/30",
-  },
-};
-
-/* Playlist component (from your TSX) */
-function Playlist({
-  tracks,
-  currentTrackIndex,
-  onTrackSelect,
-  onReorder,
-  onDeleteTrack,
-  theme,
-}) {
-  const [draggedIndex, setDraggedIndex] = useState(null);
-  const [dragOverIndex, setDragOverIndex] = useState(null);
-
-  const colors = themeColors[theme];
-
-  const handleDragStart = (e, index) => {
-    setDraggedIndex(index);
-    e.dataTransfer.effectAllowed = "move";
-    if (e.dataTransfer.setData) {
-      e.dataTransfer.setData("text/html", "");
-    }
-  };
-
-  const handleDragOver = (e, index) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = "move";
-    setDragOverIndex(index);
-  };
-
-  const handleDragLeave = () => {
-    setDragOverIndex(null);
-  };
-
-  const handleDrop = (e, dropIndex) => {
-    e.preventDefault();
-    if (draggedIndex === null || draggedIndex === dropIndex) {
-      setDraggedIndex(null);
-      setDragOverIndex(null);
-      return;
-    }
-    const newTracks = [...tracks];
-    const [draggedTrack] = newTracks.splice(draggedIndex, 1);
-    newTracks.splice(dropIndex, 0, draggedTrack);
-    onReorder(newTracks);
-    setDraggedIndex(null);
-    setDragOverIndex(null);
-  };
-
-  const handleDragEnd = () => {
-    setDraggedIndex(null);
-    setDragOverIndex(null);
-  };
-
-  const handleTouchStart = (e, index) => {
-    setDraggedIndex(index);
-  };
-
-  const handleTouchMove = (e) => {
-    if (draggedIndex === null) return;
-    const touch = e.touches[0];
-    const el = document.elementFromPoint(touch.clientX, touch.clientY);
-    const trackEl = el && el.closest("[data-track-index]");
-    if (trackEl) {
-      const index = parseInt(trackEl.getAttribute("data-track-index") || "0", 10);
-      setDragOverIndex(index);
-    }
-  };
-
-  const handleTouchEnd = () => {
-    if (
-      draggedIndex === null ||
-      dragOverIndex === null ||
-      draggedIndex === dragOverIndex
-    ) {
-      setDraggedIndex(null);
-      setDragOverIndex(null);
-      return;
-    }
-    const newTracks = [...tracks];
-    const [draggedTrack] = newTracks.splice(draggedIndex, 1);
-    newTracks.splice(dragOverIndex, 0, draggedTrack);
-    onReorder(newTracks);
-    setDraggedIndex(null);
-    setDragOverIndex(null);
-  };
-
-  return (
-    <div
-      className={
-        "bg-gradient-to-b " +
-        colors.bg +
-        " rounded-lg p-4 md:p-6 shadow-2xl border-2 md:border-4 " +
-        colors.border +
-        " backdrop-blur-sm flex flex-col"
+    // ------------- Theme definitions --------------
+    const THEMES = {
+      "nite life": {
+        id: "nite life",
+        label: "NITE LIFE",
+        bg: "from-slate-800/90 to-slate-950/90",
+        border: "border-slate-600",
+        text: "text-slate-100",
+        textSub: "text-slate-300",
+        accentHex: "#22d3ee",
+      },
+      "day break": {
+        id: "day break",
+        label: "DAY BREAK",
+        bg: "from-orange-100/90 to-amber-200/90",
+        border: "border-orange-400",
+        text: "text-slate-900",
+        textSub: "text-orange-900",
+        accentHex: "#fb923c",
+      },
+      "fantasy": {
+        id: "fantasy",
+        label: "FANTASY",
+        bg: "from-purple-800/90 to-fuchsia-950/90",
+        border: "border-purple-500",
+        text: "text-purple-50",
+        textSub: "text-purple-200",
+        accentHex: "#e879f9",
       }
-    >
-      <div className="mb-3 md:mb-4">
-        <h3
-          className={
-            colors.textSecondary + " tracking-widest text-xs md:text-sm mb-1"
+    };
+
+    function formatTime(sec) {
+      if (!isFinite(sec) || sec < 0) return "0:00";
+      const m = Math.floor(sec / 60);
+      const s = Math.floor(sec % 60);
+      return m + ":" + (s < 10 ? "0" + s : s);
+    }
+
+    // 🔊 Web Audio hook to get overall loudness level
+    function useAudioLevel(audioElement, isPlaying) {
+      const [level, setLevel] = useState(0.15);
+      const ctxRef = useRef(null);
+      const analyserRef = useRef(null);
+      const dataRef = useRef(null);
+      const sourceRef = useRef(null);
+      const rafRef = useRef(null);
+
+      // Wire analyser once when we get a real HTMLAudioElement
+      useEffect(() => {
+        if (!audioElement) return;
+        if (ctxRef.current) return;
+
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+
+        const ctx = new AudioCtx();
+        const analyser = ctx.createAnalyser();
+        analyser.fftSize = 256;
+
+        const bufferLength = analyser.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+
+        const source = ctx.createMediaElementSource(audioElement);
+        source.connect(analyser);
+        analyser.connect(ctx.destination);
+
+        ctxRef.current = ctx;
+        analyserRef.current = analyser;
+        dataRef.current = dataArray;
+        sourceRef.current = source;
+
+        return () => {
+          cancelAnimationFrame(rafRef.current);
+          if (sourceRef.current) sourceRef.current.disconnect();
+          if (analyserRef.current) analyserRef.current.disconnect();
+          if (ctxRef.current && ctxRef.current.state !== "closed") {
+            ctxRef.current.close();
           }
-        >
-          PLAYLIST
-        </h3>
-        <p className={colors.accentDim + " text-xs"}>
-          {tracks.length} {tracks.length === 1 ? "Track" : "Tracks"}
-        </p>
-      </div>
+        };
+      }, [audioElement]);
 
-      <div className="flex-1 overflow-y-auto space-y-2 pr-1 md:pr-2 max-h-[420px]">
-        {tracks.length === 0 ? (
-          <div
-            className={
-              "flex flex-col items-center justify-center h-full " +
-              colors.textSecondary +
-              " opacity-50"
-            }
-          >
-            <MusicIcon className="w-10 h-10 md:w-12 md:h-12 mb-2" />
-            <p className="text-xs md:text-sm">No tracks added</p>
-            <p className="text-xs mt-1 hidden sm:block">
-              Enjoy the silence (for now)
-            </p>
-          </div>
-        ) : (
-          tracks.map((track, index) => (
-            <div
-              key={track.id}
-              data-track-index={index}
-              draggable
-              onDragStart={(e) => handleDragStart(e, index)}
-              onDragOver={(e) => handleDragOver(e, index)}
-              onDragLeave={handleDragLeave}
-              onDrop={(e) => handleDrop(e, index)}
-              onDragEnd={handleDragEnd}
-              onTouchStart={(e) => handleTouchStart(e, index)}
-              onTouchMove={handleTouchMove}
-              onTouchEnd={handleTouchEnd}
-              className={
-                [
-                  "group relative flex items-center gap-2 md:gap-3 p-2 md:p-3 rounded-lg border transition-all cursor-pointer",
-                  currentTrackIndex === index
-                    ? colors.activeBg +
-                      " " +
-                      colors.activeBorder +
-                      " " +
-                      colors.activeShadow +
-                      " border-2"
-                    : colors.itemBg +
-                      " " +
-                      colors.itemBorder +
-                      " " +
-                      colors.hoverBorder,
-                  draggedIndex === index ? "opacity-50" : "",
-                  dragOverIndex === index && draggedIndex !== index
-                    ? "border-cyan-400 scale-105"
-                    : "",
-                ].join(" ")
-              }
-              onClick={() => onTrackSelect(index)}
-            >
-              <GripIcon
-                className={
-                  "w-3 h-3 md:w-4 md:h-4 " +
-                  colors.textSecondary +
-                  " opacity-60 flex-shrink-0"
-                }
-              />
+      // Animate while playing
+      useEffect(() => {
+        const analyser = analyserRef.current;
+        const ctx = ctxRef.current;
+        const dataArray = dataRef.current;
 
-              <div className="flex items-center gap-1 md:gap-2 flex-1 min-w-0">
-                <MusicIcon
-                  className={
-                    "w-3 h-3 md:w-4 md:h-4 " +
-                    colors.accentDim +
-                    " flex-shrink-0"
-                  }
-                />
-                <div className="flex-1 min-w-0">
-                  <p
-                    className={
-                      colors.text + " text-xs md:text-sm truncate"
-                    }
-                  >
-                    {track.name}
-                  </p>
-                  <p className={colors.accentDim + " text-xs"}>
-                    Track {index + 1}
-                  </p>
-                </div>
-              </div>
+        if (!analyser || !ctx || !dataArray) {
+          if (!isPlaying) setLevel(0.12);
+          return;
+        }
 
+        if (!isPlaying) {
+          cancelAnimationFrame(rafRef.current);
+          setLevel(0.12);
+          return;
+        }
+
+        const bufferLength = analyser.frequencyBinCount;
+
+        const tick = () => {
+          analyser.getByteFrequencyData(dataArray);
+          let sum = 0;
+          for (let i = 0; i < bufferLength; i++) sum += dataArray[i];
+          const avg = sum / bufferLength;
+          const norm = avg / 255;
+          const next = 0.1 + norm * 0.9;
+          setLevel(next);
+          rafRef.current = requestAnimationFrame(tick);
+        };
+
+        ctx.resume().then(() => {
+          rafRef.current = requestAnimationFrame(tick);
+        });
+
+        return () => cancelAnimationFrame(rafRef.current);
+      }, [isPlaying]);
+
+      return level;
+    }
+
+    // ---------- UI components ----------
+
+    function ThemeChips({ activeTheme, onChange }) {
+      return (
+        <div className="flex justify-center gap-3 mb-6 flex-wrap">
+          {Object.values(THEMES).map((t) => {
+            const active = t.id === activeTheme;
+            const base =
+              "px-4 py-1 rounded-full text-[11px] tracking-[0.16em] font-semibold uppercase transition-all border border-transparent shadow-sm";
+            let colorClass = "";
+            if (t.id === "nite life") colorClass = "bg-slate-900/90 text-cyan-100";
+            if (t.id === "day break") colorClass = "bg-amber-200 text-orange-900";
+            if (t.id === "fantasy")   colorClass = "bg-fuchsia-900/90 text-fuchsia-100";
+            return (
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onDeleteTrack(index);
-                }}
-                className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-red-500/20 rounded flex-shrink-0"
+                key={t.id}
+                onClick={() => onChange(t.id)}
+                className={[
+                  base,
+                  colorClass,
+                  active ? "ring-2 ring-offset-2 ring-offset-black" : "opacity-80 hover:opacity-100"
+                ].join(" ")}
               >
-                <XIcon className="w-3 h-3 md:w-4 md:h-4 text-red-400" />
+                {t.label}
               </button>
-            </div>
-          ))
-        )}
-      </div>
-
-      <div
-        className={
-          "mt-3 md:mt-4 pt-3 md:pt-4 border-t " +
-          colors.border +
-          " border-opacity-50"
-        }
-      >
-        <p
-          className={
-            colors.textSecondary + " opacity-70 text-xs text-center"
-          }
-        >
-          Drag tracks to reorder
-        </p>
-      </div>
-    </div>
-  );
-}
-
-/* Top retro deck with tubes + custom transport */
-function RetroPanel({
-  currentTrack,
-  audioRef,
-  theme,
-  isPlaying,
-  levels,
-  currentTime,
-  duration,
-  onPlay,
-  onPause,
-  onStop,
-  onPrev,
-  onNext,
-  onSeek,
-}) {
-  const colors = themeColors[theme];
-  const themeKey = theme === "nite life" ? "nite" : theme === "day break" ? "day" : "fantasy";
-
-  const formatTime = (t) => {
-    if (!t || !isFinite(t)) return "0:00";
-    const m = Math.floor(t / 60);
-    const s = Math.floor(t % 60);
-    return m + ":" + (s < 10 ? "0" + s : s);
-  };
-
-  return (
-    <div
-      className={
-        "rounded-2xl border-2 shadow-2xl px-6 py-5 md:px-8 md:py-6 mx-auto w-full max-w-3xl bg-gradient-to-b " +
-        colors.bg +
-        " " +
-        colors.border
-      }
-    >
-      {/* Housings + tubes */}
-      <div className="tube-row mb-6">
-        {Array.from({ length: 5 }).map((_, i) => {
-          const level = levels[i] ?? 0.3;
-          const scale = 0.25 + level * 0.75;
-          const opacity = 0.35 + level * 0.6;
-          return (
-            <div key={i} className="tube">
-              <div
-                className="tube-inner"
-                style={{
-                  transform: "scaleY(" + scale.toFixed(2) + ")",
-                  opacity: opacity,
-                  boxShadow:
-                    "0 0 " +
-                    (6 + level * 10).toFixed(1) +
-                    "px rgba(56,189,248," +
-                    (0.35 + level * 0.45).toFixed(2) +
-                    ")",
-                }}
-              />
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Track label */}
-      <div className="mt-2 text-center">
-        <p
-          className={
-            "text-[10px] tracking-[0.25em] uppercase mb-1 " +
-            colors.textSecondary
-          }
-        >
-          CARBON STUDIO DECK
-        </p>
-        <p
-          className={
-            "text-base md:text-lg font-semibold " + colors.text
-          }
-        >
-          {currentTrack ? currentTrack.name : "Select a track below"}
-        </p>
-      </div>
-
-      {/* Time bar */}
-      <div className="time-row">
-        <span>{formatTime(currentTime)}</span>
-        <input
-          type="range"
-          min="0"
-          max={duration || 0}
-          value={duration ? currentTime : 0}
-          onChange={(e) => onSeek(parseFloat(e.target.value || "0"))}
-        />
-        <span>{formatTime(duration)}</span>
-      </div>
-
-      {/* Transport controls */}
-      <div className="transport-row">
-        <button
-          type="button"
-          className={"transport-btn " + themeKey}
-          onClick={onPrev}
-          aria-label="Previous track"
-        >
-          <div className="transport-icon chevrons prev">
-            <span></span>
-            <span></span>
-          </div>
-        </button>
-
-        <button
-          type="button"
-          className={"transport-btn " + themeKey}
-          onClick={onStop}
-          aria-label="Stop"
-        >
-          <div className="transport-icon stop" />
-        </button>
-
-        <button
-          type="button"
-          className={
-            "transport-btn " +
-            themeKey +
-            (isPlaying ? " transport-btn--active" : "")
-          }
-          onClick={isPlaying ? onPause : onPlay}
-          aria-label={isPlaying ? "Pause" : "Play"}
-        >
-          {isPlaying ? (
-            <div className="transport-icon pause">
-              <span></span>
-              <span></span>
-            </div>
-          ) : (
-            <div className="transport-icon play" />
-          )}
-        </button>
-
-        <button
-          type="button"
-          className={"transport-btn " + themeKey}
-          onClick={onNext}
-          aria-label="Next track"
-        >
-          <div className="transport-icon chevrons next">
-            <span></span>
-            <span></span>
-          </div>
-        </button>
-      </div>
-
-      {/* Hidden audio element; controlled via buttons */}
-      <audio
-        ref={audioRef}
-        className="hidden"
-      >
-        Your browser does not support the audio element.
-      </audio>
-    </div>
-  );
-}
-
-/* Tracks (in your specified order) */
-const initialTracks = [
-  { id: "01", name: "The Copycat",             url: "/assets/The_Copycat.mp3" },
-  { id: "02", name: "Moving Forward",          url: "/assets/Moving_Forward.mp3" },
-  { id: "03", name: "Fleetwood National",      url: "/assets/Fleetwood_National.mp3" },
-  { id: "04", name: "Ashes and Aurora",        url: "/assets/Ashes_and_Aurora.mp3" },
-  { id: "05", name: "Sugartrain Voyage",       url: "/assets/Sugartrain_Voyage.mp3" },
-  { id: "06", name: "Car Crash in Cardiff",    url: "/assets/Car_Crash_in_Cardiff.mp3" },
-  { id: "07", name: "Dune Audio",              url: "/assets/Dune_Audio.mp3" },
-  { id: "08", name: "Slow Roast",              url: "/assets/Slow_Roast.mp3" },
-  { id: "09", name: "Bayou Moon",              url: "/assets/Bayou_Moon.mp3" },
-  { id: "10", name: "Lonely Carbon Lifeforms", url: "/assets/Lonely_Carbon_Lifeforms.mp3" },
-  { id: "11", name: "The Magical Third",       url: "/assets/The_Magical_Third.mp3" },
-  { id: "12", name: "Up and Down",             url: "/assets/Up_and_Down.mp3" },
-  { id: "13", name: "Arcadia Drive",           url: "/assets/Arcadia_Drive.mp3" },
-  { id: "14", name: "Ocean Post",              url: "/assets/Ocean_Post.mp3" },
-  { id: "15", name: "Covert Company",          url: "/assets/Covert_Company.mp3" },
-  { id: "16", name: "Too Many Lights",         url: "/assets/Too_Many_Lights.mp3" },
-  { id: "17", name: "American Sword",          url: "/assets/American_Sword.mp3" },
-  { id: "18", name: "Go Driving Fast",         url: "/assets/Go_Driving_Fast.mp3" },
-];
-
-/* Main app: theme buttons, retro deck, centered playlist, Web Audio tubes */
-function MusicApp() {
-  const [tracks, setTracks] = useState(initialTracks);
-  const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
-  const [theme, setTheme] = useState("nite life");
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [levels, setLevels] = useState([0.35, 0.4, 0.38, 0.42, 0.39]);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-
-  const audioRef = useRef(null);
-
-  const audioCtxRef = useRef(null);
-  const analyserRef = useRef(null);
-  const dataArrayRef = useRef(null);
-  const sourceRef = useRef(null);
-  const rafRef = useRef(null);
-
-  const currentTrack = tracks[currentTrackIndex];
-  const colors = themeColors[theme];
-
-  /* Load current track into audio element whenever index changes */
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio || !currentTrack) return;
-    audio.src = currentTrack.url;
-    audio.load();
-    setCurrentTime(0);
-    // auto-play on track change if we were already playing
-    if (isPlaying) {
-      audio
-        .play()
-        .then(() => audioCtxRef.current && audioCtxRef.current.resume())
-        .catch(() => {});
-    }
-  }, [currentTrackIndex, currentTrack, isPlaying]);
-
-  /* Wire Web Audio analyser once and animate tube levels */
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    let ctx = audioCtxRef.current;
-    if (!ctx) {
-      const AudioCtx =
-        window.AudioContext || window.webkitAudioContext;
-      if (!AudioCtx) return;
-      ctx = new AudioCtx();
-      audioCtxRef.current = ctx;
-    }
-
-    let analyser = analyserRef.current;
-    if (!analyser) {
-      analyser = ctx.createAnalyser();
-      analyser.fftSize = 256;
-      analyserRef.current = analyser;
-      dataArrayRef.current = new Uint8Array(analyser.frequencyBinCount);
-    }
-
-    if (!sourceRef.current) {
-      const src = ctx.createMediaElementSource(audio);
-      src.connect(analyser);
-      analyser.connect(ctx.destination);
-      sourceRef.current = src;
-    }
-
-    const dataArray = dataArrayRef.current;
-
-    const tick = () => {
-      if (!analyser || !dataArray) return;
-
-      analyser.getByteFrequencyData(dataArray);
-      let sum = 0;
-      for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
-      const avg = sum / dataArray.length || 0;
-      const norm = avg / 255; // 0–1
-
-      const base = Math.max(0.1, norm * 1.2);
-      const arr = [
-        base * 1.0,
-        base * 1.15,
-        base * 0.95,
-        base * 1.05,
-        base * 0.9,
-      ].map((v) => Math.min(v, 1));
-
-      // Ease a bit so tubes don’t jitter
-      setLevels((prev) =>
-        prev.map((p, i) => p + (arr[i] - p) * 0.4)
+            );
+          })}
+        </div>
       );
+    }
 
-      rafRef.current = requestAnimationFrame(tick);
-    };
+    function TubeDeck({ trackName, currentTime, duration, theme, level, onSeek }) {
+      const t = THEMES[theme];
+      const tubes = [0,1,2,3,4].map(() => level);
 
-    rafRef.current = requestAnimationFrame(tick);
+      const handleBarClick = (e) => {
+        if (!duration || !onSeek) return;
+        const rect = e.currentTarget.getBoundingClientRect();
+        const ratio = (e.clientX - rect.left) / rect.width;
+        const clamped = Math.max(0, Math.min(1, ratio));
+        onSeek(clamped * duration);
+      };
 
-    return () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    };
-  }, []);
+      return (
+        <div
+          className={[
+            "w-full max-w-3xl mx-auto rounded-3xl border shadow-2xl px-6 py-5 mb-6",
+            "bg-gradient-to-b", t.bg, t.border
+          ].join(" ")}
+        >
+          {/* Tube window */}
+          <div className="rounded-2xl border border-slate-700/60 bg-slate-900/70 px-6 py-6 mb-5 flex justify-between">
+            {tubes.map((lvl, i) => (
+              <div key={i} className="flex flex-col items-center">
+                <div className="w-[42px] h-[120px] rounded-full border border-slate-500/70 bg-gradient-to-b from-slate-800/95 to-slate-900/95 flex items-end justify-center shadow-[0_0_28px_rgba(0,0,0,0.7)]">
+                  <div
+                    className="w-[24px] rounded-full bg-gradient-to-b from-white/90 to-slate-200/40"
+                    style={{
+                      height: `${40 + lvl * 60}px`,
+                      boxShadow: `0 0 ${12 + lvl * 18}px ${t.accentHex}cc`
+                    }}
+                  />
+                </div>
+                <div className="mt-2 w-9 h-3 rounded-full bg-slate-800 border border-slate-600/80" />
+              </div>
+            ))}
+          </div>
 
-  /* Sync time + duration */
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
+          {/* Track title */}
+          <div className="text-center mb-4">
+            <div className={[t.text, "font-semibold text-lg"].join(" ")}>
+              {trackName || "Select a track from the playlist"}
+            </div>
+          </div>
 
-    const onTime = () => setCurrentTime(audio.currentTime || 0);
-    const onMeta = () => setDuration(audio.duration || 0);
-    const onEnd = () => setIsPlaying(false);
-
-    audio.addEventListener("timeupdate", onTime);
-    audio.addEventListener("loadedmetadata", onMeta);
-    audio.addEventListener("ended", onEnd);
-
-    return () => {
-      audio.removeEventListener("timeupdate", onTime);
-      audio.removeEventListener("loadedmetadata", onMeta);
-      audio.removeEventListener("ended", onEnd);
-    };
-  }, []);
-
-  const handlePlay = () => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    audio
-      .play()
-      .then(() => {
-        if (audioCtxRef.current && audioCtxRef.current.state === "suspended") {
-          audioCtxRef.current.resume();
-        }
-        setIsPlaying(true);
-      })
-      .catch(() => {});
-  };
-
-  const handlePause = () => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    audio.pause();
-    setIsPlaying(false);
-  };
-
-  const handleStop = () => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    audio.pause();
-    audio.currentTime = 0;
-    setCurrentTime(0);
-    setIsPlaying(false);
-  };
-
-  const handlePrev = () => {
-    setCurrentTrackIndex((prev) =>
-      (prev - 1 + tracks.length) % tracks.length
-    );
-  };
-
-  const handleNext = () => {
-    setCurrentTrackIndex((prev) =>
-      (prev + 1) % tracks.length
-    );
-  };
-
-  const handleSeek = (t) => {
-    const audio = audioRef.current;
-    if (!audio || !isFinite(t)) return;
-    audio.currentTime = t;
-    setCurrentTime(t);
-  };
-
-  const themeLabel = {
-    "nite life": "NITE LIFE",
-    "day break": "DAY BREAK",
-    fantasy: "FANTASY",
-  };
-
-  const themeColorPreview = {
-    "nite life":
-      "bg-gradient-to-r from-slate-800 via-slate-900 to-cyan-700 border-cyan-400 text-cyan-100",
-    "day break":
-      "bg-gradient-to-r from-orange-50 via-amber-200 to-amber-400 border-orange-500 text-orange-900",
-    fantasy:
-      "bg-gradient-to-r from-purple-800 via-fuchsia-700 to-fuchsia-500 border-fuchsia-400 text-fuchsia-100",
-  };
-
-  const themeColorIdle = {
-    "nite life": "bg-slate-900/70 text-slate-200 border-slate-600",
-    "day break": "bg-amber-50/80 text-amber-900 border-amber-400",
-    fantasy: "bg-purple-900/80 text-purple-100 border-purple-600",
-  };
-
-  return (
-    <div className="mt-6 flex flex-col items-center gap-6 lg:gap-8">
-      {/* Theme buttons */}
-      <div className="flex flex-wrap justify-center gap-2 text-[11px]">
-        {["nite life", "day break", "fantasy"].map((t) => {
-          const active = t === theme;
-          return (
-            <button
-              key={t}
-              type="button"
-              onClick={() => setTheme(t)}
-              className={
-                "px-3 py-1.5 rounded-full border shadow-sm uppercase tracking-[0.16em] transition-transform duration-150 " +
-                (active
-                  ? themeColorPreview[t] + " scale-[1.03]"
-                  : themeColorIdle[t] + " hover:scale-[1.02]")
-              }
+          {/* Timeline (click to seek) */}
+          <div className="mt-2">
+            <div className="flex items-center gap-3 text-[11px] text-slate-400 mb-2 px-1">
+              <span>{formatTime(currentTime)}</span>
+              <div className="flex-1 h-px bg-slate-700/80" />
+              <span>{formatTime(duration)}</span>
+            </div>
+            <div
+              className="w-full h-2 rounded-full bg-slate-900/80 overflow-hidden shadow-inner cursor-pointer"
+              onClick={handleBarClick}
             >
-              {themeLabel[t]}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Top retro deck */}
-      <RetroPanel
-        currentTrack={currentTrack}
-        audioRef={audioRef}
-        theme={theme}
-        isPlaying={isPlaying}
-        levels={levels}
-        currentTime={currentTime}
-        duration={duration}
-        onPlay={handlePlay}
-        onPause={handlePause}
-        onStop={handleStop}
-        onPrev={handlePrev}
-        onNext={handleNext}
-        onSeek={handleSeek}
-      />
-
-      {/* Centered playlist matching width */}
-      <div className="w-full max-w-3xl">
-        <Playlist
-          tracks={tracks}
-          currentTrackIndex={currentTrackIndex}
-          onTrackSelect={(i) => setCurrentTrackIndex(i)}
-          onReorder={setTracks}
-          onDeleteTrack={(index) =>
-            setTracks((prev) => prev.filter((_, i) => i !== index))
-          }
-          theme={theme}
-        />
-      </div>
-    </div>
-  );
-}
-
-/* Mount into #root */
-const rootEl = document.getElementById("root");
-if (rootEl) {
-  const root = ReactDOM.createRoot(rootEl);
-  root.render(<MusicApp />);
-}
-</script>
-
-<script type="text/babel">
-const { useState, useEffect, useRef } = React;
-
-// ----------------- Track data -----------------
-const TRACKS = [
-  { id: 'copycat',          name: 'The Copycat',             file: 'The_Copycat.mp3' },
-  { id: 'moving-forward',   name: 'Moving Forward',          file: 'Moving_Forward.mp3' },
-  { id: 'fleetwood',        name: 'Fleetwood National',      file: 'Fleetwood_National.mp3' },
-  { id: 'ashes',            name: 'Ashes and Aurora',        file: 'Ashes_and_Aurora.mp3' },
-  { id: 'sugartrain',       name: 'Sugartrain Voyage',       file: 'Sugartrain_Voyage.mp3' },
-  { id: 'cardiff',          name: 'Car Crash in Cardiff',    file: 'Car_Crash_in_Cardiff.mp3' },
-  { id: 'dune',             name: 'Dune Audio',              file: 'Dune_Audio.mp3' },
-  { id: 'slow-roast',       name: 'Slow Roast',              file: 'Slow_Roast.mp3' },
-  { id: 'bayou-moon',       name: 'Bayou Moon',              file: 'Bayou_Moon.mp3' },
-  { id: 'lonely-carbon',    name: 'Lonely Carbon Lifeforms', file: 'Lonely_Carbon_Lifeforms.mp3' },
-  { id: 'magical-third',    name: 'The Magical Third',       file: 'The_Magical_Third.mp3' },
-  { id: 'up-down',          name: 'Up and Down',             file: 'Up_and_Down.mp3' },
-  { id: 'arcadia',          name: 'Arcadia Drive',           file: 'Arcadia_Drive.mp3' },
-  { id: 'ocean-post',       name: 'Ocean Post',              file: 'Ocean_Post.mp3' },
-  { id: 'covert-company',   name: 'Covert Company',          file: 'Covert_Company.mp3' },
-  { id: 'too-many-lights',  name: 'Too Many Lights',         file: 'Too_Many_Lights.mp3' },
-  { id: 'american-sword',   name: 'American Sword',          file: 'American_Sword.mp3' },
-  { id: 'go-driving-fast',  name: 'Go Driving Fast',         file: 'Go_Driving_Fast.mp3' },
-];
-
-// assumes all files live in /assets/
-const AUDIO_BASE = 'assets/';
-
-// ------------- Theme definitions --------------
-const THEMES = {
-  "nite life": {
-    id: "nite life",
-    label: "NITE LIFE",
-    bg: "from-slate-800/90 to-slate-950/90",
-    border: "border-slate-600",
-    text: "text-slate-100",
-    textSub: "text-slate-300",
-    accent: "text-cyan-400",
-    accentHex: "#22d3ee",
-  },
-  "day break": {
-    id: "day break",
-    label: "DAY BREAK",
-    bg: "from-orange-100/90 to-amber-200/90",
-    border: "border-orange-400",
-    text: "text-slate-900",
-    textSub: "text-orange-900",
-    accent: "text-orange-600",
-    accentHex: "#fb923c",
-  },
-  "fantasy": {
-    id: "fantasy",
-    label: "FANTASY",
-    bg: "from-purple-800/90 to-fuchsia-950/90",
-    border: "border-purple-500",
-    text: "text-purple-50",
-    textSub: "text-purple-200",
-    accent: "text-fuchsia-400",
-    accentHex: "#e879f9",
-  }
-};
-
-// ----------------- Helpers --------------------
-function formatTime(sec) {
-  if (!isFinite(sec) || sec < 0) return "0:00";
-  const m = Math.floor(sec / 60);
-  const s = Math.floor(sec % 60);
-  return m + ":" + (s < 10 ? "0" + s : s);
-}
-
-// Audio-reactive tube level using Web Audio API
-function useAudioLevel(audioElement, isPlaying) {
-  const [level, setLevel] = useState(0.15);
-  const ctxRef = useRef(null);
-  const analyserRef = useRef(null);
-  const dataRef = useRef(null);
-  const sourceRef = useRef(null);
-  const rafRef = useRef(null);
-
-  // Wire the *actual* HTMLAudioElement to an analyser
-  useEffect(() => {
-    if (!audioElement) return;           // nothing to wire yet
-    if (ctxRef.current) return;          // already wired
-
-    const AudioCtx = window.AudioContext || window.webkitAudioContext;
-    if (!AudioCtx) {
-      // Browser doesn’t support Web Audio → tubes will stay at idle level
-      return;
-    }
-
-    const ctx = new AudioCtx();
-    const analyser = ctx.createAnalyser();
-    analyser.fftSize = 256;
-    const bufferLength = analyser.frequencyBinCount;
-    const dataArray = new Uint8Array(bufferLength);
-
-    const source = ctx.createMediaElementSource(audioElement);
-    source.connect(analyser);
-    analyser.connect(ctx.destination);
-
-    ctxRef.current = ctx;
-    analyserRef.current = analyser;
-    dataRef.current = dataArray;
-    sourceRef.current = source;
-
-    return () => {
-      cancelAnimationFrame(rafRef.current);
-      if (sourceRef.current) sourceRef.current.disconnect();
-      if (analyserRef.current) analyserRef.current.disconnect();
-      if (ctxRef.current && ctxRef.current.state !== "closed") {
-        ctxRef.current.close();
-      }
-    };
-  }, [audioElement]);
-
-  // Animate level while playing
-  useEffect(() => {
-    const analyser = analyserRef.current;
-    const ctx = ctxRef.current;
-    const dataArray = dataRef.current;
-
-    if (!analyser || !ctx || !dataArray) {
-      // no analyser (older browser) → keep a gentle idle glow
-      if (!isPlaying) setLevel(0.12);
-      return;
-    }
-
-    if (!isPlaying) {
-      cancelAnimationFrame(rafRef.current);
-      setLevel(0.12);
-      return;
-    }
-
-    const bufferLength = analyser.frequencyBinCount;
-
-    const tick = () => {
-      analyser.getByteFrequencyData(dataArray);
-      let sum = 0;
-      for (let i = 0; i < bufferLength; i++) sum += dataArray[i];
-      const avg = sum / bufferLength;        // 0–255
-      const norm = avg / 255;                // 0–1
-      const next = 0.1 + norm * 0.9;         // 0.1–1.0
-      setLevel(next);
-      rafRef.current = requestAnimationFrame(tick);
-    };
-
-    ctx.resume().then(() => {
-      rafRef.current = requestAnimationFrame(tick);
-    });
-
-    return () => {
-      cancelAnimationFrame(rafRef.current);
-    };
-  }, [isPlaying]);
-
-  return level;
-}
-
-
-// ----------------- Components -----------------
-
-function ThemeChips({ activeTheme, onChange }) {
-  return (
-    <div className="flex justify-center gap-3 mb-6">
-      {Object.values(THEMES).map((t) => {
-        const active = t.id === activeTheme;
-        const base = "px-4 py-1 rounded-full text-xs tracking-[0.14em] font-semibold uppercase transition-all border border-transparent shadow-sm";
-        let colorClass = "";
-        if (t.id === "nite life") colorClass = "bg-slate-900/90 text-cyan-100";
-        if (t.id === "day break") colorClass = "bg-amber-200 text-orange-900";
-        if (t.id === "fantasy")   colorClass = "bg-fuchsia-900/90 text-fuchsia-100";
-        return (
-          <button
-            key={t.id}
-            onClick={() => onChange(t.id)}
-            className={[
-              base,
-              colorClass,
-              active ? "ring-2 ring-offset-2 ring-offset-black" : "opacity-80 hover:opacity-100"
-            ].join(" ")}
-          >
-            {t.label}
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
-function TubeDeck({ trackName, currentTime, duration, theme, level }) {
-  const themeDef = THEMES[theme];
-  const tubes = [0, 1, 2, 3, 4].map(() => level); // all in unison
-
-  return (
-    <div className={[
-      "w-full max-w-3xl mx-auto rounded-3xl border shadow-2xl px-6 py-5 mb-8",
-      "bg-gradient-to-b",
-      themeDef.bg,
-      themeDef.border
-    ].join(" ")}>
-      {/* Tube window */}
-      <div className="rounded-2xl border border-slate-700/60 bg-slate-900/70 px-6 py-6 mb-5 flex justify-between">
-        {tubes.map((lvl, i) => (
-          <div key={i} className="flex flex-col items-center">
-            {/* glass housing */}
-            <div className="w-[42px] h-[120px] rounded-full border border-slate-500/70 bg-gradient-to-b from-slate-800/95 to-slate-900/95 flex items-end justify-center shadow-[0_0_28px_rgba(0,0,0,0.7)]">
-              {/* glowing core */}
               <div
-                className="w-[24px] rounded-full bg-gradient-to-b from-white/90 to-slate-200/40"
+                className="h-full bg-gradient-to-r from-slate-100 via-slate-200 to-slate-50 rounded-full"
                 style={{
-                  height: `${40 + lvl * 60}px`,
-                  boxShadow: `0 0 ${12 + lvl * 18}px ${themeDef.accentHex}cc`
+                  width: duration
+                    ? `${Math.min(100, (currentTime / duration) * 100)}%`
+                    : "0%"
                 }}
               />
             </div>
-            {/* base */}
-            <div className="mt-2 w-9 h-3 rounded-full bg-slate-800 border border-slate-600/80" />
           </div>
-        ))}
-      </div>
-
-      {/* Track name only (removed 'CARBON STUDIO DECK') */}
-      <div className="text-center mb-4">
-        <div className={[themeDef.text, "font-semibold text-lg"].join(" ")}>
-          {trackName}
         </div>
-      </div>
+      );
+    }
 
-      {/* Progress bar */}
-      <div className="mt-2 mb-2">
-        <div className="flex items-center gap-3 text-[11px] text-slate-400 mb-2 px-1">
-          <span>{formatTime(currentTime)}</span>
-          <div className="flex-1 h-px bg-slate-700/80" />
-          <span>{formatTime(duration)}</span>
+    function VintageControls({ onPlay, onPause, onStop, onPrev, onNext, isPlaying, theme }) {
+      const t = THEMES[theme];
+      const baseBtn =
+        "w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center " +
+        "bg-slate-900/90 border border-slate-600/80 text-slate-100 " +
+        "shadow-[0_8px_18px_rgba(0,0,0,0.65)] " +
+        "transition-all transform hover:-translate-y-[1px] focus:outline-none " +
+        "hover:shadow-[0_0_16px]";
+      const glow = `drop-shadow(0 0 10px ${t.accentHex})`;
+
+      return (
+        <div className="flex items-center justify-center gap-3 sm:gap-4 mb-6">
+          <button
+            aria-label="Previous track"
+            onClick={onPrev}
+            className={baseBtn}
+            style={{ filter: glow }}
+          >
+            <span className="text-xs">⏮</span>
+          </button>
+
+          <button
+            aria-label="Play"
+            onClick={onPlay}
+            className={baseBtn + " scale-110"}
+            style={{ filter: glow, boxShadow: `0 0 18px ${t.accentHex}cc` }}
+          >
+            <span className="text-sm">▶</span>
+          </button>
+
+          <button
+            aria-label="Pause"
+            onClick={onPause}
+            className={baseBtn}
+            style={isPlaying ? { filter: glow } : {}}
+          >
+            <span className="text-sm">⏸</span>
+          </button>
+
+          <button
+            aria-label="Stop"
+            onClick={onStop}
+            className={baseBtn}
+          >
+            <span className="text-xs">■</span>
+          </button>
+
+          <button
+            aria-label="Next track"
+            onClick={onNext}
+            className={baseBtn}
+            style={{ filter: glow }}
+          >
+            <span className="text-xs">⏭</span>
+          </button>
         </div>
-        <div className="w-full h-2 rounded-full bg-slate-900/80 overflow-hidden shadow-inner">
-          <div
-            className="h-full bg-gradient-to-r from-slate-100 via-slate-200 to-slate-50 rounded-full"
-            style={{
-              width: duration ? `${Math.min(100, (currentTime / duration) * 100)}%` : "0%"
-            }}
+      );
+    }
+
+    function Playlist({ tracks, currentIndex, onSelect, theme }) {
+      const t = THEMES[theme];
+
+      return (
+        <div
+          className={[
+            "w-full max-w-3xl mx-auto rounded-3xl border",
+            "bg-gradient-to-b", t.bg, t.border,
+            "p-5 sm:p-6 shadow-2xl"
+          ].join(" ")}
+        >
+          <div className="mb-2">
+            <div className="text-[11px] tracking-[0.26em] text-slate-400 uppercase mb-1">
+              PLAYLIST
+            </div>
+            <div className="text-[11px] text-slate-500">
+              {tracks.length} Tracks
+            </div>
+          </div>
+
+          <div className="mt-3 space-y-2 max-h-[480px] overflow-y-auto pr-1">
+            {tracks.map((t, i) => {
+              const active = i === currentIndex;
+              return (
+                <button
+                  key={t.id}
+                  onClick={() => onSelect(i)}
+                  className={[
+                    "w-full flex items-center justify-between rounded-xl px-3 py-3 text-left border transition-all",
+                    active
+                      ? "bg-cyan-700/50 border-cyan-400/70 shadow-[0_0_18px_rgba(34,211,238,0.3)]"
+                      : "bg-slate-950/40 border-slate-700/70 hover:border-slate-500/70"
+                  ].join(" ")}
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-5 text-xs text-slate-500">
+                      {String(i + 1).padStart(2, "0")}
+                    </div>
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-sm text-slate-100 truncate">
+                        {t.name}
+                      </span>
+                      <span className="text-[11px] text-cyan-300/80">
+                        Track {i + 1}
+                      </span>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      );
+    }
+
+    // ----------------- Root app -------------------
+
+    function MusicApp() {
+      const [currentIndex, setCurrentIndex] = useState(0);
+      const [theme, setTheme] = useState("nite life");
+      const [isPlaying, setIsPlaying] = useState(false);
+      const [currentTime, setCurrentTime] = useState(0);
+      const [duration, setDuration] = useState(0);
+
+      const audioRef = useRef(null);
+      const [audioEl, setAudioEl] = useState(null);
+
+      const level = useAudioLevel(audioEl, isPlaying);
+
+      // Create audio element once
+      useEffect(() => {
+        if (audioRef.current) return;
+
+        const audio = new Audio();
+        audioRef.current = audio;
+        setAudioEl(audio);
+
+        audio.addEventListener("timeupdate", () => {
+          setCurrentTime(audio.currentTime || 0);
+        });
+
+        audio.addEventListener("loadedmetadata", () => {
+          setDuration(audio.duration || 0);
+        });
+
+        audio.addEventListener("ended", () => {
+          setCurrentIndex((prev) => (prev + 1) % TRACKS.length);
+          setIsPlaying(true); // keep rolling to next track
+        });
+      }, []);
+
+      // Load track when index or isPlaying changes
+      useEffect(() => {
+        const audio = audioRef.current;
+        if (!audio) return;
+
+        const t = TRACKS[currentIndex];
+        if (!t) return;
+
+        audio.src = AUDIO_BASE + t.file;
+        audio.load();
+        setCurrentTime(0);
+
+        if (isPlaying) {
+          audio.play().catch(() => setIsPlaying(false));
+        }
+      }, [currentIndex, isPlaying]);
+
+      const handlePlay = () => {
+        const audio = audioRef.current;
+        if (!audio) return;
+        audio.play()
+          .then(() => setIsPlaying(true))
+          .catch(() => {});
+      };
+
+      const handlePause = () => {
+        const audio = audioRef.current;
+        if (!audio) return;
+        audio.pause();
+        setIsPlaying(false);
+      };
+
+      const handleStop = () => {
+        const audio = audioRef.current;
+        if (!audio) return;
+        audio.pause();
+        audio.currentTime = 0;
+        setCurrentTime(0);
+        setIsPlaying(false);
+      };
+
+      const handlePrev = () => {
+        setCurrentIndex((prev) => (prev - 1 + TRACKS.length) % TRACKS.length);
+      };
+
+      const handleNext = () => {
+        setCurrentIndex((prev) => (prev + 1) % TRACKS.length);
+      };
+
+      const handleSelectTrack = (index) => {
+        setCurrentIndex(index);
+        const audio = audioRef.current;
+        if (audio) {
+          audio.play()
+            .then(() => setIsPlaying(true))
+            .catch(() => {});
+        } else {
+          setIsPlaying(true);
+        }
+      };
+
+      const handleSeek = (newTime) => {
+        const audio = audioRef.current;
+        if (!audio || !isFinite(newTime)) return;
+        audio.currentTime = newTime;
+        setCurrentTime(newTime);
+      };
+
+      const activeTrack = TRACKS[currentIndex];
+
+      return (
+        <div className="mt-6 flex flex-col items-center">
+          <ThemeChips activeTheme={theme} onChange={setTheme} />
+
+          <TubeDeck
+            trackName={activeTrack ? activeTrack.name : ""}
+            currentTime={currentTime}
+            duration={duration}
+            theme={theme}
+            level={level}
+            onSeek={handleSeek}
+          />
+
+          <VintageControls
+            onPlay={handlePlay}
+            onPause={handlePause}
+            onStop={handleStop}
+            onPrev={handlePrev}
+            onNext={handleNext}
+            isPlaying={isPlaying}
+            theme={theme}
+          />
+
+          <Playlist
+            tracks={TRACKS}
+            currentIndex={currentIndex}
+            onSelect={handleSelectTrack}
+            theme={theme}
           />
         </div>
-      </div>
-    </div>
-  );
-}
-
-function VintageControls({ onPlay, onPause, onStop, onPrev, onNext, isPlaying, theme }) {
-  const themeDef = THEMES[theme];
-
-  const baseBtn =
-    "w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center " +
-    "bg-slate-900/90 border border-slate-600/80 text-slate-100 " +
-    "shadow-[0_8px_18px_rgba(0,0,0,0.65)] " +
-    "transition-all transform hover:-translate-y-[1px] focus:outline-none " +
-    "hover:shadow-[0_0_16px]";
-
-  const glow = `drop-shadow(0 0 10px ${themeDef.accentHex})`;
-
-  return (
-    <div className="flex items-center justify-center gap-3 sm:gap-4 mb-6">
-      {/* Reverse / Previous */}
-      <button
-        aria-label="Previous track"
-        onClick={onPrev}
-        className={baseBtn}
-        style={{ filter: glow }}
-      >
-        <span className="text-xs">⏮</span>
-      </button>
-
-      {/* Play */}
-      <button
-        aria-label="Play"
-        onClick={onPlay}
-        className={baseBtn + " scale-110"}
-        style={{ filter: glow, boxShadow: `0 0 18px ${themeDef.accentHex}cc` }}
-      >
-        <span className="text-sm">▶</span>
-      </button>
-
-      {/* Pause */}
-      <button
-        aria-label="Pause"
-        onClick={onPause}
-        className={baseBtn}
-        style={isPlaying ? { filter: glow } : {}}
-      >
-        <span className="text-sm">⏸</span>
-      </button>
-
-      {/* Stop */}
-      <button
-        aria-label="Stop"
-        onClick={onStop}
-        className={baseBtn}
-      >
-        <span className="text-xs">■</span>
-      </button>
-
-      {/* Forward / Next */}
-      <button
-        aria-label="Next track"
-        onClick={onNext}
-        className={baseBtn}
-        style={{ filter: glow }}
-      >
-        <span className="text-xs">⏭</span>
-      </button>
-    </div>
-  );
-}
-
-function Playlist({ tracks, currentIndex, onSelect, theme }) {
-  const themeDef = THEMES[theme];
-
-  return (
-    <div className={[
-      "w-full max-w-3xl mx-auto rounded-3xl border",
-      "bg-gradient-to-b", themeDef.bg, themeDef.border,
-      "p-5 sm:p-6 shadow-2xl"
-    ].join(" ")}>
-      <div className="mb-2">
-        <div className="text-[11px] tracking-[0.26em] text-slate-400 uppercase mb-1">
-          PLAYLIST
-        </div>
-        <div className="text-[11px] text-slate-500">{tracks.length} Tracks</div>
-      </div>
-
-      <div className="mt-3 space-y-2 max-h-[480px] overflow-y-auto pr-1">
-        {tracks.map((t, i) => {
-          const active = i === currentIndex;
-          return (
-            <button
-              key={t.id}
-              onClick={() => onSelect(i)}
-              className={[
-                "w-full flex items-center justify-between rounded-xl px-3 py-3 text-left border transition-all",
-                active
-                  ? "bg-cyan-700/50 border-cyan-400/70 shadow-[0_0_18px_rgba(34,211,238,0.3)]"
-                  : "bg-slate-950/40 border-slate-700/70 hover:border-slate-500/70"
-              ].join(" ")}
-            >
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="w-5 text-xs text-slate-500">{String(i + 1).padStart(2, "0")}</div>
-                <div className="flex flex-col min-w-0">
-                  <span className="text-sm text-slate-100 truncate">
-                    {t.name}
-                  </span>
-                  <span className="text-[11px] text-cyan-300/80">
-                    Track {i + 1}
-                  </span>
-                </div>
-              </div>
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-// ----------------- Root app -------------------
-
-function MusicApp() {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [theme, setTheme] = useState("nite life");
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-
-  const audioRef = useRef(null);
-  const [audioEl, setAudioEl] = useState(null);
-
-  const level = useAudioLevel(audioEl, isPlaying);
-
-
-  // create audio element once
-    useEffect(() => {
-    if (!audioRef.current) {
-      const audio = new Audio();
-      audioRef.current = audio;
-      setAudioEl(audio);   // 🔑 give the hook the real element
-
-      audio.addEventListener("timeupdate", () => {
-        setCurrentTime(audio.currentTime || 0);
-      });
-      audio.addEventListener("loadedmetadata", () => {
-        setDuration(audio.duration || 0);
-      });
-      audio.addEventListener("ended", () => {
-        handleNext();
-      });
+      );
     }
 
-    const audio = audioRef.current;
-    const t = TRACKS[currentIndex];
-    if (t) {
-      audio.src = AUDIO_BASE + t.file;
-      audio.load();
+    // Mount the app
+    const rootEl = document.getElementById("root");
+    if (rootEl) {
+      const root = ReactDOM.createRoot(rootEl);
+      root.render(<MusicApp />);
     }
-  }, []);
-
-
-  // when track index changes
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    const t = TRACKS[currentIndex];
-    if (!t) return;
-    audio.src = AUDIO_BASE + t.file;
-    audio.load();
-    setCurrentTime(0);
-    if (isPlaying) {
-      audio.play().catch(() => {
-        setIsPlaying(false);
-      });
-    }
-  }, [currentIndex]);
-
-  const handlePlay = () => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    audio.play()
-      .then(() => setIsPlaying(true))
-      .catch(() => {});
-  };
-
-  const handlePause = () => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    audio.pause();
-    setIsPlaying(false); // keeps currentTime where it is
-  };
-
-  const handleStop = () => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    audio.pause();
-    audio.currentTime = 0;
-    setIsPlaying(false);
-    setCurrentTime(0);
-  };
-
-  const handlePrev = () => {
-    setCurrentIndex(prev => (prev - 1 + TRACKS.length) % TRACKS.length);
-  };
-
-  const handleNext = () => {
-    setCurrentIndex(prev => (prev + 1) % TRACKS.length);
-  };
-
-  const handleSelectTrack = (index) => {
-    setCurrentIndex(index);
-    const audio = audioRef.current;
-    if (audio) {
-      audio.play()
-        .then(() => setIsPlaying(true))
-        .catch(() => {});
-    } else {
-      setIsPlaying(true);
-    }
-  };
-
-  const activeTrack = TRACKS[currentIndex];
-
-  return (
-    <div className="mt-6 flex flex-col items-center">
-      <ThemeChips activeTheme={theme} onChange={setTheme} />
-
-      <TubeDeck
-        trackName={activeTrack ? activeTrack.name : ""}
-        currentTime={currentTime}
-        duration={duration}
-        theme={theme}
-        level={level}
-      />
-
-      <VintageControls
-        onPlay={handlePlay}
-        onPause={handlePause}
-        onStop={handleStop}
-        onPrev={handlePrev}
-        onNext={handleNext}
-        isPlaying={isPlaying}
-        theme={theme}
-      />
-
-      <Playlist
-        tracks={TRACKS}
-        currentIndex={currentIndex}
-        onSelect={handleSelectTrack}
-        theme={theme}
-      />
-    </div>
-  );
-}
-
-// Mount the app
-const rootEl = document.getElementById("root");
-if (rootEl) {
-  const root = ReactDOM.createRoot(rootEl);
-  root.render(<MusicApp />);
-}
-</script>
-
-
+  </script>
 </body>
 </html>
