@@ -486,9 +486,12 @@ const initialTracks = [
 function MusicApp() {
   const [tracks, setTracks] = useState(initialTracks);
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
+  const [theme, setTheme] = useState("nite life");  // ⭐ current theme
   const audioRef = useRef(null);
 
-  // Whenever the current track changes, update the audio src and play
+  const colors = themeColors[theme];
+
+  // keep audio in sync with current track
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio || !tracks[currentTrackIndex]) return;
@@ -510,67 +513,128 @@ function MusicApp() {
     );
   };
 
+  const themeLabel = {
+    "nite life": "Nite Life",
+    "day break": "Day Break",
+    fantasy: "Fantasy",
+  };
+
   return (
-    <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(260px,2fr)] items-start">
-      <Playlist
-        tracks={tracks}
-        currentTrackIndex={currentTrackIndex}
-        onTrackSelect={setCurrentTrackIndex}
-        onReorder={setTracks}
-        onDeleteTrack={(index) =>
-          setTracks((prev) => prev.filter((_, i) => i !== index))
-        }
-        theme="nite life"
-      />
-
-      <div className="bg-slate-900/80 border border-slate-700/70 rounded-xl p-4 md:p-5 shadow-2xl flex flex-col gap-3">
-        <h2 className="text-xs tracking-[0.2em] text-slate-400 uppercase">
-          Now Playing
-        </h2>
-
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-cyan-400/80 to-emerald-500/80 flex items-center justify-center shadow-lg shadow-cyan-500/40">
-            <MusicIcon className="w-6 h-6 text-slate-950" />
-          </div>
-          <div className="min-w-0">
-            <p className="text-sm font-semibold truncate">
-              {currentTrack ? currentTrack.name : "—"}
-            </p>
-            <p className="text-xs text-slate-400">
-              {currentTrack ? `Track ${currentTrackIndex + 1}` : "Select a track"}
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3">
+    <div className="mt-6 space-y-4 lg:space-y-6">
+      {/* THEME TOGGLER */}
+      <div className="flex justify-end gap-2 text-xs">
+        {["nite life", "day break", "fantasy"].map((t) => (
           <button
+            key={t}
             type="button"
-            onClick={handlePrev}
-            className="px-3 py-2 rounded-full bg-slate-800 hover:bg-slate-700 text-xs text-slate-100"
+            onClick={() => setTheme(t)}
+            className={
+              "px-3 py-1 rounded-full border transition-colors uppercase tracking-[0.12em] " +
+              (t === theme
+                ? "bg-cyan-400 text-slate-900 border-cyan-300 shadow-md"
+                : "bg-slate-900/70 text-slate-200 border-slate-600 hover:bg-slate-800")
+            }
           >
-            ◀ Prev
+            {themeLabel[t]}
           </button>
-          <button
-            type="button"
-            onClick={handleNext}
-            className="px-3 py-2 rounded-full bg-slate-800 hover:bg-slate-700 text-xs text-slate-100"
-          >
-            Next ▶
-          </button>
-        </div>
+        ))}
+      </div>
 
-        <audio
-          ref={audioRef}
-          controls
-          className="w-full mt-1 accent-cyan-400"
-          onEnded={handleNext}
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(260px,2fr)] items-start">
+        {/* LEFT: your Playlist, themed */}
+        <Playlist
+          tracks={tracks}
+          currentTrackIndex={currentTrackIndex}
+          onTrackSelect={setCurrentTrackIndex}
+          onReorder={setTracks}
+          onDeleteTrack={(index) =>
+            setTracks((prev) => prev.filter((_, i) => i !== index))
+          }
+          theme={theme}
+        />
+
+        {/* RIGHT: themed Now Playing card */}
+        <div
+          className={
+            [
+              "rounded-xl p-4 md:p-5 shadow-2xl border flex flex-col gap-3",
+              colors.border,
+              "bg-gradient-to-b",
+              colors.bg,
+            ].join(" ")
+          }
         >
-          Your browser does not support the audio element.
-        </audio>
+          <h2
+            className={
+              "text-xs tracking-[0.25em] uppercase " + colors.textSecondary
+            }
+          >
+            NOW PLAYING
+          </h2>
+
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-xl bg-black/40 flex items-center justify-center shadow-inner">
+              <MusicIcon className={"w-6 h-6 " + colors.accent} />
+            </div>
+            <div className="min-w-0">
+              <p
+                className={
+                  "text-sm font-semibold truncate " + colors.text
+                }
+              >
+                {currentTrack ? currentTrack.name : "—"}
+              </p>
+              <p className={"text-xs " + colors.accentDim}>
+                {currentTrack
+                  ? `Track ${currentTrackIndex + 1}`
+                  : "Select a track from the list"}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 mt-1">
+            <button
+              type="button"
+              onClick={handlePrev}
+              className={
+                "px-3 py-2 rounded-full text-xs font-medium border " +
+                colors.itemBg +
+                " " +
+                colors.itemBorder +
+                " hover:brightness-110"
+              }
+            >
+              ◀ Prev
+            </button>
+            <button
+              type="button"
+              onClick={handleNext}
+              className={
+                "px-3 py-2 rounded-full text-xs font-medium border " +
+                colors.itemBg +
+                " " +
+                colors.itemBorder +
+                " hover:brightness-110"
+              }
+            >
+              Next ▶
+            </button>
+          </div>
+
+          <audio
+            ref={audioRef}
+            controls
+            className="w-full mt-2 accent-cyan-400"
+            onEnded={handleNext}
+          >
+            Your browser does not support the audio element.
+          </audio>
+        </div>
       </div>
     </div>
   );
 }
+
 
 /** Mount React into #root */
 const rootEl = document.getElementById("root");
