@@ -1064,24 +1064,24 @@ const { useState, useEffect, useRef } = React;
 
 // ----------------- Track data -----------------
 const TRACKS = [
-  { id: 'copycat',          name: 'The Copycat',            file: 'The_Copycat.mp3' },
-  { id: 'moving-forward',   name: 'Moving Forward',         file: 'Moving_Forward.mp3' },
-  { id: 'fleetwood',        name: 'Fleetwood National',     file: 'Fleetwood_National.mp3' },
-  { id: 'ashes',            name: 'Ashes and Aurora',       file: 'Ashes_and_Aurora.mp3' },
-  { id: 'sugartrain',       name: 'Sugartrain Voyage',      file: 'Sugartrain_Voyage.mp3' },
-  { id: 'cardiff',          name: 'Car Crash in Cardiff',   file: 'Car_Crash_in_Cardiff.mp3' },
-  { id: 'dune',             name: 'Dune Audio',             file: 'Dune_Audio.mp3' },
-  { id: 'slow-roast',       name: 'Slow Roast',             file: 'Slow_Roast.mp3' },
-  { id: 'bayou-moon',       name: 'Bayou Moon',             file: 'Bayou_Moon.mp3' },
-  { id: 'lonely-carbon',    name: 'Lonely Carbon Lifeforms',file: 'Lonely_Carbon_Lifeforms.mp3' },
-  { id: 'magical-third',    name: 'The Magical Third',      file: 'The_Magical_Third.mp3' },
-  { id: 'up-down',          name: 'Up and Down',            file: 'Up_and_Down.mp3' },
-  { id: 'arcadia',          name: 'Arcadia Drive',          file: 'Arcadia_Drive.mp3' },
-  { id: 'ocean-post',       name: 'Ocean Post',             file: 'Ocean_Post.mp3' },
-  { id: 'covert-company',   name: 'Covert Company',         file: 'Covert_Company.mp3' },
-  { id: 'too-many-lights',  name: 'Too Many Lights',        file: 'Too_Many_Lights.mp3' },
-  { id: 'american-sword',   name: 'American Sword',         file: 'American_Sword.mp3' },
-  { id: 'go-driving-fast',  name: 'Go Driving Fast',        file: 'Go_Driving_Fast.mp3' },
+  { id: 'copycat',          name: 'The Copycat',             file: 'The_Copycat.mp3' },
+  { id: 'moving-forward',   name: 'Moving Forward',          file: 'Moving_Forward.mp3' },
+  { id: 'fleetwood',        name: 'Fleetwood National',      file: 'Fleetwood_National.mp3' },
+  { id: 'ashes',            name: 'Ashes and Aurora',        file: 'Ashes_and_Aurora.mp3' },
+  { id: 'sugartrain',       name: 'Sugartrain Voyage',       file: 'Sugartrain_Voyage.mp3' },
+  { id: 'cardiff',          name: 'Car Crash in Cardiff',    file: 'Car_Crash_in_Cardiff.mp3' },
+  { id: 'dune',             name: 'Dune Audio',              file: 'Dune_Audio.mp3' },
+  { id: 'slow-roast',       name: 'Slow Roast',              file: 'Slow_Roast.mp3' },
+  { id: 'bayou-moon',       name: 'Bayou Moon',              file: 'Bayou_Moon.mp3' },
+  { id: 'lonely-carbon',    name: 'Lonely Carbon Lifeforms', file: 'Lonely_Carbon_Lifeforms.mp3' },
+  { id: 'magical-third',    name: 'The Magical Third',       file: 'The_Magical_Third.mp3' },
+  { id: 'up-down',          name: 'Up and Down',             file: 'Up_and_Down.mp3' },
+  { id: 'arcadia',          name: 'Arcadia Drive',           file: 'Arcadia_Drive.mp3' },
+  { id: 'ocean-post',       name: 'Ocean Post',              file: 'Ocean_Post.mp3' },
+  { id: 'covert-company',   name: 'Covert Company',          file: 'Covert_Company.mp3' },
+  { id: 'too-many-lights',  name: 'Too Many Lights',         file: 'Too_Many_Lights.mp3' },
+  { id: 'american-sword',   name: 'American Sword',          file: 'American_Sword.mp3' },
+  { id: 'go-driving-fast',  name: 'Go Driving Fast',         file: 'Go_Driving_Fast.mp3' },
 ];
 
 // assumes all files live in /assets/
@@ -1098,7 +1098,6 @@ const THEMES = {
     textSub: "text-slate-300",
     accent: "text-cyan-400",
     accentHex: "#22d3ee",
-    buttonBg: "bg-slate-800/90",
   },
   "day break": {
     id: "day break",
@@ -1109,7 +1108,6 @@ const THEMES = {
     textSub: "text-orange-900",
     accent: "text-orange-600",
     accentHex: "#fb923c",
-    buttonBg: "bg-orange-100/90",
   },
   "fantasy": {
     id: "fantasy",
@@ -1120,7 +1118,6 @@ const THEMES = {
     textSub: "text-purple-200",
     accent: "text-fuchsia-400",
     accentHex: "#e879f9",
-    buttonBg: "bg-purple-900/90",
   }
 };
 
@@ -1132,35 +1129,89 @@ function formatTime(sec) {
   return m + ":" + (s < 10 ? "0" + s : s);
 }
 
-// Simple "fake VU" levels while playing.
-// Later we can wire this to Web Audio for true audio-reactive tubes.
-function useTubeLevels(isPlaying) {
-  const [levels, setLevels] = useState([0.15, 0.2, 0.18, 0.22, 0.17]);
+// Audio-reactive tube level using Web Audio API
+function useAudioLevel(audioRef, isPlaying) {
+  const [level, setLevel] = useState(0.15);
+  const ctxRef = useRef(null);
+  const analyserRef = useRef(null);
+  const dataRef = useRef(null);
+  const sourceRef = useRef(null);
+  const rafRef = useRef(null);
 
+  // Wire audio element to analyser once
   useEffect(() => {
-    let frame;
-    if (!isPlaying) {
-      // when paused, gently settle to low glow
-      setLevels([0.1, 0.1, 0.1, 0.1, 0.1]);
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (ctxRef.current) return; // already wired
+
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) {
+      // browser doesn't support Web Audio
       return;
     }
 
-    const animate = () => {
-      setLevels(prev =>
-        prev.map(v => {
-          const jitter = (Math.random() - 0.5) * 0.18;
-          let next = v + jitter;
-          next = Math.max(0.08, Math.min(1, next));
-          return next;
-        })
-      );
-      frame = requestAnimationFrame(animate);
+    const ctx = new AudioCtx();
+    const analyser = ctx.createAnalyser();
+    analyser.fftSize = 256;
+    const bufferLength = analyser.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+
+    const source = ctx.createMediaElementSource(audio);
+    source.connect(analyser);
+    analyser.connect(ctx.destination);
+
+    ctxRef.current = ctx;
+    analyserRef.current = analyser;
+    dataRef.current = dataArray;
+    sourceRef.current = source;
+
+    return () => {
+      cancelAnimationFrame(rafRef.current);
+      if (sourceRef.current) sourceRef.current.disconnect();
+      if (analyserRef.current) analyserRef.current.disconnect();
+      if (ctxRef.current && ctxRef.current.state !== "closed") ctxRef.current.close();
     };
-    frame = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(frame);
+  }, [audioRef]);
+
+  // Animate level while playing
+  useEffect(() => {
+    const analyser = analyserRef.current;
+    const ctx = ctxRef.current;
+    const dataArray = dataRef.current;
+
+    if (!analyser || !ctx || !dataArray) return;
+
+    if (!isPlaying) {
+      cancelAnimationFrame(rafRef.current);
+      setLevel(0.12);
+      return;
+    }
+
+    const bufferLength = analyser.frequencyBinCount;
+
+    const tick = () => {
+      analyser.getByteFrequencyData(dataArray);
+      let sum = 0;
+      for (let i = 0; i < bufferLength; i++) {
+        sum += dataArray[i];
+      }
+      const avg = sum / bufferLength;   // 0–255
+      const norm = avg / 255;           // 0–1
+      const next = 0.1 + norm * 0.9;
+      setLevel(next);
+      rafRef.current = requestAnimationFrame(tick);
+    };
+
+    ctx.resume().then(() => {
+      rafRef.current = requestAnimationFrame(tick);
+    });
+
+    return () => {
+      cancelAnimationFrame(rafRef.current);
+    };
   }, [isPlaying]);
 
-  return levels;
+  return level;
 }
 
 // ----------------- Components -----------------
@@ -1170,16 +1221,18 @@ function ThemeChips({ activeTheme, onChange }) {
     <div className="flex justify-center gap-3 mb-6">
       {Object.values(THEMES).map((t) => {
         const active = t.id === activeTheme;
+        const base = "px-4 py-1 rounded-full text-xs tracking-[0.14em] font-semibold uppercase transition-all border border-transparent shadow-sm";
+        let colorClass = "";
+        if (t.id === "nite life") colorClass = "bg-slate-900/90 text-cyan-100";
+        if (t.id === "day break") colorClass = "bg-amber-200 text-orange-900";
+        if (t.id === "fantasy")   colorClass = "bg-fuchsia-900/90 text-fuchsia-100";
         return (
           <button
             key={t.id}
             onClick={() => onChange(t.id)}
             className={[
-              "px-4 py-1 rounded-full text-xs tracking-[0.14em] font-semibold uppercase transition-all",
-              "border border-transparent shadow-sm",
-              t.id === "nite life"  ? "bg-slate-900/90 text-cyan-100"   : "",
-              t.id === "day break"  ? "bg-amber-200 text-orange-900"    : "",
-              t.id === "fantasy"    ? "bg-fuchsia-900/90 text-fuchsia-100" : "",
+              base,
+              colorClass,
               active ? "ring-2 ring-offset-2 ring-offset-black" : "opacity-80 hover:opacity-100"
             ].join(" ")}
           >
@@ -1191,20 +1244,20 @@ function ThemeChips({ activeTheme, onChange }) {
   );
 }
 
-function TubeDeck({ trackName, currentTime, duration, theme, isPlaying }) {
+function TubeDeck({ trackName, currentTime, duration, theme, level }) {
   const themeDef = THEMES[theme];
-  const levels = useTubeLevels(isPlaying);
+  const tubes = [0, 1, 2, 3, 4].map(() => level); // all in unison
 
   return (
     <div className={[
-      "w-full max-w-3xl mx-auto rounded-3xl border shadow-2xl px-6 py-5 mb-10",
+      "w-full max-w-3xl mx-auto rounded-3xl border shadow-2xl px-6 py-5 mb-8",
       "bg-gradient-to-b",
       themeDef.bg,
       themeDef.border
     ].join(" ")}>
       {/* Tube window */}
       <div className="rounded-2xl border border-slate-700/60 bg-slate-900/70 px-6 py-6 mb-5 flex justify-between">
-        {levels.map((lvl, i) => (
+        {tubes.map((lvl, i) => (
           <div key={i} className="flex flex-col items-center">
             {/* glass housing */}
             <div className="w-[42px] h-[120px] rounded-full border border-slate-500/70 bg-gradient-to-b from-slate-800/95 to-slate-900/95 flex items-end justify-center shadow-[0_0_28px_rgba(0,0,0,0.7)]">
@@ -1223,11 +1276,8 @@ function TubeDeck({ trackName, currentTime, duration, theme, isPlaying }) {
         ))}
       </div>
 
-      {/* Label + track name */}
+      {/* Track name only (removed 'CARBON STUDIO DECK') */}
       <div className="text-center mb-4">
-        <div className="text-[10px] tracking-[0.22em] text-slate-400 uppercase mb-2">
-          CARBON STUDIO DECK
-        </div>
         <div className={[themeDef.text, "font-semibold text-lg"].join(" ")}>
           {trackName}
         </div>
@@ -1253,7 +1303,7 @@ function TubeDeck({ trackName, currentTime, duration, theme, isPlaying }) {
   );
 }
 
-function VintageControls({ isPlaying, onPlayPause, onStop, onPrev, onNext, theme }) {
+function VintageControls({ onPlay, onPause, onStop, onPrev, onNext, isPlaying, theme }) {
   const themeDef = THEMES[theme];
 
   const baseBtn =
@@ -1267,6 +1317,7 @@ function VintageControls({ isPlaying, onPlayPause, onStop, onPrev, onNext, theme
 
   return (
     <div className="flex items-center justify-center gap-3 sm:gap-4 mb-6">
+      {/* Reverse / Previous */}
       <button
         aria-label="Previous track"
         onClick={onPrev}
@@ -1276,6 +1327,27 @@ function VintageControls({ isPlaying, onPlayPause, onStop, onPrev, onNext, theme
         <span className="text-xs">⏮</span>
       </button>
 
+      {/* Play */}
+      <button
+        aria-label="Play"
+        onClick={onPlay}
+        className={baseBtn + " scale-110"}
+        style={{ filter: glow, boxShadow: `0 0 18px ${themeDef.accentHex}cc` }}
+      >
+        <span className="text-sm">▶</span>
+      </button>
+
+      {/* Pause */}
+      <button
+        aria-label="Pause"
+        onClick={onPause}
+        className={baseBtn}
+        style={isPlaying ? { filter: glow } : {}}
+      >
+        <span className="text-sm">⏸</span>
+      </button>
+
+      {/* Stop */}
       <button
         aria-label="Stop"
         onClick={onStop}
@@ -1284,17 +1356,7 @@ function VintageControls({ isPlaying, onPlayPause, onStop, onPrev, onNext, theme
         <span className="text-xs">■</span>
       </button>
 
-      <button
-        aria-label={isPlaying ? "Pause" : "Play"}
-        onClick={onPlayPause}
-        className={baseBtn + " scale-110"}
-        style={{ filter: glow, boxShadow: `0 0 18px ${themeDef.accentHex}cc` }}
-      >
-        <span className="text-sm">
-          {isPlaying ? "⏸" : "▶"}
-        </span>
-      </button>
-
+      {/* Forward / Next */}
       <button
         aria-label="Next track"
         onClick={onNext}
@@ -1367,7 +1429,9 @@ function MusicApp() {
 
   const audioRef = useRef(null);
 
-  // ensure single audio element
+  const level = useAudioLevel(audioRef, isPlaying);
+
+  // create audio element once
   useEffect(() => {
     if (!audioRef.current) {
       const audio = new Audio();
@@ -1384,7 +1448,6 @@ function MusicApp() {
       });
     }
 
-    // load first track on mount
     const audio = audioRef.current;
     const t = TRACKS[currentIndex];
     if (t) {
@@ -1393,7 +1456,7 @@ function MusicApp() {
     }
   }, []);
 
-  // when track changes
+  // when track index changes
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -1409,19 +1472,19 @@ function MusicApp() {
     }
   }, [currentIndex]);
 
-  const handlePlayPause = () => {
+  const handlePlay = () => {
     const audio = audioRef.current;
     if (!audio) return;
-    if (isPlaying) {
-      audio.pause();
-      setIsPlaying(false);
-    } else {
-      audio.play().then(() => {
-        setIsPlaying(true);
-      }).catch(() => {
-        // autoplay blocked
-      });
-    }
+    audio.play()
+      .then(() => setIsPlaying(true))
+      .catch(() => {});
+  };
+
+  const handlePause = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.pause();
+    setIsPlaying(false); // keeps currentTime where it is
   };
 
   const handleStop = () => {
@@ -1430,21 +1493,24 @@ function MusicApp() {
     audio.pause();
     audio.currentTime = 0;
     setIsPlaying(false);
+    setCurrentTime(0);
   };
 
   const handlePrev = () => {
-    setCurrentIndex((prev) => (prev - 1 + TRACKS.length) % TRACKS.length);
+    setCurrentIndex(prev => (prev - 1 + TRACKS.length) % TRACKS.length);
   };
 
   const handleNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % TRACKS.length);
+    setCurrentIndex(prev => (prev + 1) % TRACKS.length);
   };
 
   const handleSelectTrack = (index) => {
     setCurrentIndex(index);
     const audio = audioRef.current;
     if (audio) {
-      audio.play().then(() => setIsPlaying(true)).catch(() => {});
+      audio.play()
+        .then(() => setIsPlaying(true))
+        .catch(() => {});
     } else {
       setIsPlaying(true);
     }
@@ -1457,19 +1523,20 @@ function MusicApp() {
       <ThemeChips activeTheme={theme} onChange={setTheme} />
 
       <TubeDeck
-        trackName={activeTrack?.name || ""}
+        trackName={activeTrack ? activeTrack.name : ""}
         currentTime={currentTime}
         duration={duration}
         theme={theme}
-        isPlaying={isPlaying}
+        level={level}
       />
 
       <VintageControls
-        isPlaying={isPlaying}
-        onPlayPause={handlePlayPause}
+        onPlay={handlePlay}
+        onPause={handlePause}
         onStop={handleStop}
         onPrev={handlePrev}
         onNext={handleNext}
+        isPlaying={isPlaying}
         theme={theme}
       />
 
