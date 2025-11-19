@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chris Chattom — Music</title>
+  <meta name="description" content="Music by Chris Chattom." />
+
+  <!-- Same font as main site -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --accent:#00f5d4; /* you can tweak this */
+    }
+
+    *{box-sizing:border-box;}
+
+    html,body{height:100%;}
+    body{
+      margin:0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background:#000;
+      color:#f8fafc;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    /* NAVBAR (white-on-black version) */
+    .site-nav {
+      display:flex;
+      justify-content:center;
+      gap:2.2rem;
+      margin-top:2rem;
+      font-weight:500;
+    }
+
+    .site-nav a {
+      color:#f8fafc;
+      text-decoration:none;
+      position:relative;
+      padding-bottom:4px;
+      transition:color .3s ease;
+    }
+    .site-nav a::after{
+      content:"";
+      position:absolute;
+      left:50%;
+      bottom:0;
+      width:0%;
+      height:2px;
+      background-color:var(--accent);
+      border-radius:2px;
+      transition:all .35s cubic-bezier(0.4,0,0.2,1);
+      transform:translateX(-50%);
+    }
+    .site-nav a:hover::after{ width:100%; }
+
+    .site-nav [aria-current="page"]{
+      color:var(--accent);
+    }
+    .site-nav [aria-current="page"]::after{
+      width:100%;
+    }
+
+    @media (max-width:640px){
+      .site-nav{
+        gap:1.2rem;
+        margin-top:1rem;
+        font-size:15px;
+        flex-wrap:wrap;
+      }
+      .site-nav a{
+        padding-bottom:6px;
+        -webkit-tap-highlight-color:rgba(0,0,0,0);
+      }
+    }
+
+    .wrap{
+      max-width:960px;
+      margin:0 auto;
+      padding:32px 20px 48px;
+    }
+
+    h1{
+      font-size:clamp(24px,3vw,32px);
+      margin:0 0 12px;
+    }
+    p.lead{
+      margin:0 0 24px;
+      color:#94a3b8;
+    }
+
+    /* Root for React player */
+    #root{
+      margin-top:24px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Local nav for this page -->
+  <nav class="site-nav" aria-label="Main">
+    <a href="/">Home</a>
+    <a href="photography.html">Photography</a>
+    <a href="music.html" aria-current="page">Music</a>
+    <a href="/#contact">Contact</a>
+  </nav>
+
+  <div class="wrap">
+    <header>
+      <h1>Music</h1>
+      <p class="lead">Selections by Chris Chattom.</p>
+    </header>
+
+    <!-- React player will mount here -->
+    <div id="root"></div>
+  </div>
+
+  <!-- Your compiled React bundle goes here -->
+  <script type="module" src="music-player.js"></script>
+</body>
+</html>
