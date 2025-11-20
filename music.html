@@ -19,7 +19,7 @@
   <style>
     :root{
       --accent:#00f5d4;
-      --glow-soft: rgba(34, 211, 238, 0.12);   /* default, overridden per theme */
+      --glow-soft: rgba(34, 211, 238, 0.12);
       --glow-strong: rgba(34, 211, 238, 0.55);
     }
 
@@ -171,7 +171,7 @@
       pointer-events:none;
     }
 
-    /* --- Volume control on same row --- */
+    /* --- Volume control --- */
     .volume-wrap{
       display:flex;
       align-items:center;
@@ -271,7 +271,7 @@
         filter 140ms ease;
       color:#e5e7eb;
       cursor:pointer;
-      filter:drop-shadow(0 0 3px var(--glow-soft)); /* subtle 2–3% glow */
+      filter:drop-shadow(0 0 3px var(--glow-soft)); /* subtle glow */
     }
     .transport-btn--play{
       width:52px;
@@ -281,7 +281,7 @@
     .transport-btn:focus-visible{
       outline:none;
       transform:translateY(-1px);
-      filter:drop-shadow(0 0 10px var(--glow-strong)); /* stronger 10–15% */
+      filter:drop-shadow(0 0 10px var(--glow-strong)); /* stronger glow */
     }
     .transport-btn:active{
       transform:translateY(1px) scale(0.97);
@@ -387,54 +387,49 @@
       return m + ":" + (s < 10 ? "0"+s : s);
     }
 
-    // Web Audio hook: single level 0–1 from the HTMLAudioElement
-    function useAudioLevel(audioElement, isPlaying, volume, isMuted){
+    // Web Audio hook: get a level 0–1 from HTMLAudioElement
+    function useAudioLevel(audioElement, isPlaying){
       const [level,setLevel] = useState(0.15);
-const ctxRef = useRef(null);
-const analyserRef = useRef(null);
-const dataRef = useRef(null);
-const sourceRef = useRef(null);
-const gainRef = useRef(null);   // NEW: for master volume
-const rafRef = useRef(null);
+      const ctxRef = useRef(null);
+      const analyserRef = useRef(null);
+      const dataRef = useRef(null);
+      const sourceRef = useRef(null);
+      const rafRef = useRef(null);
 
+      // Wire once
       useEffect(() => {
         if (!audioElement) return;
         if (ctxRef.current) return;
 
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+
         const ctx = new AudioCtx();
-const analyser = ctx.createAnalyser();
-analyser.fftSize = 256;
-const bufferLen = analyser.frequencyBinCount;
-const dataArray = new Uint8Array(bufferLen);
+        const analyser = ctx.createAnalyser();
+        analyser.fftSize = 256;
+        const bufferLen = analyser.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLen);
 
-const src = ctx.createMediaElementSource(audioElement);
-const gain = ctx.createGain();
+        const src = ctx.createMediaElementSource(audioElement);
+        src.connect(analyser);
+        analyser.connect(ctx.destination);
 
-// initial volume (respect mute + slider)
-gain.gain.value = isMuted ? 0 : (typeof volume === "number" ? volume : 1);
-
-// Wire: element -> gain -> analyser -> speakers
-src.connect(gain);
-gain.connect(analyser);
-analyser.connect(ctx.destination);
-
-ctxRef.current = ctx;
-analyserRef.current = analyser;
-dataRef.current = dataArray;
-sourceRef.current = src;
-gainRef.current = gain;
+        ctxRef.current = ctx;
+        analyserRef.current = analyser;
+        dataRef.current = dataArray;
+        sourceRef.current = src;
 
         return () => {
-  if (rafRef.current) cancelAnimationFrame(rafRef.current);
-  if (sourceRef.current) sourceRef.current.disconnect();
-  if (analyserRef.current) analyserRef.current.disconnect();
-  if (gainRef.current) gainRef.current.disconnect();   // NEW
-  if (ctxRef.current && ctxRef.current.state !== "closed"){
-    ctxRef.current.close();
-  }
-};
+          if (rafRef.current) cancelAnimationFrame(rafRef.current);
+          if (sourceRef.current) sourceRef.current.disconnect();
+          if (analyserRef.current) analyserRef.current.disconnect();
+          if (ctxRef.current && ctxRef.current.state !== "closed"){
+            ctxRef.current.close();
+          }
+        };
       }, [audioElement]);
 
+      // Animate while playing
       useEffect(() => {
         const ctx = ctxRef.current;
         const analyser = analyserRef.current;
@@ -492,7 +487,11 @@ gainRef.current = gain;
                 key={id}
                 type="button"
                 onClick={() => onChange(id)}
-                className={base + " " + bg + " " + (selected ? "ring-2 ring-offset-2 ring-offset-black" : "opacity-80 hover:opacity-100")}
+                className={
+                  base + " " + bg + " " +
+                  (selected ? "ring-2 ring-offset-2 ring-offset-black" :
+                   "opacity-80 hover:opacity-100")
+                }
               >
                 {t.label}
               </button>
@@ -553,21 +552,16 @@ gainRef.current = gain;
       );
     }
 
-    function VintageControls(props){
-  const {
-    onPlay,
-    onPause,
-    onStop,
-    onSkipBack,
-    onSkipForward,
-    onRewind,
-    onFastForward,
-    isPlaying,
-    volume,
-    onVolumeChange,
-    isMuted,
-    onToggleMute,
-  } = props;
+    function VintageControls({
+      onPlay,
+      onPause,
+      onStop,
+      onSkipBack,
+      onSkipForward,
+      onRewind,
+      onFastForward,
+      isPlaying,
+    }){
       return (
         <div className="flex items-center justify-center gap-3 sm:gap-4">
           {/* ⏮ REVERSE SKIP (previous track) */}
@@ -623,7 +617,7 @@ gainRef.current = gain;
             <span className="transport-icon text-xs">■</span>
           </button>
 
-          {/* ⏩ FAST FORWARD (small nudge forward) */}
+          {/* ⏩ FAST FORWARD */}
           <button
             aria-label="Fast forward"
             type="button"
@@ -738,7 +732,7 @@ gainRef.current = gain;
         };
       }, []);
 
-      // Load track whenever index changes (NOT when play/pause changes)
+      // Load track whenever index changes
       useEffect(() => {
         const audio = audioRef.current;
         if (!audio || !activeTrack) return;
@@ -748,18 +742,17 @@ gainRef.current = gain;
         audio.currentTime = 0;
         setCurrentTime(0);
 
-        // if we were in "playing" mode (e.g. auto-advance), keep playing
         if (isPlaying){
           audio.play().catch(() => setIsPlaying(false));
         }
-      }, [currentIndex, activeTrack]);
+      }, [currentIndex, activeTrack, isPlaying]);
 
       // Apply volume + mute
       useEffect(() => {
         const audio = audioRef.current;
         if (!audio) return;
-        audio.volume = volume;          // 0–1
-        audio.muted = isMuted;          // true/false
+        audio.volume = volume;  // 0–1
+        audio.muted = isMuted;  // true/false
       }, [volume, isMuted]);
 
       // small +/- nudge in seconds
@@ -794,12 +787,6 @@ gainRef.current = gain;
         setCurrentTime(0);
         setIsPlaying(false);
       };
-      // respond to volume + mute changes
-useEffect(() => {
-  const gain = gainRef.current;
-  if (!gain) return;
-  gain.gain.value = isMuted ? 0 : (typeof volume === "number" ? volume : 1);
-}, [volume, isMuted]);
 
       const handleSkipBack = () => {
         setCurrentIndex(prev => (prev - 1 + TRACKS.length) % TRACKS.length);
@@ -896,19 +883,15 @@ useEffect(() => {
             </div>
 
             <VintageControls
-  onSkipBack={handleSkipBack}
-  onRewind={handleRewind}
-  onPlay={handlePlay}
-  onPause={handlePause}
-  onStop={handleStop}
-  onFastForward={handleFastForward}
-  onSkipForward={handleSkipForward}
-  isPlaying={isPlaying}
-  volume={volume}
-  onVolumeChange={handleVolumeChange}
-  isMuted={isMuted}
-  onToggleMute={handleToggleMute}
-/>
+              onSkipBack={handleSkipBack}
+              onRewind={handleRewind}
+              onPlay={handlePlay}
+              onPause={handlePause}
+              onStop={handleStop}
+              onFastForward={handleFastForward}
+              onSkipForward={handleSkipForward}
+              isPlaying={isPlaying}
+            />
           </div>
 
           <Playlist
