@@ -471,69 +471,116 @@
     }
 
     function VintageControls({
-      onSkipBack,
-      onRewind,
-      onPlay,
-      onPause,
-      onStop,
-      onFastForward,
-      onSkipForward,
-      isPlaying,
-      theme
-    }){
-      const accent = THEMES[theme].accentHex;
-      const glow = `drop-shadow(0 0 12px ${accent})`;
+  onPlay,
+  onPause,
+  onStop,
+  onPrev,
+  onNext,
+  isPlaying,
+  theme,
+}) {
+  const themeDef = THEMES[theme];
+  const [hovered, setHovered] = React.useState(null);
 
-      const base = "transport-btn";
-      const playClass = "transport-btn transport-btn--play";
+  const baseBtn =
+    "w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center " +
+    "bg-slate-900/90 border border-slate-600/80 text-slate-100 " +
+    "shadow-[0_8px_18px_rgba(0,0,0,0.65)] " +
+    "transition-all transform focus:outline-none";
 
-      return (
-        <div className="flex items-center justify-center gap-3 sm:gap-4 mb-6">
-          {/* Reverse Skip */}
-          <button type="button" aria-label="Previous track" onClick={onSkipBack}
-            className={base} style={{ filter: glow }}>
-            <span className="transport-icon">⏮</span>
-          </button>
+  // decide glow amount based on which button is hovered
+  const getGlowStyle = (id, isPlay = false) => {
+    const isHovered = hovered === id;
+    const color = isHovered ? themeDef.glowStrong : themeDef.glowSoft;
+    const radius = isPlay ? (isHovered ? 22 : 14) : (isHovered ? 18 : 10);
+    return {
+      boxShadow: `0 0 ${radius}px ${color}`,
+    };
+  };
 
-          {/* Reverse (rew -5s) */}
-          <button type="button" aria-label="Rewind" onClick={onRewind}
-            className={base} style={{ filter: glow }}>
-            <span className="transport-icon">⏪</span>
-          </button>
+  const handleEnter = (id) => {
+    setHovered(id);
+  };
 
-          {/* Play */}
-          <button type="button" aria-label="Play" onClick={onPlay}
-            className={playClass}
-            style={{ filter: glow, boxShadow:`0 0 22px ${accent}dd, 0 8px 18px rgba(0,0,0,0.7), inset 0 2px 4px rgba(255,255,255,0.4)` }}>
-            <span className="transport-icon">▶</span>
-          </button>
+  const handleLeave = () => {
+    setHovered(null);
+  };
 
-          {/* Pause */}
-          <button type="button" aria-label="Pause" onClick={onPause}
-            className={base} style={isPlaying ? { filter: glow } : {}}>
-            <span className="transport-icon">⏸</span>
-          </button>
+  return (
+    <div className="flex items-center justify-center gap-3 sm:gap-4 mb-6">
+      {/* Reverse / previous track */}
+      <button
+        aria-label="Previous track"
+        onClick={onPrev}
+        className={baseBtn}
+        style={getGlowStyle("prev")}
+        onMouseEnter={() => handleEnter("prev")}
+        onMouseLeave={handleLeave}
+        onTouchStart={() => handleEnter("prev")}
+        onTouchEnd={handleLeave}
+      >
+        <span className="text-xs">⏮</span>
+      </button>
 
-          {/* Stop */}
-          <button type="button" aria-label="Stop" onClick={onStop}
-            className={base}>
-            <span className="transport-icon">■</span>
-          </button>
+      {/* Play */}
+      <button
+        aria-label="Play"
+        onClick={onPlay}
+        className={baseBtn + " scale-110"}
+        style={getGlowStyle("play", true)}
+        onMouseEnter={() => handleEnter("play")}
+        onMouseLeave={handleLeave}
+        onTouchStart={() => handleEnter("play")}
+        onTouchEnd={handleLeave}
+      >
+        <span className="text-sm">▶</span>
+      </button>
 
-          {/* Fast forward (+5s) */}
-          <button type="button" aria-label="Fast forward" onClick={onFastForward}
-            className={base} style={{ filter: glow }}>
-            <span className="transport-icon">⏩</span>
-          </button>
+      {/* Pause */}
+      <button
+        aria-label="Pause"
+        onClick={onPause}
+        className={baseBtn}
+        style={getGlowStyle("pause")}
+        onMouseEnter={() => handleEnter("pause")}
+        onMouseLeave={handleLeave}
+        onTouchStart={() => handleEnter("pause")}
+        onTouchEnd={handleLeave}
+      >
+        <span className="text-sm">⏸</span>
+      </button>
 
-          {/* Forward skip */}
-          <button type="button" aria-label="Next track" onClick={onSkipForward}
-            className={base} style={{ filter: glow }}>
-            <span className="transport-icon">⏭</span>
-          </button>
-        </div>
-      );
-    }
+      {/* Stop */}
+      <button
+        aria-label="Stop"
+        onClick={onStop}
+        className={baseBtn}
+        style={getGlowStyle("stop")}
+        onMouseEnter={() => handleEnter("stop")}
+        onMouseLeave={handleLeave}
+        onTouchStart={() => handleEnter("stop")}
+        onTouchEnd={handleLeave}
+      >
+        <span className="text-xs">■</span>
+      </button>
+
+      {/* Forward / next track */}
+      <button
+        aria-label="Next track"
+        onClick={onNext}
+        className={baseBtn}
+        style={getGlowStyle("next")}
+        onMouseEnter={() => handleEnter("next")}
+        onMouseLeave={handleLeave}
+        onTouchStart={() => handleEnter("next")}
+        onTouchEnd={handleLeave}
+      >
+        <span className="text-xs">⏭</span>
+      </button>
+    </div>
+  );
+}
+
 
     function Playlist({ tracks, currentIndex, onSelect, theme }){
       const t = THEMES[theme];
