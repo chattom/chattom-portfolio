@@ -100,12 +100,12 @@
 
     #root{ margin-top:24px; }
 
-    /* --- Retro tubes --- */
+    /* --- Retro tubes & deck --- */
     .tube-window{
       border-radius:1.25rem;
       border:1px solid rgba(148,163,184,0.6);
       background:radial-gradient(circle at 50% 0%, rgba(255,255,255,0.06), transparent 55%),
-                 linear-gradient(to bottom,#020617,#020617,#020617,#020617,#020617,#020617,#020617);
+                 linear-gradient(to bottom,#020617,#020617,#020617,#020617,#020617);
       box-shadow:
         inset 0 0 40px rgba(15,23,42,1),
         0 24px 60px rgba(0,0,0,0.85);
@@ -113,15 +113,19 @@
       display:flex;
       justify-content:space-between;
     }
+
+    /* glassier tubes */
     .tube-shell{
+      position:relative;
       width:48px;
       height:126px;
       border-radius:999px;
       border:1px solid rgba(148,163,184,0.7);
-      background:radial-gradient(circle at 25% 15%, rgba(255,255,255,0.18), transparent 55%),
-                 linear-gradient(to bottom,#111827,#020617);
+      background:
+        radial-gradient(circle at 20% 10%, rgba(255,255,255,0.55), transparent 55%),
+        radial-gradient(circle at 80% 90%, rgba(15,23,42,0.95), #020617);
       box-shadow:
-        inset 0 0 18px rgba(15,23,42,0.95),
+        inset 0 0 22px rgba(15,23,42,0.95),
         0 14px 32px rgba(0,0,0,0.9);
       display:flex;
       align-items:flex-end;
@@ -129,10 +133,21 @@
       padding:8px;
       overflow:hidden;
     }
+    .tube-shell::before{
+      content:"";
+      position:absolute;
+      inset:10% 18%;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,0.35);
+      opacity:0.75;
+      pointer-events:none;
+    }
     .tube-core{
       width:26px;
       border-radius:999px;
-      background:linear-gradient(to bottom,#f9fafb,#e5e7eb,#e5e7eb,#94a3b8);
+      background:
+        radial-gradient(circle at 50% 0%, #f9fafb, #e5e7eb 45%, #94a3b8 85%),
+        linear-gradient(to bottom, rgba(15,23,42,0.15), rgba(15,23,42,0.55));
       transition:height 120ms ease-out, box-shadow 120ms ease-out, opacity 120ms ease-out;
     }
     .tube-foot{
@@ -144,6 +159,35 @@
       box-shadow:
         inset 0 1px 2px rgba(255,255,255,0.12),
         0 6px 14px rgba(0,0,0,0.9);
+    }
+
+    /* brushed-metal deck shell */
+    .player-shell{
+      background-image:
+        linear-gradient(135deg, rgba(255,255,255,0.22), rgba(255,255,255,0) 42%),
+        repeating-linear-gradient(90deg,
+          rgba(148,163,184,0.22) 0px,
+          rgba(148,163,184,0.22) 1px,
+          rgba(15,23,42,0.9) 1px,
+          rgba(15,23,42,0.9) 3px
+        );
+      background-blend-mode: soft-light, normal;
+    }
+
+    /* rubber feet */
+    .deck-feet{
+      margin-top:1.25rem;
+      display:flex;
+      justify-content:center;
+      gap:2.5rem;
+    }
+    .deck-feet span{
+      height:8px;
+      width:64px;
+      border-radius:999px;
+      background:#020617;
+      border:1px solid #020617;
+      box-shadow:0 8px 14px rgba(0,0,0,0.9);
     }
 
     /* --- Progress strip --- */
@@ -167,7 +211,37 @@
       pointer-events:none;
     }
 
-      /* --- Button glow helper --- */
+    /* --- Vintage transport buttons --- */
+    .transport-btn{
+      position:relative;
+      border-radius:999px;
+      width:46px;
+      height:46px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border:1px solid rgba(148,163,184,0.7);
+      background:
+        radial-gradient(circle at 30% 18%, rgba(255,255,255,0.26), transparent 55%),
+        radial-gradient(circle at 70% 82%, #020617, #020617);
+      box-shadow:
+        0 8px 16px rgba(0,0,0,0.7),
+        inset 0 2px 4px rgba(255,255,255,0.36);
+      transition:
+        box-shadow 140ms ease,
+        transform 120ms ease,
+        border-color 140ms ease,
+        background 140ms ease;
+      color:#e5e7eb;
+      cursor:pointer;
+    }
+
+    .transport-icon{
+      font-size:14px;
+      filter:drop-shadow(0 1px 1px rgba(0,0,0,0.9));
+    }
+
+    /* Glow helper: 2–3% at rest, 10–15% on hover */
     .glow-btn{
       filter: drop-shadow(0 0 3px var(--glow-soft));
       transition: filter 140ms ease, transform 120ms ease, box-shadow 140ms ease;
@@ -177,8 +251,44 @@
       filter: drop-shadow(0 0 10px var(--glow-strong));
     }
 
-
-    /* (old .transport-btn styles left in case we re-use them later) */
+    /* Volume control */
+    .volume-wrap{
+      display:flex;
+      align-items:center;
+      gap:0.4rem;
+    }
+    .volume-slider{
+      -webkit-appearance:none;
+      appearance:none;
+      height:4px;
+      width:88px;
+      border-radius:999px;
+      background:linear-gradient(to right,#020617,#0f172a);
+      outline:none;
+      cursor:pointer;
+    }
+    .volume-slider::-webkit-slider-thumb{
+      -webkit-appearance:none;
+      appearance:none;
+      width:14px;
+      height:14px;
+      border-radius:999px;
+      background:radial-gradient(circle at 30% 20%, #f9fafb, #94a3b8);
+      box-shadow:
+        0 0 6px rgba(0,0,0,0.7),
+        0 0 10px rgba(148,163,184,0.55);
+      border:1px solid rgba(148,163,184,0.8);
+    }
+    .volume-slider::-moz-range-thumb{
+      width:14px;
+      height:14px;
+      border-radius:999px;
+      background:radial-gradient(circle at 30% 20%, #f9fafb, #94a3b8);
+      box-shadow:
+        0 0 6px rgba(0,0,0,0.7),
+        0 0 10px rgba(148,163,184,0.55);
+      border:1px solid rgba(148,163,184,0.8);
+    }
   </style>
 </head>
 <body>
@@ -227,7 +337,7 @@
     const AUDIO_BASE = "assets/";
 
     // -------- Themes ----------
-       const THEMES = {
+    const THEMES = {
       "nite life": {
         id: "nite life",
         label: "NITE LIFE",
@@ -237,8 +347,8 @@
         textSub: "text-slate-300",
         accent: "text-cyan-400",
         accentHex: "#22d3ee",
-        glowSoft: "rgba(34, 211, 238, 0.03)",  // ~3%
-        glowStrong: "rgba(34, 211, 238, 0.15)",// ~15%
+        glowSoft: "rgba(34, 211, 238, 0.03)",
+        glowStrong: "rgba(34, 211, 238, 0.15)",
       },
       "day break": {
         id: "day break",
@@ -357,7 +467,7 @@
       return level;
     }
 
-    // ---------- Components ----------
+    // ---------- UI Components ----------
     function ThemeChips({ active, onChange }){
       return (
         <div className="flex flex-wrap justify-center gap-3 mb-6">
@@ -392,7 +502,7 @@
       return (
         <div className={[
           "w-full max-w-3xl mx-auto rounded-3xl border px-6 py-5 mb-6",
-          "bg-gradient-to-b", t.bg, t.border, "shadow-2xl"
+          "bg-gradient-to-b", t.bg, t.border, "shadow-2xl", "player-shell"
         ].join(" ")}>
           <div className="tube-window mb-5">
             {tubes.map((lvl,i) => (
@@ -430,11 +540,16 @@
               />
             </div>
           </div>
+
+          <div className="deck-feet">
+            <span></span>
+            <span></span>
+          </div>
         </div>
       );
     }
 
-        function VintageControls({
+    function VintageControls({
       onPlay,
       onPause,
       onStop,
@@ -444,16 +559,16 @@
       onNudgeForward,
       isPlaying,
       theme,
+      volume,
+      isMuted,
+      onVolumeChange,
+      onToggleMute,
     }) {
       const themeDef = THEMES[theme];
 
       const baseBtn =
-        "w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center " +
-        "bg-slate-900/90 border border-slate-600/80 text-slate-100 " +
-        "shadow-[0_8px_18px_rgba(0,0,0,0.65)] " +
-        "transition-all transform hover:-translate-y-[1px] focus:outline-none";
+        "transport-btn glow-btn w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center";
 
-      // play a bit larger
       const playScale = " scale-[1.12]";
 
       const glowVars = {
@@ -462,92 +577,123 @@
       };
 
       return (
-        <div className="flex items-center justify-center gap-3 sm:gap-4 mb-6">
-          {/* ⏮ REVERSE SKIP (previous track) */}
-          <button
-            aria-label="Previous track"
-            type="button"
-            onClick={onSkipBack}
-            className={baseBtn + " glow-btn"}
-            style={glowVars}
-          >
-            <span className="text-xs">⏮</span>
-          </button>
+        <div className="flex items-center justify-center gap-4 mb-6">
+          {/* Volume + mute block on the left */}
+          <div className="volume-wrap glow-btn" style={glowVars}>
+            <button
+              type="button"
+              aria-label={isMuted ? "Unmute" : "Mute"}
+              onClick={onToggleMute}
+              className={
+                "w-8 h-8 rounded-full flex items-center justify-center " +
+                "bg-slate-900/90 border border-slate-600/80 text-slate-100 " +
+                "shadow-[0_4px_10px_rgba(0,0,0,0.6)] focus:outline-none"
+              }
+            >
+              <span className="text-[11px]">
+                {isMuted ? "🔇" : "🔈"}
+              </span>
+            </button>
 
-          {/* ⏪ REWIND (small nudge back) */}
-          <button
-            aria-label="Rewind"
-            type="button"
-            onClick={onNudgeBack}
-            className={baseBtn + " glow-btn"}
-            style={glowVars}
-          >
-            <span className="text-xs">⏪</span>
-          </button>
+            <input
+              className="volume-slider"
+              type="range"
+              min="0"
+              max="100"
+              value={Math.round(volume * 100)}
+              onChange={(e) =>
+                onVolumeChange(parseInt(e.target.value, 10) / 100)
+              }
+            />
+          </div>
 
-          {/* ▶ PLAY (always start / resume) */}
-          <button
-            aria-label="Play"
-            type="button"
-            onClick={onPlay}
-            className={baseBtn + " glow-btn" + playScale}
-            style={{
-              ...glowVars,
-              boxShadow: isPlaying
-                ? `0 0 16px ${themeDef.accentHex}aa, 0 8px 18px rgba(0,0,0,0.7)`
-                : "0 8px 18px rgba(0,0,0,0.65)",
-            }}
-          >
-            <span className="text-sm">▶</span>
-          </button>
+          {/* Transport controls */}
+          <div className="flex items-center justify-center gap-3 sm:gap-4">
+            {/* ⏮ REVERSE SKIP (previous track) */}
+            <button
+              aria-label="Previous track"
+              type="button"
+              onClick={onSkipBack}
+              className={baseBtn}
+              style={glowVars}
+            >
+              <span className="transport-icon text-xs">⏮</span>
+            </button>
 
-          {/* ⏸ PAUSE (toggles pause / resume) */}
-          <button
-            aria-label="Pause / Resume"
-            type="button"
-            onClick={() => (isPlaying ? onPause() : onPlay())}
-            className={baseBtn + " glow-btn"}
-            style={glowVars}
-          >
-            <span className="text-sm">⏸</span>
-          </button>
+            {/* ⏪ REWIND (small nudge back) */}
+            <button
+              aria-label="Rewind"
+              type="button"
+              onClick={onNudgeBack}
+              className={baseBtn}
+              style={glowVars}
+            >
+              <span className="transport-icon text-xs">⏪</span>
+            </button>
 
-          {/* ■ STOP (stop + return to 0) */}
-          <button
-            aria-label="Stop"
-            type="button"
-            onClick={onStop}
-            className={baseBtn + " glow-btn"}
-            style={glowVars}
-          >
-            <span className="text-xs">■</span>
-          </button>
+            {/* ▶ PLAY (always start / resume) */}
+            <button
+              aria-label="Play"
+              type="button"
+              onClick={onPlay}
+              className={baseBtn + playScale}
+              style={{
+                ...glowVars,
+                boxShadow: isPlaying
+                  ? `0 0 16px ${themeDef.accentHex}aa, 0 8px 18px rgba(0,0,0,0.7)`
+                  : "0 8px 18px rgba(0,0,0,0.65)",
+              }}
+            >
+              <span className="transport-icon text-sm">▶</span>
+            </button>
 
-          {/* ⏩ FAST FORWARD (small nudge forward) */}
-          <button
-            aria-label="Fast forward"
-            type="button"
-            onClick={onNudgeForward}
-            className={baseBtn + " glow-btn"}
-            style={glowVars}
-          >
-            <span className="text-xs">⏩</span>
-          </button>
+            {/* ⏸ PAUSE (toggles pause / resume) */}
+            <button
+              aria-label="Pause / Resume"
+              type="button"
+              onClick={() => (isPlaying ? onPause() : onPlay())}
+              className={baseBtn}
+              style={glowVars}
+            >
+              <span className="transport-icon text-sm">⏸</span>
+            </button>
 
-          {/* ⏭ FORWARD SKIP (next track) */}
-          <button
-            aria-label="Next track"
-            type="button"
-            onClick={onSkipForward}
-            className={baseBtn + " glow-btn"}
-            style={glowVars}
-          >
-            <span className="text-xs">⏭</span>
-          </button>
+            {/* ■ STOP (stop + return to 0) */}
+            <button
+              aria-label="Stop"
+              type="button"
+              onClick={onStop}
+              className={baseBtn}
+              style={glowVars}
+            >
+              <span className="transport-icon text-xs">■</span>
+            </button>
+
+            {/* ⏩ FAST FORWARD (small nudge forward) */}
+            <button
+              aria-label="Fast forward"
+              type="button"
+              onClick={onNudgeForward}
+              className={baseBtn}
+              style={glowVars}
+            >
+              <span className="transport-icon text-xs">⏩</span>
+            </button>
+
+            {/* ⏭ FORWARD SKIP (next track) */}
+            <button
+              aria-label="Next track"
+              type="button"
+              onClick={onSkipForward}
+              className={baseBtn}
+              style={glowVars}
+            >
+              <span className="transport-icon text-xs">⏭</span>
+            </button>
+          </div>
         </div>
       );
     }
-
 
     function Playlist({ tracks, currentIndex, onSelect, theme }){
       const t = THEMES[theme];
@@ -605,31 +751,20 @@
     function MusicApp(){
       const [currentIndex,setCurrentIndex] = useState(0);
       const [theme,setTheme] = useState("nite life");
-      const [isPlaying,setIsPlaying] = useState(false);
+      const [isPlaying,setIsPlaying] = useState(true);
       const [currentTime,setCurrentTime] = useState(0);
       const [duration,setDuration] = useState(0);
+
+      const [volume, setVolume] = useState(1);
+      const [isMuted, setIsMuted] = useState(false);
+      const [lastVolume, setLastVolume] = useState(1);
 
       const audioRef = useRef(null);
       const activeTrack = TRACKS[currentIndex];
 
       const level = useAudioLevel(audioRef.current, isPlaying);
 
-      // Load track whenever index changes
-      useEffect(() => {
-        const audio = audioRef.current;
-        if (!audio || !activeTrack) return;
-
-        audio.src = AUDIO_BASE + activeTrack.file;
-        audio.load();
-        setCurrentTime(0);
-
-        // If we're in "playing" state (e.g. user skipped tracks), keep playing
-        if (isPlaying){
-          audio.play().catch(() => setIsPlaying(false));
-        }
-      }, [currentIndex, activeTrack]);
-
-      // Bind time/duration + ended listeners once
+      // wire time/duration + ended (auto-advance)
       useEffect(() => {
         const audio = audioRef.current;
         if (!audio) return;
@@ -637,7 +772,6 @@
         const onTime = () => setCurrentTime(audio.currentTime || 0);
         const onMeta = () => setDuration(audio.duration || 0);
         const onEnd = () => {
-          // Auto-advance to next track and keep playing
           setCurrentIndex(prev => (prev + 1) % TRACKS.length);
           setCurrentTime(0);
           setIsPlaying(true);
@@ -654,7 +788,26 @@
         };
       }, []);
 
-      // small +/- nudge in seconds
+      // load track whenever index or activeTrack changes
+      useEffect(() => {
+        const audio = audioRef.current;
+        if (!audio || !activeTrack) return;
+        audio.src = AUDIO_BASE + activeTrack.file;
+        audio.load();
+        setCurrentTime(0);
+        if (isPlaying){
+          audio.play().catch(() => setIsPlaying(false));
+        }
+      }, [currentIndex, activeTrack, isPlaying]);
+
+      // keep volume on <audio> in sync
+      useEffect(() => {
+        const audio = audioRef.current;
+        if (!audio) return;
+        audio.volume = volume;
+      }, [volume]);
+
+      // nudge +/- in seconds
       const handleNudge = (deltaSeconds) => {
         const audio = audioRef.current;
         if (!audio || !duration) return;
@@ -663,29 +816,27 @@
         setCurrentTime(next);
       };
 
-      // --- PLAY ---
+      // PLAY (start / resume)
       const handlePlay = () => {
         const audio = audioRef.current;
         if (!audio) return;
-
         audio.play()
           .then(() => setIsPlaying(true))
           .catch(() => {});
       };
 
-      // --- PAUSE (does NOT reset currentTime) ---
+      // PAUSE (stop at current position; resume from here)
       const handlePause = () => {
         const audio = audioRef.current;
         if (!audio) return;
         audio.pause();
-        setIsPlaying(false);  // keeps timeline where it is
+        setIsPlaying(false);
       };
 
-      // --- STOP (reset to zero) ---
+      // STOP (reset to zero)
       const handleStop = () => {
         const audio = audioRef.current;
         if (!audio) return;
-
         audio.pause();
         audio.currentTime = 0;
         setCurrentTime(0);
@@ -704,8 +855,7 @@
 
       const handleSelectTrack = (idx) => {
         setCurrentIndex(idx);
-        // Put player into "playing" state; load effect will call audio.play()
-        setIsPlaying(true);
+        setIsPlaying(true); // auto-play on selection
       };
 
       const handleSeekClick = (e) => {
@@ -717,6 +867,31 @@
         const newTime = clamped * duration;
         audio.currentTime = newTime;
         setCurrentTime(newTime);
+      };
+
+      const handleVolumeChange = (v) => {
+        const clamped = Math.max(0, Math.min(1, v));
+        setVolume(clamped);
+
+        if (clamped === 0) {
+          setIsMuted(true);
+        } else {
+          setIsMuted(false);
+          setLastVolume(clamped);
+        }
+      };
+
+      const handleToggleMute = () => {
+        setIsMuted((prev) => {
+          const next = !prev;
+          if (next) {
+            setLastVolume(volume || 1);
+            setVolume(0);
+          } else {
+            setVolume(lastVolume || 1);
+          }
+          return next;
+        });
       };
 
       return (
@@ -733,15 +908,19 @@
           />
 
           <VintageControls
+            onSkipBack={handleSkipBack}
+            onNudgeBack={handleRewind}
             onPlay={handlePlay}
             onPause={handlePause}
             onStop={handleStop}
-            onSkipBack={handleSkipBack}
-            onSkipForward={handleSkipForward}
-            onNudgeBack={handleRewind}
             onNudgeForward={handleFastForward}
+            onSkipForward={handleSkipForward}
             isPlaying={isPlaying}
             theme={theme}
+            volume={volume}
+            isMuted={isMuted}
+            onVolumeChange={handleVolumeChange}
+            onToggleMute={handleToggleMute}
           />
 
           <Playlist
