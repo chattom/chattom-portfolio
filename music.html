@@ -260,32 +260,45 @@
     const AUDIO_BASE = "assets/";
 
     // -------- Themes ----------
-    const THEMES = {
-      "nite life": {
-        label: "NITE LIFE",
-        bg: "from-slate-800/90 to-slate-950/90",
-        border: "border-slate-700",
-        text: "text-slate-100",
-        textSub: "text-slate-300",
-        accentHex: "#22d3ee",
-      },
-      "day break": {
-        label: "DAY BREAK",
-        bg: "from-orange-100/90 to-amber-200/90",
-        border: "border-orange-400",
-        text: "text-slate-900",
-        textSub: "text-orange-900",
-        accentHex: "#fb923c",
-      },
-      "fantasy": {
-        label: "FANTASY",
-        bg: "from-purple-800/90 to-fuchsia-950/90",
-        border: "border-purple-500",
-        text: "text-purple-50",
-        textSub: "text-purple-200",
-        accentHex: "#e879f9",
-      },
-    };
+   const THEMES = {
+  "nite life": {
+    id: "nite life",
+    label: "NITE LIFE",
+    bg: "from-slate-800/90 to-slate-950/90",
+    border: "border-slate-600",
+    text: "text-slate-100",
+    textSub: "text-slate-300",
+    accent: "text-cyan-400",
+    accentHex: "#22d3ee",
+    glowSoft: "rgba(34, 211, 238, 0.12)",   // subtle
+    glowStrong: "rgba(34, 211, 238, 0.55)", // hover / active
+  },
+  "day break": {
+    id: "day break",
+    label: "DAY BREAK",
+    bg: "from-orange-100/90 to-amber-200/90",
+    border: "border-orange-400",
+    text: "text-slate-900",
+    textSub: "text-orange-900",
+    accent: "text-orange-600",
+    accentHex: "#fb923c",
+    glowSoft: "rgba(251, 146, 60, 0.12)",
+    glowStrong: "rgba(251, 146, 60, 0.55)",
+  },
+  fantasy: {
+    id: "fantasy",
+    label: "FANTASY",
+    bg: "from-purple-800/90 to-fuchsia-950/90",
+    border: "border-purple-500",
+    text: "text-purple-50",
+    textSub: "text-purple-200",
+    accent: "text-fuchsia-400",
+    accentHex: "#e879f9",
+    glowSoft: "rgba(232, 121, 249, 0.12)",
+    glowStrong: "rgba(232, 121, 249, 0.55)",
+  },
+};
+
 
     function formatTime(sec){
       if (!isFinite(sec) || sec < 0) return "0:00";
