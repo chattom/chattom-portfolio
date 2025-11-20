@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- React + Babel (so we can write JSX inline) -->
+  <!-- React + Babel -->
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -22,7 +22,6 @@
     }
 
     *{box-sizing:border-box;}
-
     html,body{height:100%;}
     body{
       margin:0;
@@ -33,7 +32,7 @@
       text-rendering: optimizeLegibility;
     }
 
-    /* NAVBAR (white-on-black) */
+    /* NAVBAR */
     .site-nav {
       display:flex;
       justify-content:center;
@@ -191,13 +190,16 @@
         background 140ms ease;
       color:#e5e7eb;
       cursor:pointer;
+      filter:drop-shadow(0 0 3px var(--glow-soft));
+    }
+    .transport-btn:hover,
+    .transport-btn:active{
+      transform:translateY(-1px);
+      filter:drop-shadow(0 0 10px var(--glow-strong));
     }
     .transport-btn--play{
       width:52px;
       height:52px;
-    }
-    .transport-btn:hover{
-      transform:translateY(-1px);
     }
     .transport-btn:active{
       transform:translateY(1px) scale(0.97);
@@ -209,9 +211,6 @@
       font-size:14px;
       filter:drop-shadow(0 1px 1px rgba(0,0,0,0.9));
     }
-
-    /* glow color is applied inline via style filter */
-
   </style>
 </head>
 <body>
@@ -260,45 +259,44 @@
     const AUDIO_BASE = "assets/";
 
     // -------- Themes ----------
-   const THEMES = {
-  "nite life": {
-    id: "nite life",
-    label: "NITE LIFE",
-    bg: "from-slate-800/90 to-slate-950/90",
-    border: "border-slate-600",
-    text: "text-slate-100",
-    textSub: "text-slate-300",
-    accent: "text-cyan-400",
-    accentHex: "#22d3ee",
-    glowSoft: "rgba(34, 211, 238, 0.12)",   // subtle
-    glowStrong: "rgba(34, 211, 238, 0.55)", // hover / active
-  },
-  "day break": {
-    id: "day break",
-    label: "DAY BREAK",
-    bg: "from-orange-100/90 to-amber-200/90",
-    border: "border-orange-400",
-    text: "text-slate-900",
-    textSub: "text-orange-900",
-    accent: "text-orange-600",
-    accentHex: "#fb923c",
-    glowSoft: "rgba(251, 146, 60, 0.12)",
-    glowStrong: "rgba(251, 146, 60, 0.55)",
-  },
-  fantasy: {
-    id: "fantasy",
-    label: "FANTASY",
-    bg: "from-purple-800/90 to-fuchsia-950/90",
-    border: "border-purple-500",
-    text: "text-purple-50",
-    textSub: "text-purple-200",
-    accent: "text-fuchsia-400",
-    accentHex: "#e879f9",
-    glowSoft: "rgba(232, 121, 249, 0.12)",
-    glowStrong: "rgba(232, 121, 249, 0.55)",
-  },
-};
-
+    const THEMES = {
+      "nite life": {
+        id: "nite life",
+        label: "NITE LIFE",
+        bg: "from-slate-800/90 to-slate-950/90",
+        border: "border-slate-600",
+        text: "text-slate-100",
+        textSub: "text-slate-300",
+        accent: "text-cyan-400",
+        accentHex: "#22d3ee",
+        glowSoft: "rgba(34, 211, 238, 0.12)",
+        glowStrong: "rgba(34, 211, 238, 0.55)",
+      },
+      "day break": {
+        id: "day break",
+        label: "DAY BREAK",
+        bg: "from-orange-100/90 to-amber-200/90",
+        border: "border-orange-400",
+        text: "text-slate-900",
+        textSub: "text-orange-900",
+        accent: "text-orange-600",
+        accentHex: "#fb923c",
+        glowSoft: "rgba(251, 146, 60, 0.12)",
+        glowStrong: "rgba(251, 146, 60, 0.55)",
+      },
+      fantasy: {
+        id: "fantasy",
+        label: "FANTASY",
+        bg: "from-purple-800/90 to-fuchsia-950/90",
+        border: "border-purple-500",
+        text: "text-purple-50",
+        textSub: "text-purple-200",
+        accent: "text-fuchsia-400",
+        accentHex: "#e879f9",
+        glowSoft: "rgba(232, 121, 249, 0.12)",
+        glowStrong: "rgba(232, 121, 249, 0.55)",
+      },
+    };
 
     function formatTime(sec){
       if (!isFinite(sec) || sec < 0) return "0:00";
@@ -307,7 +305,7 @@
       return m + ":" + (s < 10 ? "0"+s : s);
     }
 
-    // Web Audio hook: derive a single level 0–1 from the HTMLAudioElement
+    // Web Audio hook: single level 0–1 from the HTMLAudioElement
     function useAudioLevel(audioElement, isPlaying){
       const [level,setLevel] = useState(0.15);
       const ctxRef = useRef(null);
@@ -420,9 +418,7 @@
     function TubeDeck({ trackName, currentTime, duration, theme, level, onSeekClick }){
       const t = THEMES[theme];
       const tubes = [0,1,2,3,4].map(() => level);
-
       const glow = t.accentHex + "dd";
-
       const progressPercent = duration ? Math.min(100, (currentTime / duration) * 100) : 0;
 
       return (
@@ -471,116 +467,106 @@
     }
 
     function VintageControls({
-  onPlay,
-  onPause,
-  onStop,
-  onPrev,
-  onNext,
-  isPlaying,
-  theme,
-}) {
-  const themeDef = THEMES[theme];
-  const [hovered, setHovered] = React.useState(null);
+      onSkipBack,
+      onRewind,
+      onPlay,
+      onPause,
+      onStop,
+      onFastForward,
+      onSkipForward,
+      isPlaying,
+      theme,
+    }){
+      const themeDef = THEMES[theme];
 
-  const baseBtn =
-    "w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center " +
-    "bg-slate-900/90 border border-slate-600/80 text-slate-100 " +
-    "shadow-[0_8px_18px_rgba(0,0,0,0.65)] " +
-    "transition-all transform focus:outline-none";
+      const baseBtn =
+        "transport-btn flex items-center justify-center text-slate-100";
 
-  // decide glow amount based on which button is hovered
-  const getGlowStyle = (id, isPlay = false) => {
-    const isHovered = hovered === id;
-    const color = isHovered ? themeDef.glowStrong : themeDef.glowSoft;
-    const radius = isPlay ? (isHovered ? 22 : 14) : (isHovered ? 18 : 10);
-    return {
-      boxShadow: `0 0 ${radius}px ${color}`,
-    };
-  };
+      const playExtraShadow = isPlaying
+        ? `0 0 16px ${themeDef.accentHex}aa, 0 8px 18px rgba(0,0,0,0.7)`
+        : "0 8px 18px rgba(0,0,0,0.65)";
 
-  const handleEnter = (id) => {
-    setHovered(id);
-  };
+      return (
+        <div
+          className="flex items-center justify-center gap-3 sm:gap-4 mb-6"
+          style={{
+            "--glow-soft": themeDef.glowSoft,
+            "--glow-strong": themeDef.glowStrong,
+          }}
+        >
+          {/* ⏮ REVERSE SKIP (previous track) */}
+          <button
+            aria-label="Previous track"
+            type="button"
+            onClick={onSkipBack}
+            className={baseBtn}
+          >
+            <span className="transport-icon text-xs">⏮</span>
+          </button>
 
-  const handleLeave = () => {
-    setHovered(null);
-  };
+          {/* ⏪ REWIND (small nudge back) */}
+          <button
+            aria-label="Rewind"
+            type="button"
+            onClick={onRewind}
+            className={baseBtn}
+          >
+            <span className="transport-icon text-xs">⏪</span>
+          </button>
 
-  return (
-    <div className="flex items-center justify-center gap-3 sm:gap-4 mb-6">
-      {/* Reverse / previous track */}
-      <button
-        aria-label="Previous track"
-        onClick={onPrev}
-        className={baseBtn}
-        style={getGlowStyle("prev")}
-        onMouseEnter={() => handleEnter("prev")}
-        onMouseLeave={handleLeave}
-        onTouchStart={() => handleEnter("prev")}
-        onTouchEnd={handleLeave}
-      >
-        <span className="text-xs">⏮</span>
-      </button>
+          {/* ▶ PLAY (always starts / resumes) */}
+          <button
+            aria-label="Play"
+            type="button"
+            onClick={onPlay}
+            className={baseBtn + " transport-btn--play"}
+            style={{ boxShadow: playExtraShadow }}
+          >
+            <span className="transport-icon text-sm">▶</span>
+          </button>
 
-      {/* Play */}
-      <button
-        aria-label="Play"
-        onClick={onPlay}
-        className={baseBtn + " scale-110"}
-        style={getGlowStyle("play", true)}
-        onMouseEnter={() => handleEnter("play")}
-        onMouseLeave={handleLeave}
-        onTouchStart={() => handleEnter("play")}
-        onTouchEnd={handleLeave}
-      >
-        <span className="text-sm">▶</span>
-      </button>
+          {/* ⏸ PAUSE (toggles pause/resume) */}
+          <button
+            aria-label="Pause / Resume"
+            type="button"
+            onClick={() => (isPlaying ? onPause() : onPlay())}
+            className={baseBtn}
+          >
+            <span className="transport-icon text-sm">⏸</span>
+          </button>
 
-      {/* Pause */}
-      <button
-        aria-label="Pause"
-        onClick={onPause}
-        className={baseBtn}
-        style={getGlowStyle("pause")}
-        onMouseEnter={() => handleEnter("pause")}
-        onMouseLeave={handleLeave}
-        onTouchStart={() => handleEnter("pause")}
-        onTouchEnd={handleLeave}
-      >
-        <span className="text-sm">⏸</span>
-      </button>
+          {/* ■ STOP (stop + return to 0) */}
+          <button
+            aria-label="Stop"
+            type="button"
+            onClick={onStop}
+            className={baseBtn}
+          >
+            <span className="transport-icon text-xs">■</span>
+          </button>
 
-      {/* Stop */}
-      <button
-        aria-label="Stop"
-        onClick={onStop}
-        className={baseBtn}
-        style={getGlowStyle("stop")}
-        onMouseEnter={() => handleEnter("stop")}
-        onMouseLeave={handleLeave}
-        onTouchStart={() => handleEnter("stop")}
-        onTouchEnd={handleLeave}
-      >
-        <span className="text-xs">■</span>
-      </button>
+          {/* ⏩ FAST FORWARD (small nudge forward) */}
+          <button
+            aria-label="Fast forward"
+            type="button"
+            onClick={onFastForward}
+            className={baseBtn}
+          >
+            <span className="transport-icon text-xs">⏩</span>
+          </button>
 
-      {/* Forward / next track */}
-      <button
-        aria-label="Next track"
-        onClick={onNext}
-        className={baseBtn}
-        style={getGlowStyle("next")}
-        onMouseEnter={() => handleEnter("next")}
-        onMouseLeave={handleLeave}
-        onTouchStart={() => handleEnter("next")}
-        onTouchEnd={handleLeave}
-      >
-        <span className="text-xs">⏭</span>
-      </button>
-    </div>
-  );
-}
-
+          {/* ⏭ FORWARD SKIP (next track) */}
+          <button
+            aria-label="Next track"
+            type="button"
+            onClick={onSkipForward}
+            className={baseBtn}
+          >
+            <span className="transport-icon text-xs">⏭</span>
+          </button>
+        </div>
+      );
+    }
 
     function Playlist({ tracks, currentIndex, onSelect, theme }){
       const t = THEMES[theme];
@@ -657,7 +643,7 @@
         if (isPlaying){
           audio.play().catch(() => setIsPlaying(false));
         }
-      }, [currentIndex, activeTrack]);
+      }, [currentIndex, activeTrack, isPlaying]);
 
       // bind time/duration listeners once
       useEffect(() => {
@@ -681,6 +667,15 @@
           audio.removeEventListener("ended", onEnd);
         };
       }, []);
+
+      // small +/- nudge in seconds
+      const handleNudge = (deltaSeconds) => {
+        const audio = audioRef.current;
+        if (!audio || !duration) return;
+        const next = Math.max(0, Math.min(duration, (audio.currentTime || 0) + deltaSeconds));
+        audio.currentTime = next;
+        setCurrentTime(next);
+      };
 
       const handlePlay = () => {
         const audio = audioRef.current;
@@ -713,21 +708,8 @@
         setCurrentIndex(prev => (prev + 1) % TRACKS.length);
       };
 
-      const handleRewind = () => {
-        const audio = audioRef.current;
-        if (!audio) return;
-        const newTime = Math.max(0, (audio.currentTime || 0) - 5);
-        audio.currentTime = newTime;
-        setCurrentTime(newTime);
-      };
-      const handleFastForward = () => {
-        const audio = audioRef.current;
-        if (!audio) return;
-        const len = duration || audio.duration || 0;
-        const newTime = Math.min(len, (audio.currentTime || 0) + 5);
-        audio.currentTime = newTime;
-        setCurrentTime(newTime);
-      };
+      const handleRewind = () => handleNudge(-3);
+      const handleFastForward = () => handleNudge(3);
 
       const handleSelectTrack = (idx) => {
         setCurrentIndex(idx);
