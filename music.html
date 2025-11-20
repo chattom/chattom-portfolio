@@ -633,17 +633,17 @@
 
       const level = useAudioLevel(audioRef.current, isPlaying);
 
-      // load track whenever index changes
-      useEffect(() => {
-        const audio = audioRef.current;
-        if (!audio || !activeTrack) return;
-        audio.src = AUDIO_BASE + activeTrack.file;
-        audio.load();
-        setCurrentTime(0);
-        if (isPlaying){
-          audio.play().catch(() => setIsPlaying(false));
-        }
-      }, [currentIndex, activeTrack, isPlaying]);
+     // load track whenever index changes
+useEffect(() => {
+  const audio = audioRef.current;
+  if (!audio || !activeTrack) return;
+  audio.src = AUDIO_BASE + activeTrack.file;
+  audio.load();
+  setCurrentTime(0);
+  if (isPlaying){
+    audio.play().catch(() => setIsPlaying(false));
+  }
+}, [currentIndex, activeTrack]);  // ✅ remove isPlaying here
 
       // bind time/duration listeners once
       useEffect(() => {
