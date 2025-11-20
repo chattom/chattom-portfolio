@@ -388,44 +388,51 @@
     }
 
     // Web Audio hook: single level 0–1 from the HTMLAudioElement
-    function useAudioLevel(audioElement, isPlaying){
+    function useAudioLevel(audioElement, isPlaying, volume, isMuted){
       const [level,setLevel] = useState(0.15);
-      const ctxRef = useRef(null);
-      const analyserRef = useRef(null);
-      const dataRef = useRef(null);
-      const sourceRef = useRef(null);
-      const rafRef = useRef(null);
+const ctxRef = useRef(null);
+const analyserRef = useRef(null);
+const dataRef = useRef(null);
+const sourceRef = useRef(null);
+const gainRef = useRef(null);   // NEW: for master volume
+const rafRef = useRef(null);
 
       useEffect(() => {
         if (!audioElement) return;
         if (ctxRef.current) return;
 
-        const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        if (!AudioCtx) return;
-
         const ctx = new AudioCtx();
-        const analyser = ctx.createAnalyser();
-        analyser.fftSize = 256;
-        const bufferLen = analyser.frequencyBinCount;
-        const dataArray = new Uint8Array(bufferLen);
+const analyser = ctx.createAnalyser();
+analyser.fftSize = 256;
+const bufferLen = analyser.frequencyBinCount;
+const dataArray = new Uint8Array(bufferLen);
 
-        const src = ctx.createMediaElementSource(audioElement);
-        src.connect(analyser);
-        analyser.connect(ctx.destination);
+const src = ctx.createMediaElementSource(audioElement);
+const gain = ctx.createGain();
 
-        ctxRef.current = ctx;
-        analyserRef.current = analyser;
-        dataRef.current = dataArray;
-        sourceRef.current = src;
+// initial volume (respect mute + slider)
+gain.gain.value = isMuted ? 0 : (typeof volume === "number" ? volume : 1);
+
+// Wire: element -> gain -> analyser -> speakers
+src.connect(gain);
+gain.connect(analyser);
+analyser.connect(ctx.destination);
+
+ctxRef.current = ctx;
+analyserRef.current = analyser;
+dataRef.current = dataArray;
+sourceRef.current = src;
+gainRef.current = gain;
 
         return () => {
-          if (rafRef.current) cancelAnimationFrame(rafRef.current);
-          if (sourceRef.current) sourceRef.current.disconnect();
-          if (analyserRef.current) analyserRef.current.disconnect();
-          if (ctxRef.current && ctxRef.current.state !== "closed"){
-            ctxRef.current.close();
-          }
-        };
+  if (rafRef.current) cancelAnimationFrame(rafRef.current);
+  if (sourceRef.current) sourceRef.current.disconnect();
+  if (analyserRef.current) analyserRef.current.disconnect();
+  if (gainRef.current) gainRef.current.disconnect();   // NEW
+  if (ctxRef.current && ctxRef.current.state !== "closed"){
+    ctxRef.current.close();
+  }
+};
       }, [audioElement]);
 
       useEffect(() => {
@@ -546,16 +553,21 @@
       );
     }
 
-    function VintageControls({
-      onPlay,
-      onPause,
-      onStop,
-      onSkipBack,
-      onSkipForward,
-      onRewind,
-      onFastForward,
-      isPlaying,
-    }){
+    function VintageControls(props){
+  const {
+    onPlay,
+    onPause,
+    onStop,
+    onSkipBack,
+    onSkipForward,
+    onRewind,
+    onFastForward,
+    isPlaying,
+    volume,
+    onVolumeChange,
+    isMuted,
+    onToggleMute,
+  } = props;
       return (
         <div className="flex items-center justify-center gap-3 sm:gap-4">
           {/* ⏮ REVERSE SKIP (previous track) */}
@@ -782,6 +794,12 @@
         setCurrentTime(0);
         setIsPlaying(false);
       };
+      // respond to volume + mute changes
+useEffect(() => {
+  const gain = gainRef.current;
+  if (!gain) return;
+  gain.gain.value = isMuted ? 0 : (typeof volume === "number" ? volume : 1);
+}, [volume, isMuted]);
 
       const handleSkipBack = () => {
         setCurrentIndex(prev => (prev - 1 + TRACKS.length) % TRACKS.length);
@@ -878,15 +896,19 @@
             </div>
 
             <VintageControls
-              onSkipBack={handleSkipBack}
-              onRewind={handleRewind}
-              onPlay={handlePlay}
-              onPause={handlePause}
-              onStop={handleStop}
-              onFastForward={handleFastForward}
-              onSkipForward={handleSkipForward}
-              isPlaying={isPlaying}
-            />
+  onSkipBack={handleSkipBack}
+  onRewind={handleRewind}
+  onPlay={handlePlay}
+  onPause={handlePause}
+  onStop={handleStop}
+  onFastForward={handleFastForward}
+  onSkipForward={handleSkipForward}
+  isPlaying={isPlaying}
+  volume={volume}
+  onVolumeChange={handleVolumeChange}
+  isMuted={isMuted}
+  onToggleMute={handleToggleMute}
+/>
           </div>
 
           <Playlist
