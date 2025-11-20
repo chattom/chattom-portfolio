@@ -100,7 +100,7 @@
 
     #root{ margin-top:24px; }
 
-    /* --- Player shell (brushed-metal-ish deck) --- */
+    /* --- Player shell (brushed-ish metal deck) --- */
     .player-shell{
       position:relative;
       border-radius:1.75rem;
@@ -110,8 +110,8 @@
       background:
         repeating-linear-gradient(
           90deg,
-          rgba(15,23,42,0.95) 0px,
-          rgba(15,23,42,0.95) 1px,
+          rgba(15,23,42,0.98) 0px,
+          rgba(15,23,42,0.98) 1px,
           rgba(15,23,42,0.92) 3px,
           rgba(15,23,42,0.92) 4px
         );
@@ -126,8 +126,8 @@
       background:
         linear-gradient(
           to bottom,
-          rgba(255,255,255,0.12),
-          transparent 32%
+          rgba(255,255,255,0.14),
+          transparent 30%
         );
       pointer-events:none;
       mix-blend-mode:screen;
@@ -240,11 +240,11 @@
       justify-content:center;
       border:1px solid rgba(148,163,184,0.7);
       background:
-        radial-gradient(circle at 30% 18%, rgba(255,255,255,0.26), transparent 55%),
+        radial-gradient(circle at 30% 18%, rgba(255,255,255,0.22), transparent 55%),
         radial-gradient(circle at 70% 82%, #020617, #020617);
       box-shadow:
         0 8px 16px rgba(0,0,0,0.7),
-        inset 0 2px 4px rgba(255,255,255,0.36);
+        inset 0 2px 4px rgba(255,255,255,0.32);
       transition:
         box-shadow 140ms ease,
         transform 120ms ease,
@@ -253,7 +253,7 @@
         filter 140ms ease;
       color:#e5e7eb;
       cursor:pointer;
-      /* 2–3% resting glow */
+      /* 2–3% resting glow (theme sets CSS vars) */
       filter:drop-shadow(0 0 3px var(--glow-soft, rgba(148,163,184,0.25)));
     }
     .transport-btn--play{
@@ -277,6 +277,7 @@
       filter:drop-shadow(0 1px 1px rgba(0,0,0,0.9));
     }
 
+    /* --- Volume --- */
     .volume-rail{
       position:relative;
       width:110px;
@@ -287,26 +288,28 @@
         inset 0 0 4px rgba(15,23,42,0.9),
         0 0 10px rgba(15,23,42,0.7);
       overflow:hidden;
+      cursor:pointer;
     }
     .volume-fill{
       position:absolute;
       inset:0;
       border-radius:999px;
       background:linear-gradient(to right,#e5e7eb,#f9fafb);
-      box-shadow:0 0 10px rgba(248,250,252,0.75);
+      box-shadow:0 0 8px rgba(248,250,252,0.55);
       pointer-events:none;
     }
     .volume-thumb{
       position:absolute;
       top:50%;
-      width:14px;
-      height:14px;
+      width:11px;
+      height:11px;
       border-radius:999px;
       transform:translate(-50%, -50%);
-      background:radial-gradient(circle at 30% 20%, #f9fafb, #cbd5f5 55%, #020617);
+      background:
+        radial-gradient(circle at 30% 22%, #f9fafb, #cbd5f5 55%, #020617);
       border:1px solid rgba(148,163,184,0.8);
       box-shadow:
-        0 4px 10px rgba(0,0,0,0.8),
+        0 3px 8px rgba(0,0,0,0.8),
         inset 0 1px 2px rgba(255,255,255,0.5);
       pointer-events:none;
     }
@@ -642,7 +645,6 @@
 
       return (
         <div className="flex flex-col items-center gap-4 mb-6 mt-4">
-          {/* Top row: volume + transport */}
           <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
             <VolumeControl
               volume={volume}
@@ -809,7 +811,7 @@
 
       const level = useAudioLevel(audioRef.current, isPlaying);
 
-      // Wire time/duration + auto-advance
+      // bind time/duration listeners + auto-advance
       useEffect(() => {
         const audio = audioRef.current;
         if (!audio) return;
@@ -817,6 +819,7 @@
         const onTime = () => setCurrentTime(audio.currentTime || 0);
         const onMeta = () => setDuration(audio.duration || 0);
         const onEnd = () => {
+          // auto-advance and keep playing
           setCurrentIndex(prev => (prev + 1) % TRACKS.length);
           setCurrentTime(0);
           setIsPlaying(true);
@@ -833,25 +836,24 @@
         };
       }, []);
 
-      // Load track whenever index or isPlaying changes
+      // load track whenever index changes (NOT when pause/volume change)
       useEffect(() => {
         const audio = audioRef.current;
-        if (!audio) return;
-        const t = activeTrack;
-        if (!t) return;
-        audio.src = AUDIO_BASE + t.file;
+        if (!audio || !activeTrack) return;
+
+        audio.src = AUDIO_BASE + activeTrack.file;
         audio.load();
         setCurrentTime(0);
 
-        // apply current volume
+        // apply current volume to new track
         audio.volume = isMuted ? 0 : volume;
 
         if (isPlaying){
           audio.play().catch(() => setIsPlaying(false));
         }
-      }, [currentIndex, isPlaying, activeTrack, volume, isMuted]);
+      }, [currentIndex, activeTrack, isMuted, volume, isPlaying]); // we NEED isMuted/volume/isPlaying here so new track respects them
 
-      // Ensure volume state always reflects audio
+      // keep audio.volume in sync when volume/mute change (without reloading)
       useEffect(() => {
         const audio = audioRef.current;
         if (!audio) return;
@@ -872,7 +874,6 @@
         const audio = audioRef.current;
         if (!audio) return;
 
-        // make sure correct volume is applied
         audio.volume = isMuted ? 0 : volume;
 
         audio.play()
@@ -960,7 +961,7 @@
         setIsMuted(prev => {
           const nextMuted = !prev;
           if (nextMuted) {
-            // going from unmuted -> muted
+            // unmuted -> muted
             volumeBeforeMuteRef.current = volume;
             if (audio) audio.volume = 0;
           } else {
@@ -988,11 +989,10 @@
 
           <VintageControls
             onSkipBack={handleSkipBack}
-            onRewind={handleRewind}
+            onNudgeBack={handleRewind}
             onPlay={handlePlay}
             onPause={handlePause}
             onStop={handleStop}
-            onNudgeBack={handleRewind}
             onNudgeForward={handleFastForward}
             onSkipForward={handleSkipForward}
             isPlaying={isPlaying}
@@ -1010,7 +1010,7 @@
             theme={theme}
           />
 
-          {/* Hidden audio element actual player */}
+          {/* Hidden audio element */}
           <audio ref={audioRef} className="hidden">
             Your browser does not support the audio element.
           </audio>
