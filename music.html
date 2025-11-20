@@ -175,6 +175,7 @@
     .volume-wrap{
       display:flex;
       align-items:center;
+      justify-content:center;
       gap:0.75rem;
       min-width:0;
     }
@@ -271,7 +272,7 @@
         filter 140ms ease;
       color:#e5e7eb;
       cursor:pointer;
-      filter:drop-shadow(0 0 3px var(--glow-soft)); /* subtle glow */
+      filter:drop-shadow(0 0 3px var(--glow-soft));
     }
     .transport-btn--play{
       width:52px;
@@ -281,7 +282,7 @@
     .transport-btn:focus-visible{
       outline:none;
       transform:translateY(-1px);
-      filter:drop-shadow(0 0 10px var(--glow-strong)); /* stronger glow */
+      filter:drop-shadow(0 0 10px var(--glow-strong));
     }
     .transport-btn:active{
       transform:translateY(1px) scale(0.97);
@@ -387,17 +388,15 @@
       return m + ":" + (s < 10 ? "0"+s : s);
     }
 
-    // Web Audio hook with master gain (for level + volume/mute)
-    function useAudioLevel(audioElement, isPlaying, volume, isMuted){
+    // Web Audio hook: single level 0–1 from the HTMLAudioElement
+    function useAudioLevel(audioElement, isPlaying){
       const [level,setLevel] = useState(0.15);
       const ctxRef = useRef(null);
       const analyserRef = useRef(null);
       const dataRef = useRef(null);
       const sourceRef = useRef(null);
-      const gainRef = useRef(null);
       const rafRef = useRef(null);
 
-      // Create / wire context once
       useEffect(() => {
         if (!audioElement) return;
         if (ctxRef.current) return;
@@ -412,39 +411,24 @@
         const dataArray = new Uint8Array(bufferLen);
 
         const src = ctx.createMediaElementSource(audioElement);
-        const gain = ctx.createGain();
-        gain.gain.value = isMuted ? 0 : (typeof volume === "number" ? volume : 1);
-
-        // element -> gain -> analyser -> speakers
-        src.connect(gain);
-        gain.connect(analyser);
+        src.connect(analyser);
         analyser.connect(ctx.destination);
 
         ctxRef.current = ctx;
         analyserRef.current = analyser;
         dataRef.current = dataArray;
         sourceRef.current = src;
-        gainRef.current = gain;
 
         return () => {
           if (rafRef.current) cancelAnimationFrame(rafRef.current);
           if (sourceRef.current) sourceRef.current.disconnect();
           if (analyserRef.current) analyserRef.current.disconnect();
-          if (gainRef.current) gainRef.current.disconnect();
           if (ctxRef.current && ctxRef.current.state !== "closed"){
             ctxRef.current.close();
           }
         };
       }, [audioElement]);
 
-      // React to volume + mute changes
-      useEffect(() => {
-        const gain = gainRef.current;
-        if (!gain) return;
-        gain.gain.value = isMuted ? 0 : (typeof volume === "number" ? volume : 1);
-      }, [volume, isMuted]);
-
-      // Animate while playing
       useEffect(() => {
         const ctx = ctxRef.current;
         const analyser = analyserRef.current;
@@ -502,11 +486,7 @@
                 key={id}
                 type="button"
                 onClick={() => onChange(id)}
-                className={
-                  base + " " + bg + " " +
-                  (selected ? "ring-2 ring-offset-2 ring-offset-black" :
-                   "opacity-80 hover:opacity-100")
-                }
+                className={base + " " + bg + " " + (selected ? "ring-2 ring-offset-2 ring-offset-black" : "opacity-80 hover:opacity-100")}
               >
                 {t.label}
               </button>
@@ -612,7 +592,7 @@
             <span className="transport-icon text-sm">▶</span>
           </button>
 
-          {/* ⏸ PAUSE (toggles pause/resume) */}
+          {/* ⏸ PAUSE (toggle pause/resume) */}
           <button
             aria-label="Pause / Resume"
             type="button"
@@ -632,7 +612,7 @@
             <span className="transport-icon text-xs">■</span>
           </button>
 
-          {/* ⏩ FAST FORWARD */}
+          {/* ⏩ FAST FORWARD (small nudge forward) */}
           <button
             aria-label="Fast forward"
             type="button"
@@ -720,8 +700,7 @@
       const audioRef = useRef(null);
       const activeTrack = TRACKS[currentIndex];
 
-      // *** audio level + volume/mute ***
-      const level = useAudioLevel(audioRef.current, isPlaying, volume, isMuted);
+      const level = useAudioLevel(audioRef.current, isPlaying);
 
       // time / metadata / ended listeners
       useEffect(() => {
@@ -748,7 +727,7 @@
         };
       }, []);
 
-      // Load track whenever index changes (NOT when play/pause changes)
+      // Load track whenever index changes
       useEffect(() => {
         const audio = audioRef.current;
         if (!audio || !activeTrack) return;
@@ -761,7 +740,15 @@
         if (isPlaying){
           audio.play().catch(() => setIsPlaying(false));
         }
-      }, [currentIndex, activeTrack]); // <-- no isPlaying here
+      }, [currentIndex, activeTrack]);
+
+      // Apply volume + mute to the <audio> element
+      useEffect(() => {
+        const audio = audioRef.current;
+        if (!audio) return;
+        audio.volume = volume;   // 0–1
+        audio.muted = isMuted;
+      }, [volume, isMuted]);
 
       // small +/- nudge in seconds
       const handleNudge = (deltaSeconds) => {
@@ -835,7 +822,7 @@
         setVolume(value);
       };
 
-      const toggleMute = () => {
+      const handleToggleMute = () => {
         setIsMuted(prev => !prev);
       };
 
@@ -861,14 +848,14 @@
             onSeekClick={handleSeekClick}
           />
 
-          {/* Volume + transport on the SAME ROW */}
-          <div className="w-full max-w-3xl flex items-center justify-between gap-4 mb-6">
-            <div className="volume-wrap">
+          {/* Volume + transport (stack on mobile, row on md+) */}
+          <div className="w-full max-w-3xl flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+            <div className="volume-wrap md:justify-start">
               <button
                 type="button"
                 className="volume-knob"
                 aria-label={isMuted ? "Unmute" : "Mute"}
-                onClick={toggleMute}
+                onClick={handleToggleMute}
               >
                 <span className="text-xs">
                   {isMuted ? "🔇" : "🔊"}
@@ -890,16 +877,18 @@
               </div>
             </div>
 
-            <VintageControls
-              onSkipBack={handleSkipBack}
-              onRewind={handleRewind}
-              onPlay={handlePlay}
-              onPause={handlePause}
-              onStop={handleStop}
-              onFastForward={handleFastForward}
-              onSkipForward={handleSkipForward}
-              isPlaying={isPlaying}
-            />
+            <div className="flex justify-center">
+              <VintageControls
+                onSkipBack={handleSkipBack}
+                onRewind={handleRewind}
+                onPlay={handlePlay}
+                onPause={handlePause}
+                onStop={handleStop}
+                onFastForward={handleFastForward}
+                onSkipForward={handleSkipForward}
+                isPlaying={isPlaying}
+              />
+            </div>
           </div>
 
           <Playlist
