@@ -388,15 +388,17 @@
       return m + ":" + (s < 10 ? "0"+s : s);
     }
 
-    // Web Audio hook: single level 0–1 from the HTMLAudioElement
-    function useAudioLevel(audioElement, isPlaying){
+    // Web Audio hook: uses GainNode for volume/mute + tube levels
+    function useAudioLevel(audioElement, isPlaying, volume, isMuted){
       const [level,setLevel] = useState(0.15);
       const ctxRef = useRef(null);
       const analyserRef = useRef(null);
       const dataRef = useRef(null);
       const sourceRef = useRef(null);
+      const gainRef = useRef(null);
       const rafRef = useRef(null);
 
+      // wire graph once
       useEffect(() => {
         if (!audioElement) return;
         if (ctxRef.current) return;
@@ -411,17 +413,24 @@
         const dataArray = new Uint8Array(bufferLen);
 
         const src = ctx.createMediaElementSource(audioElement);
-        src.connect(analyser);
+        const gain = ctx.createGain();
+        gain.gain.value = isMuted ? 0 : (typeof volume === "number" ? volume : 1);
+
+        // audio element -> gain -> analyser -> speakers
+        src.connect(gain);
+        gain.connect(analyser);
         analyser.connect(ctx.destination);
 
         ctxRef.current = ctx;
         analyserRef.current = analyser;
         dataRef.current = dataArray;
         sourceRef.current = src;
+        gainRef.current = gain;
 
         return () => {
           if (rafRef.current) cancelAnimationFrame(rafRef.current);
           if (sourceRef.current) sourceRef.current.disconnect();
+          if (gainRef.current) gainRef.current.disconnect();
           if (analyserRef.current) analyserRef.current.disconnect();
           if (ctxRef.current && ctxRef.current.state !== "closed"){
             ctxRef.current.close();
@@ -429,6 +438,14 @@
         };
       }, [audioElement]);
 
+      // respond to volume/mute
+      useEffect(() => {
+        const gain = gainRef.current;
+        if (!gain) return;
+        gain.gain.value = isMuted ? 0 : (typeof volume === "number" ? volume : 1);
+      }, [volume, isMuted]);
+
+      // animate tubes when playing
       useEffect(() => {
         const ctx = ctxRef.current;
         const analyser = analyserRef.current;
@@ -450,10 +467,10 @@
         const tick = () => {
           analyser.getByteFrequencyData(dataArray);
           let sum = 0;
-          for (let i=0;i<bufferLen;i++) sum += dataArray[i];
+          for (let i = 0; i < bufferLen; i++) sum += dataArray[i];
           const avg = sum / bufferLen;
           const norm = avg / 255;
-          const next = 0.1 + norm*0.9;
+          const next = 0.1 + norm * 0.9;
           setLevel(next);
           rafRef.current = requestAnimationFrame(tick);
         };
@@ -700,7 +717,7 @@
       const audioRef = useRef(null);
       const activeTrack = TRACKS[currentIndex];
 
-      const level = useAudioLevel(audioRef.current, isPlaying);
+      const level = useAudioLevel(audioRef.current, isPlaying, volume, isMuted);
 
       // time / metadata / ended listeners
       useEffect(() => {
@@ -741,14 +758,6 @@
           audio.play().catch(() => setIsPlaying(false));
         }
       }, [currentIndex, activeTrack]);
-
-      // Apply volume + mute to the <audio> element
-      useEffect(() => {
-        const audio = audioRef.current;
-        if (!audio) return;
-        audio.volume = volume;   // 0–1
-        audio.muted = isMuted;
-      }, [volume, isMuted]);
 
       // small +/- nudge in seconds
       const handleNudge = (deltaSeconds) => {
