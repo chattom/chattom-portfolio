@@ -19,8 +19,7 @@
   <style>
     :root{
       --accent:#00f5d4;
-      /* default glow; React overrides per theme via CSS vars */
-      --glow-soft: rgba(34, 211, 238, 0.12);
+      --glow-soft: rgba(34, 211, 238, 0.12);   /* default, overridden per theme */
       --glow-strong: rgba(34, 211, 238, 0.55);
     }
 
@@ -172,15 +171,12 @@
       pointer-events:none;
     }
 
-    /* --- Volume control --- */
+    /* --- Volume control on same row --- */
     .volume-wrap{
-      width:100%;
-      max-width:768px;
       display:flex;
       align-items:center;
-      justify-content:center;
       gap:0.75rem;
-      margin-bottom:1rem;
+      min-width:0;
     }
     .volume-knob{
       width:36px;
@@ -199,6 +195,7 @@
       cursor:pointer;
       filter:drop-shadow(0 0 3px var(--glow-soft));
       transition:transform 120ms ease, box-shadow 140ms ease, filter 140ms ease;
+      flex-shrink:0;
     }
     .volume-knob:hover,
     .volume-knob:focus-visible{
@@ -208,7 +205,7 @@
     }
     .volume-track{
       flex:1;
-      max-width:260px;
+      max-width:220px;
     }
     .volume-slider{
       width:100%;
@@ -216,7 +213,7 @@
       height:6px;
       border-radius:999px;
       background:linear-gradient(to right,
-        rgba(148,163,184,0.8),
+        rgba(148,163,184,0.85),
         rgba(71,85,105,0.9));
       outline:none;
       cursor:pointer;
@@ -243,6 +240,12 @@
         0 0 8px var(--glow-soft),
         0 2px 4px rgba(0,0,0,0.6);
     }
+    .volume-percent{
+      font-size:11px;
+      color:#94a3b8;
+      min-width:32px;
+      text-align:right;
+    }
 
     /* --- Vintage transport buttons --- */
     .transport-btn{
@@ -268,7 +271,7 @@
         filter 140ms ease;
       color:#e5e7eb;
       cursor:pointer;
-      filter:drop-shadow(0 0 3px var(--glow-soft)); /* ~2–3% glow */
+      filter:drop-shadow(0 0 3px var(--glow-soft)); /* subtle 2–3% glow */
     }
     .transport-btn--play{
       width:52px;
@@ -278,7 +281,7 @@
     .transport-btn:focus-visible{
       outline:none;
       transform:translateY(-1px);
-      filter:drop-shadow(0 0 10px var(--glow-strong)); /* ~10–15% glow */
+      filter:drop-shadow(0 0 10px var(--glow-strong)); /* stronger 10–15% */
     }
     .transport-btn:active{
       transform:translateY(1px) scale(0.97);
@@ -554,7 +557,7 @@
       isPlaying,
     }){
       return (
-        <div className="flex items-center justify-center gap-3 sm:gap-4 mb-6">
+        <div className="flex items-center justify-center gap-3 sm:gap-4">
           {/* ⏮ REVERSE SKIP (previous track) */}
           <button
             aria-label="Previous track"
@@ -723,7 +726,7 @@
         };
       }, []);
 
-      // Load track whenever index or play-state changes
+      // Load track whenever index changes (NOT when play/pause changes)
       useEffect(() => {
         const audio = audioRef.current;
         if (!audio || !activeTrack) return;
@@ -733,16 +736,18 @@
         audio.currentTime = 0;
         setCurrentTime(0);
 
+        // if we were in "playing" mode (e.g. auto-advance), keep playing
         if (isPlaying){
           audio.play().catch(() => setIsPlaying(false));
         }
-      }, [currentIndex, activeTrack, isPlaying]);
+      }, [currentIndex, activeTrack]);
 
-      // Apply volume + mute to audio element
+      // Apply volume + mute
       useEffect(() => {
         const audio = audioRef.current;
         if (!audio) return;
-        audio.volume = isMuted ? 0 : volume;
+        audio.volume = volume;          // 0–1
+        audio.muted = isMuted;          // true/false
       }, [volume, isMuted]);
 
       // small +/- nudge in seconds
@@ -815,11 +820,6 @@
         const value = parseFloat(e.target.value);
         if (Number.isNaN(value)) return;
         setVolume(value);
-        if (value === 0){
-          setIsMuted(true);
-        } else if (isMuted){
-          setIsMuted(false);
-        }
       };
 
       const toggleMute = () => {
@@ -827,6 +827,7 @@
       };
 
       const themeDef = THEMES[theme];
+      const volumePercent = Math.round(volume * 100);
 
       return (
         <div
@@ -847,41 +848,46 @@
             onSeekClick={handleSeekClick}
           />
 
-          {/* Volume + mute */}
-          <div className="volume-wrap">
-            <button
-              type="button"
-              className="volume-knob"
-              aria-label={isMuted ? "Unmute" : "Mute"}
-              onClick={toggleMute}
-            >
-              <span className="text-xs">
-                {isMuted ? "🔇" : "🔊"}
-              </span>
-            </button>
-            <div className="volume-track">
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.01"
-                value={isMuted ? 0 : volume}
-                onChange={handleVolumeChange}
-                className="volume-slider"
-              />
+          {/* Volume + transport on the SAME ROW */}
+          <div className="w-full max-w-3xl flex items-center justify-between gap-4 mb-6">
+            <div className="volume-wrap">
+              <button
+                type="button"
+                className="volume-knob"
+                aria-label={isMuted ? "Unmute" : "Mute"}
+                onClick={toggleMute}
+              >
+                <span className="text-xs">
+                  {isMuted ? "🔇" : "🔊"}
+                </span>
+              </button>
+              <div className="volume-track">
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value={volume}
+                  onChange={handleVolumeChange}
+                  className="volume-slider"
+                />
+              </div>
+              <div className="volume-percent">
+                {isMuted ? "0%" : volumePercent + "%"}
+              </div>
             </div>
-          </div>
 
-          <VintageControls
-            onSkipBack={handleSkipBack}
-            onRewind={handleRewind}
-            onPlay={handlePlay}
-            onPause={handlePause}
-            onStop={handleStop}
-            onFastForward={handleFastForward}
-            onSkipForward={handleSkipForward}
-            isPlaying={isPlaying}
-          />
+            <VintageControls
+              onSkipBack={handleSkipBack}
+              onRewind={handleRewind}
+              onPlay={handlePlay}
+              onPause={handlePause}
+              onStop={handleStop}
+              onFastForward={handleFastForward}
+              onSkipForward={handleSkipForward}
+              isPlaying={isPlaying}
+            />
+          </div>
 
           <Playlist
             tracks={TRACKS}
