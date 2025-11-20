@@ -19,6 +19,9 @@
   <style>
     :root{
       --accent:#00f5d4;
+      /* default glow; React overrides per theme via CSS vars */
+      --glow-soft: rgba(34, 211, 238, 0.12);
+      --glow-strong: rgba(34, 211, 238, 0.55);
     }
 
     *{box-sizing:border-box;}
@@ -100,63 +103,13 @@
 
     #root{ margin-top:24px; }
 
-    /* --- Player shell (brushed-ish metal deck) --- */
-    .player-shell{
-      position:relative;
-      border-radius:1.75rem;
-      padding:1.75rem 1.75rem 1.25rem;
-      overflow:hidden;
-      border:1px solid rgba(148,163,184,0.7);
-      background:
-        repeating-linear-gradient(
-          90deg,
-          rgba(15,23,42,0.98) 0px,
-          rgba(15,23,42,0.98) 1px,
-          rgba(15,23,42,0.92) 3px,
-          rgba(15,23,42,0.92) 4px
-        );
-      box-shadow:
-        0 26px 60px rgba(0,0,0,0.95),
-        inset 0 0 40px rgba(15,23,42,1);
-    }
-    .player-shell::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      background:
-        linear-gradient(
-          to bottom,
-          rgba(255,255,255,0.14),
-          transparent 30%
-        );
-      pointer-events:none;
-      mix-blend-mode:screen;
-    }
-    .deck-feet{
-      display:flex;
-      justify-content:space-between;
-      margin-top:1.25rem;
-      padding:0 0.25rem;
-    }
-    .deck-foot{
-      width:56px;
-      height:6px;
-      border-radius:999px;
-      background:radial-gradient(circle at 50% 0%, rgba(255,255,255,0.14), transparent 55%),
-                 linear-gradient(to bottom,#020617,#020617,#000);
-      box-shadow:
-        0 4px 10px rgba(0,0,0,0.8),
-        inset 0 1px 2px rgba(255,255,255,0.18);
-    }
-
     /* --- Retro tubes --- */
     .tube-window{
       border-radius:1.25rem;
       border:1px solid rgba(148,163,184,0.6);
       background:
-        radial-gradient(circle at 50% 0%, rgba(255,255,255,0.10), transparent 55%),
-        radial-gradient(circle at 10% 0%, rgba(148,163,184,0.28), transparent 55%),
-        linear-gradient(to bottom,#020617,#020617,#020617,#020617,#020617,#020617);
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,0.06), transparent 55%),
+        linear-gradient(to bottom,#020617,#020617,#020617,#020617,#020617,#020617,#020617);
       box-shadow:
         inset 0 0 40px rgba(15,23,42,1),
         0 24px 60px rgba(0,0,0,0.85);
@@ -168,33 +121,23 @@
       width:48px;
       height:126px;
       border-radius:999px;
-      border:1px solid rgba(148,163,184,0.75);
+      border:1px solid rgba(148,163,184,0.7);
       background:
-        radial-gradient(circle at 25% 12%, rgba(255,255,255,0.45), transparent 65%),
-        radial-gradient(circle at 70% 85%, rgba(15,23,42,0.95), #020617);
+        radial-gradient(circle at 25% 15%, rgba(255,255,255,0.18), transparent 55%),
+        linear-gradient(to bottom,#111827,#020617);
       box-shadow:
-        inset 0 0 18px rgba(15,23,42,0.9),
+        inset 0 0 18px rgba(15,23,42,0.95),
         0 14px 32px rgba(0,0,0,0.9);
       display:flex;
       align-items:flex-end;
       justify-content:center;
       padding:8px;
       overflow:hidden;
-      position:relative;
-    }
-    .tube-shell::after{
-      content:"";
-      position:absolute;
-      inset:4px 6px;
-      border-radius:999px;
-      border:1px solid rgba(248,250,252,0.22);
-      mix-blend-mode:screen;
-      pointer-events:none;
     }
     .tube-core{
       width:26px;
       border-radius:999px;
-      background:linear-gradient(to bottom,#f9fafb,#e5e7eb,#cbd5f5,#94a3b8);
+      background:linear-gradient(to bottom,#f9fafb,#e5e7eb,#e5e7eb,#94a3b8);
       transition:height 120ms ease-out, box-shadow 120ms ease-out, opacity 120ms ease-out;
     }
     .tube-foot{
@@ -229,7 +172,79 @@
       pointer-events:none;
     }
 
-    /* --- Vintage transport / mute buttons --- */
+    /* --- Volume control --- */
+    .volume-wrap{
+      width:100%;
+      max-width:768px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:0.75rem;
+      margin-bottom:1rem;
+    }
+    .volume-knob{
+      width:36px;
+      height:36px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,0.7);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:
+        radial-gradient(circle at 30% 18%, rgba(255,255,255,0.26), transparent 55%),
+        radial-gradient(circle at 70% 82%, #020617, #020617);
+      box-shadow:
+        0 6px 14px rgba(0,0,0,0.7),
+        inset 0 2px 4px rgba(255,255,255,0.32);
+      cursor:pointer;
+      filter:drop-shadow(0 0 3px var(--glow-soft));
+      transition:transform 120ms ease, box-shadow 140ms ease, filter 140ms ease;
+    }
+    .volume-knob:hover,
+    .volume-knob:focus-visible{
+      outline:none;
+      filter:drop-shadow(0 0 10px var(--glow-strong));
+      transform:translateY(-1px);
+    }
+    .volume-track{
+      flex:1;
+      max-width:260px;
+    }
+    .volume-slider{
+      width:100%;
+      appearance:none;
+      height:6px;
+      border-radius:999px;
+      background:linear-gradient(to right,
+        rgba(148,163,184,0.8),
+        rgba(71,85,105,0.9));
+      outline:none;
+      cursor:pointer;
+    }
+    .volume-slider::-webkit-slider-thumb{
+      appearance:none;
+      width:16px;
+      height:16px;
+      border-radius:50%;
+      background:#e5e7eb;
+      border:1px solid rgba(148,163,184,0.8);
+      box-shadow:
+        0 0 8px var(--glow-soft),
+        0 2px 4px rgba(0,0,0,0.6);
+      margin-top:-5px;
+    }
+    .volume-slider::-moz-range-thumb{
+      width:16px;
+      height:16px;
+      border-radius:50%;
+      background:#e5e7eb;
+      border:1px solid rgba(148,163,184,0.8);
+      box-shadow:
+        0 0 8px var(--glow-soft),
+        0 2px 4px rgba(0,0,0,0.6);
+    }
+
+    /* --- Vintage transport buttons --- */
     .transport-btn{
       position:relative;
       border-radius:999px;
@@ -240,11 +255,11 @@
       justify-content:center;
       border:1px solid rgba(148,163,184,0.7);
       background:
-        radial-gradient(circle at 30% 18%, rgba(255,255,255,0.22), transparent 55%),
+        radial-gradient(circle at 30% 18%, rgba(255,255,255,0.26), transparent 55%),
         radial-gradient(circle at 70% 82%, #020617, #020617);
       box-shadow:
         0 8px 16px rgba(0,0,0,0.7),
-        inset 0 2px 4px rgba(255,255,255,0.32);
+        inset 0 2px 4px rgba(255,255,255,0.36);
       transition:
         box-shadow 140ms ease,
         transform 120ms ease,
@@ -253,18 +268,17 @@
         filter 140ms ease;
       color:#e5e7eb;
       cursor:pointer;
-      /* 2–3% resting glow (theme sets CSS vars) */
-      filter:drop-shadow(0 0 3px var(--glow-soft, rgba(148,163,184,0.25)));
+      filter:drop-shadow(0 0 3px var(--glow-soft)); /* ~2–3% glow */
     }
     .transport-btn--play{
       width:52px;
       height:52px;
     }
     .transport-btn:hover,
-    .transport-btn:active{
+    .transport-btn:focus-visible{
+      outline:none;
       transform:translateY(-1px);
-      /* 10–15% hover/active glow */
-      filter:drop-shadow(0 0 10px var(--glow-strong, rgba(148,163,184,0.7)));
+      filter:drop-shadow(0 0 10px var(--glow-strong)); /* ~10–15% glow */
     }
     .transport-btn:active{
       transform:translateY(1px) scale(0.97);
@@ -275,43 +289,6 @@
     .transport-icon{
       font-size:14px;
       filter:drop-shadow(0 1px 1px rgba(0,0,0,0.9));
-    }
-
-    /* --- Volume --- */
-    .volume-rail{
-      position:relative;
-      width:110px;
-      height:6px;
-      border-radius:999px;
-      background:linear-gradient(to right,#020617,#020617,#020617);
-      box-shadow:
-        inset 0 0 4px rgba(15,23,42,0.9),
-        0 0 10px rgba(15,23,42,0.7);
-      overflow:hidden;
-      cursor:pointer;
-    }
-    .volume-fill{
-      position:absolute;
-      inset:0;
-      border-radius:999px;
-      background:linear-gradient(to right,#e5e7eb,#f9fafb);
-      box-shadow:0 0 8px rgba(248,250,252,0.55);
-      pointer-events:none;
-    }
-    .volume-thumb{
-      position:absolute;
-      top:50%;
-      width:11px;
-      height:11px;
-      border-radius:999px;
-      transform:translate(-50%, -50%);
-      background:
-        radial-gradient(circle at 30% 22%, #f9fafb, #cbd5f5 55%, #020617);
-      border:1px solid rgba(148,163,184,0.8);
-      box-shadow:
-        0 3px 8px rgba(0,0,0,0.8),
-        inset 0 1px 2px rgba(255,255,255,0.5);
-      pointer-events:none;
     }
   </style>
 </head>
@@ -371,8 +348,8 @@
         textSub: "text-slate-300",
         accent: "text-cyan-400",
         accentHex: "#22d3ee",
-        glowSoft: "rgba(34, 211, 238, 0.25)",
-        glowStrong: "rgba(34, 211, 238, 0.7)",
+        glowSoft: "rgba(34, 211, 238, 0.12)",
+        glowStrong: "rgba(34, 211, 238, 0.55)",
       },
       "day break": {
         id: "day break",
@@ -383,8 +360,8 @@
         textSub: "text-orange-900",
         accent: "text-orange-600",
         accentHex: "#fb923c",
-        glowSoft: "rgba(251, 146, 60, 0.25)",
-        glowStrong: "rgba(251, 146, 60, 0.7)",
+        glowSoft: "rgba(251, 146, 60, 0.12)",
+        glowStrong: "rgba(251, 146, 60, 0.55)",
       },
       fantasy: {
         id: "fantasy",
@@ -395,8 +372,8 @@
         textSub: "text-purple-200",
         accent: "text-fuchsia-400",
         accentHex: "#e879f9",
-        glowSoft: "rgba(232, 121, 249, 0.25)",
-        glowStrong: "rgba(232, 121, 249, 0.7)",
+        glowSoft: "rgba(232, 121, 249, 0.12)",
+        glowStrong: "rgba(232, 121, 249, 0.55)",
       },
     };
 
@@ -416,7 +393,6 @@
       const sourceRef = useRef(null);
       const rafRef = useRef(null);
 
-      // Wire once
       useEffect(() => {
         if (!audioElement) return;
         if (ctxRef.current) return;
@@ -449,7 +425,6 @@
         };
       }, [audioElement]);
 
-      // Animate while playing
       useEffect(() => {
         const ctx = ctxRef.current;
         const analyser = analyserRef.current;
@@ -525,10 +500,10 @@
 
       return (
         <div className={[
-          "player-shell w-full max-w-3xl mx-auto border",
+          "w-full max-w-3xl mx-auto rounded-3xl border px-6 py-5 mb-6",
           "bg-gradient-to-b", t.bg, t.border, "shadow-2xl"
         ].join(" ")}>
-          <div className="tube-window mb-5 relative z-10">
+          <div className="tube-window mb-5">
             {tubes.map((lvl,i) => (
               <div key={i} className="flex flex-col items-center">
                 <div className="tube-shell">
@@ -536,7 +511,7 @@
                     className="tube-core"
                     style={{
                       height: (42 + lvl*60) + "px",
-                      boxShadow: `0 0 ${14 + lvl*24}px ${glow}`,
+                      boxShadow: `0 0 ${14 + lvl*26}px ${glow}`,
                       opacity: 0.55 + lvl*0.4
                     }}
                   />
@@ -546,13 +521,13 @@
             ))}
           </div>
 
-          <div className="text-center mb-4 relative z-10">
+          <div className="text-center mb-4">
             <div className={t.text + " text-lg font-semibold"}>
               {trackName || "Select a track from the playlist"}
             </div>
           </div>
 
-          <div className="mt-2 relative z-10">
+          <div className="mt-2">
             <div className="flex items-center justify-between text-[11px] text-slate-400 mb-1 px-0.5">
               <span>{formatTime(currentTime)}</span>
               <span>{formatTime(duration)}</span>
@@ -564,60 +539,6 @@
               />
             </div>
           </div>
-
-          <div className="deck-feet relative z-10">
-            <div className="deck-foot"></div>
-            <div className="deck-foot"></div>
-          </div>
-        </div>
-      );
-    }
-
-    function VolumeControl({ volume, isMuted, onVolumeChange, onToggleMute, theme }) {
-      const t = THEMES[theme];
-      const percent = Math.round(volume * 100);
-      const thumbLeft = percent;
-
-      return (
-        <div className="flex items-center gap-2 sm:gap-3">
-          {/* Mute button */}
-          <button
-            type="button"
-            aria-label={isMuted ? "Unmute" : "Mute"}
-            onClick={onToggleMute}
-            className="transport-btn"
-            style={{
-              "--glow-soft": t.glowSoft,
-              "--glow-strong": t.glowStrong,
-              width:"40px",
-              height:"40px",
-              fontSize:"12px"
-            }}
-          >
-            <span className="transport-icon">
-              {isMuted ? "🔇" : "🔊"}
-            </span>
-          </button>
-
-          {/* Volume bar */}
-          <div
-            className="volume-rail"
-            onClick={(e) => {
-              const rect = e.currentTarget.getBoundingClientRect();
-              const ratio = (e.clientX - rect.left) / rect.width;
-              const clamped = Math.max(0, Math.min(1, ratio));
-              onVolumeChange(clamped);
-            }}
-          >
-            <div
-              className="volume-fill"
-              style={{ width: percent + "%" }}
-            ></div>
-            <div
-              className="volume-thumb"
-              style={{ left: thumbLeft + "%" }}
-            ></div>
-          </div>
         </div>
       );
     }
@@ -628,116 +549,84 @@
       onStop,
       onSkipBack,
       onSkipForward,
-      onNudgeBack,
-      onNudgeForward,
+      onRewind,
+      onFastForward,
       isPlaying,
-      theme,
-      volume,
-      isMuted,
-      onVolumeChange,
-      onToggleMute,
-    }) {
-      const themeDef = THEMES[theme];
-      const glowVars = {
-        "--glow-soft": themeDef.glowSoft,
-        "--glow-strong": themeDef.glowStrong,
-      };
-
+    }){
       return (
-        <div className="flex flex-col items-center gap-4 mb-6 mt-4">
-          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
-            <VolumeControl
-              volume={volume}
-              isMuted={isMuted}
-              onVolumeChange={onVolumeChange}
-              onToggleMute={onToggleMute}
-              theme={theme}
-            />
+        <div className="flex items-center justify-center gap-3 sm:gap-4 mb-6">
+          {/* ⏮ REVERSE SKIP (previous track) */}
+          <button
+            aria-label="Previous track"
+            type="button"
+            onClick={onSkipBack}
+            className="transport-btn"
+          >
+            <span className="transport-icon text-xs">⏮</span>
+          </button>
 
-            <div className="flex items-center justify-center gap-3 sm:gap-4">
-              {/* ⏮ REVERSE SKIP (previous track) */}
-              <button
-                aria-label="Previous track"
-                type="button"
-                onClick={onSkipBack}
-                className="transport-btn"
-                style={glowVars}
-              >
-                <span className="transport-icon text-xs">⏮</span>
-              </button>
+          {/* ⏪ REWIND (small nudge back) */}
+          <button
+            aria-label="Rewind"
+            type="button"
+            onClick={onRewind}
+            className="transport-btn"
+          >
+            <span className="transport-icon text-xs">⏪</span>
+          </button>
 
-              {/* ⏪ REWIND (small nudge back) */}
-              <button
-                aria-label="Rewind"
-                type="button"
-                onClick={onNudgeBack}
-                className="transport-btn"
-                style={glowVars}
-              >
-                <span className="transport-icon text-xs">⏪</span>
-              </button>
+          {/* ▶ PLAY */}
+          <button
+            aria-label="Play"
+            type="button"
+            onClick={onPlay}
+            className={
+              "transport-btn transport-btn--play" +
+              (isPlaying ? " ring-2 ring-offset-2 ring-offset-black ring-cyan-300/70" : "")
+            }
+          >
+            <span className="transport-icon text-sm">▶</span>
+          </button>
 
-              {/* ▶ PLAY (always start / resume) */}
-              <button
-                aria-label="Play"
-                type="button"
-                onClick={onPlay}
-                className="transport-btn transport-btn--play"
-                style={{
-                  ...glowVars,
-                  boxShadow: isPlaying
-                    ? `0 0 16px ${themeDef.accentHex}aa, 0 8px 18px rgba(0,0,0,0.7)`
-                    : "0 8px 18px rgba(0,0,0,0.65)",
-                }}
-              >
-                <span className="transport-icon text-sm">▶</span>
-              </button>
+          {/* ⏸ PAUSE (toggles pause/resume) */}
+          <button
+            aria-label="Pause / Resume"
+            type="button"
+            onClick={() => (isPlaying ? onPause() : onPlay())}
+            className="transport-btn"
+          >
+            <span className="transport-icon text-sm">⏸</span>
+          </button>
 
-              {/* ⏸ PAUSE (toggles pause / resume) */}
-              <button
-                aria-label="Pause / Resume"
-                type="button"
-                onClick={() => (isPlaying ? onPause() : onPlay())}
-                className="transport-btn"
-                style={glowVars}
-              >
-                <span className="transport-icon text-sm">⏸</span>
-              </button>
+          {/* ■ STOP */}
+          <button
+            aria-label="Stop"
+            type="button"
+            onClick={onStop}
+            className="transport-btn"
+          >
+            <span className="transport-icon text-xs">■</span>
+          </button>
 
-              {/* ■ STOP (stop + return to 0) */}
-              <button
-                aria-label="Stop"
-                type="button"
-                onClick={onStop}
-                className="transport-btn"
-                style={glowVars}
-              >
-                <span className="transport-icon text-xs">■</span>
-              </button>
+          {/* ⏩ FAST FORWARD (small nudge forward) */}
+          <button
+            aria-label="Fast forward"
+            type="button"
+            onClick={onFastForward}
+            className="transport-btn"
+          >
+            <span className="transport-icon text-xs">⏩</span>
+          </button>
 
-              {/* ⏩ FAST FORWARD (small nudge forward) */}
-              <button
-                aria-label="Fast forward"
-                type="button"
-                onClick={onNudgeForward}
-                className="transport-btn"
-                style={glowVars}
-              >
-                <span className="transport-icon text-xs">⏩</span>
-              </button>
-
-              {/* ⏭ FORWARD SKIP (next track) */}
-              <button
-                aria-label="Next track"
-                type="button"
-                onClick={onSkipForward}
-                className="transport-btn"
-                style={glowVars}
-              >
-                <span className="transport-icon text-xs">⏭</span>
-              </button>
-            </div>
-          </div>
+          {/* ⏭ FORWARD SKIP (next track) */}
+          <button
+            aria-label="Next track"
+            type="button"
+            onClick={onSkipForward}
+            className="transport-btn"
+          >
+            <span className="transport-icon text-xs">⏭</span>
+          </button>
         </div>
       );
     }
@@ -801,17 +690,15 @@
       const [isPlaying,setIsPlaying] = useState(false);
       const [currentTime,setCurrentTime] = useState(0);
       const [duration,setDuration] = useState(0);
-
-      const [volume, setVolume] = useState(0.9);
-      const [isMuted, setIsMuted] = useState(false);
-      const volumeBeforeMuteRef = useRef(0.9);
+      const [volume,setVolume] = useState(0.9);
+      const [isMuted,setIsMuted] = useState(false);
 
       const audioRef = useRef(null);
       const activeTrack = TRACKS[currentIndex];
 
       const level = useAudioLevel(audioRef.current, isPlaying);
 
-      // bind time/duration listeners + auto-advance
+      // time / metadata / ended listeners
       useEffect(() => {
         const audio = audioRef.current;
         if (!audio) return;
@@ -819,7 +706,7 @@
         const onTime = () => setCurrentTime(audio.currentTime || 0);
         const onMeta = () => setDuration(audio.duration || 0);
         const onEnd = () => {
-          // auto-advance and keep playing
+          // auto-advance to next track and keep playing
           setCurrentIndex(prev => (prev + 1) % TRACKS.length);
           setCurrentTime(0);
           setIsPlaying(true);
@@ -836,24 +723,22 @@
         };
       }, []);
 
-      // load track whenever index changes (NOT when pause/volume change)
+      // Load track whenever index or play-state changes
       useEffect(() => {
         const audio = audioRef.current;
         if (!audio || !activeTrack) return;
 
         audio.src = AUDIO_BASE + activeTrack.file;
         audio.load();
+        audio.currentTime = 0;
         setCurrentTime(0);
-
-        // apply current volume to new track
-        audio.volume = isMuted ? 0 : volume;
 
         if (isPlaying){
           audio.play().catch(() => setIsPlaying(false));
         }
-      }, [currentIndex, activeTrack, isMuted, volume, isPlaying]); // we NEED isMuted/volume/isPlaying here so new track respects them
+      }, [currentIndex, activeTrack, isPlaying]);
 
-      // keep audio.volume in sync when volume/mute change (without reloading)
+      // Apply volume + mute to audio element
       useEffect(() => {
         const audio = audioRef.current;
         if (!audio) return;
@@ -869,31 +754,24 @@
         setCurrentTime(next);
       };
 
-      // PLAY
       const handlePlay = () => {
         const audio = audioRef.current;
         if (!audio) return;
-
-        audio.volume = isMuted ? 0 : volume;
-
         audio.play()
           .then(() => setIsPlaying(true))
           .catch(() => {});
       };
 
-      // PAUSE (does NOT reset currentTime)
       const handlePause = () => {
         const audio = audioRef.current;
         if (!audio) return;
         audio.pause();
-        setIsPlaying(false);
+        setIsPlaying(false);   // keeps currentTime where it is
       };
 
-      // STOP (reset to zero)
       const handleStop = () => {
         const audio = audioRef.current;
         if (!audio) return;
-
         audio.pause();
         audio.currentTime = 0;
         setCurrentTime(0);
@@ -914,7 +792,6 @@
         setCurrentIndex(idx);
         const audio = audioRef.current;
         if (audio){
-          audio.volume = isMuted ? 0 : volume;
           audio.play()
             .then(() => setIsPlaying(true))
             .catch(() => {});
@@ -934,48 +811,31 @@
         setCurrentTime(newTime);
       };
 
-      const handleVolumeChange = (val) => {
-        const clamped = Math.max(0, Math.min(1, val));
-        setVolume(clamped);
-
-        const audio = audioRef.current;
-        if (audio) {
-          if (clamped === 0) {
-            audio.volume = 0;
-            setIsMuted(true);
-          } else {
-            audio.volume = clamped;
-            setIsMuted(false);
-          }
-        } else {
-          if (clamped === 0) {
-            setIsMuted(true);
-          } else {
-            setIsMuted(false);
-          }
+      const handleVolumeChange = (e) => {
+        const value = parseFloat(e.target.value);
+        if (Number.isNaN(value)) return;
+        setVolume(value);
+        if (value === 0){
+          setIsMuted(true);
+        } else if (isMuted){
+          setIsMuted(false);
         }
       };
 
-      const handleToggleMute = () => {
-        const audio = audioRef.current;
-        setIsMuted(prev => {
-          const nextMuted = !prev;
-          if (nextMuted) {
-            // unmuted -> muted
-            volumeBeforeMuteRef.current = volume;
-            if (audio) audio.volume = 0;
-          } else {
-            // muted -> unmuted
-            const restored = volumeBeforeMuteRef.current || 0.9;
-            setVolume(restored);
-            if (audio) audio.volume = restored;
-          }
-          return nextMuted;
-        });
+      const toggleMute = () => {
+        setIsMuted(prev => !prev);
       };
 
+      const themeDef = THEMES[theme];
+
       return (
-        <div className="mt-6 flex flex-col items-center">
+        <div
+          className="mt-6 flex flex-col items-center"
+          style={{
+            '--glow-soft': themeDef.glowSoft,
+            '--glow-strong': themeDef.glowStrong,
+          }}
+        >
           <ThemeChips active={theme} onChange={setTheme} />
 
           <TubeDeck
@@ -987,20 +847,40 @@
             onSeekClick={handleSeekClick}
           />
 
+          {/* Volume + mute */}
+          <div className="volume-wrap">
+            <button
+              type="button"
+              className="volume-knob"
+              aria-label={isMuted ? "Unmute" : "Mute"}
+              onClick={toggleMute}
+            >
+              <span className="text-xs">
+                {isMuted ? "🔇" : "🔊"}
+              </span>
+            </button>
+            <div className="volume-track">
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={isMuted ? 0 : volume}
+                onChange={handleVolumeChange}
+                className="volume-slider"
+              />
+            </div>
+          </div>
+
           <VintageControls
             onSkipBack={handleSkipBack}
-            onNudgeBack={handleRewind}
+            onRewind={handleRewind}
             onPlay={handlePlay}
             onPause={handlePause}
             onStop={handleStop}
-            onNudgeForward={handleFastForward}
+            onFastForward={handleFastForward}
             onSkipForward={handleSkipForward}
             isPlaying={isPlaying}
-            theme={theme}
-            volume={volume}
-            isMuted={isMuted}
-            onVolumeChange={handleVolumeChange}
-            onToggleMute={handleToggleMute}
           />
 
           <Playlist
