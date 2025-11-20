@@ -467,106 +467,120 @@
     }
 
     function VintageControls({
-      onSkipBack,
-      onRewind,
-      onPlay,
-      onPause,
-      onStop,
-      onFastForward,
-      onSkipForward,
-      isPlaying,
-      theme,
-    }){
-      const themeDef = THEMES[theme];
+  onPlay,
+  onPause,
+  onStop,
+  onSkipBack,
+  onSkipForward,
+  onNudgeBack,
+  onNudgeForward,
+  isPlaying,
+  theme,
+}) {
+  const themeDef = THEMES[theme];
 
-      const baseBtn =
-        "transport-btn flex items-center justify-center text-slate-100";
+  const baseBtn =
+    "w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center " +
+    "bg-slate-900/90 border border-slate-600/80 text-slate-100 " +
+    "shadow-[0_8px_18px_rgba(0,0,0,0.65)] " +
+    "transition-all transform hover:-translate-y-[1px] focus:outline-none";
 
-      const playExtraShadow = isPlaying
-        ? `0 0 16px ${themeDef.accentHex}aa, 0 8px 18px rgba(0,0,0,0.7)`
-        : "0 8px 18px rgba(0,0,0,0.65)";
+  // subtle always-on glow for all buttons
+  const baseGlow = `drop-shadow(0 0 3px ${themeDef.accentHex}33)`;
 
-      return (
-        <div
-          className="flex items-center justify-center gap-3 sm:gap-4 mb-6"
-          style={{
-            "--glow-soft": themeDef.glowSoft,
-            "--glow-strong": themeDef.glowStrong,
-          }}
-        >
-          {/* ⏮ REVERSE SKIP (previous track) */}
-          <button
-            aria-label="Previous track"
-            type="button"
-            onClick={onSkipBack}
-            className={baseBtn}
-          >
-            <span className="transport-icon text-xs">⏮</span>
-          </button>
+  // stronger glow when hovered/active
+  const hoverGlow = `drop-shadow(0 0 10px ${themeDef.accentHex}cc)`;
 
-          {/* ⏪ REWIND (small nudge back) */}
-          <button
-            aria-label="Rewind"
-            type="button"
-            onClick={onRewind}
-            className={baseBtn}
-          >
-            <span className="transport-icon text-xs">⏪</span>
-          </button>
+  // play a bit larger
+  const playScale = " scale-[1.12]";
 
-          {/* ▶ PLAY (always starts / resumes) */}
-          <button
-            aria-label="Play"
-            type="button"
-            onClick={onPlay}
-            className={baseBtn + " transport-btn--play"}
-            style={{ boxShadow: playExtraShadow }}
-          >
-            <span className="transport-icon text-sm">▶</span>
-          </button>
+  return (
+    <div className="flex items-center justify-center gap-3 sm:gap-4 mb-6">
+      {/* ⏮ REVERSE SKIP (previous track) */}
+      <button
+        aria-label="Previous track"
+        type="button"
+        onClick={onSkipBack}
+        className={baseBtn}
+        style={{ filter: baseGlow }}
+      >
+        <span className="text-xs">⏮</span>
+      </button>
 
-          {/* ⏸ PAUSE (toggles pause/resume) */}
-          <button
-            aria-label="Pause / Resume"
-            type="button"
-            onClick={() => (isPlaying ? onPause() : onPlay())}
-            className={baseBtn}
-          >
-            <span className="transport-icon text-sm">⏸</span>
-          </button>
+      {/* ⏪ REWIND (small nudge back) */}
+      <button
+        aria-label="Rewind"
+        type="button"
+        onClick={onNudgeBack}
+        className={baseBtn}
+        style={{ filter: baseGlow }}
+      >
+        <span className="text-xs">⏪</span>
+      </button>
 
-          {/* ■ STOP (stop + return to 0) */}
-          <button
-            aria-label="Stop"
-            type="button"
-            onClick={onStop}
-            className={baseBtn}
-          >
-            <span className="transport-icon text-xs">■</span>
-          </button>
+      {/* ▶ PLAY (always start / resume) */}
+      <button
+        aria-label="Play"
+        type="button"
+        onClick={onPlay}
+        className={baseBtn + playScale}
+        style={{
+          filter: isPlaying ? hoverGlow : baseGlow,
+          boxShadow: isPlaying
+            ? `0 0 16px ${themeDef.accentHex}aa, 0 8px 18px rgba(0,0,0,0.7)`
+            : "0 8px 18px rgba(0,0,0,0.65)",
+        }}
+      >
+        <span className="text-sm">▶</span>
+      </button>
 
-          {/* ⏩ FAST FORWARD (small nudge forward) */}
-          <button
-            aria-label="Fast forward"
-            type="button"
-            onClick={onFastForward}
-            className={baseBtn}
-          >
-            <span className="transport-icon text-xs">⏩</span>
-          </button>
+      {/* ⏸ PAUSE (toggles pause / resume) */}
+      <button
+        aria-label="Pause / Resume"
+        type="button"
+        onClick={() => (isPlaying ? onPause() : onPlay())}
+        className={baseBtn}
+        style={{ filter: isPlaying ? hoverGlow : baseGlow }}
+      >
+        <span className="text-sm">⏸</span>
+      </button>
 
-          {/* ⏭ FORWARD SKIP (next track) */}
-          <button
-            aria-label="Next track"
-            type="button"
-            onClick={onSkipForward}
-            className={baseBtn}
-          >
-            <span className="transport-icon text-xs">⏭</span>
-          </button>
-        </div>
-      );
-    }
+      {/* ■ STOP (stop + return to 0) */}
+      <button
+        aria-label="Stop"
+        type="button"
+        onClick={onStop}
+        className={baseBtn}
+        style={{ filter: baseGlow }}
+      >
+        <span className="text-xs">■</span>
+      </button>
+
+      {/* ⏩ FAST FORWARD (small nudge forward) */}
+      <button
+        aria-label="Fast forward"
+        type="button"
+        onClick={onNudgeForward}
+        className={baseBtn}
+        style={{ filter: baseGlow }}
+      >
+        <span className="text-xs">⏩</span>
+      </button>
+
+      {/* ⏭ FORWARD SKIP (next track) */}
+      <button
+        aria-label="Next track"
+        type="button"
+        onClick={onSkipForward}
+        className={baseBtn}
+        style={{ filter: baseGlow }}
+      >
+        <span className="text-xs">⏭</span>
+      </button>
+    </div>
+  );
+}
+
 
     function Playlist({ tracks, currentIndex, onSelect, theme }){
       const t = THEMES[theme];
@@ -657,6 +671,13 @@ useEffect(() => {
   };
 }, []);
 
+const onEnd = () => {
+  setIsPlaying(false);
+
+  // Go to the next track AND immediately start playing it
+  setCurrentIndex(prev => (prev + 1) % TRACKS.length);
+  setIsPlaying(true);
+};
 
       // small +/- nudge in seconds
       const handleNudge = (deltaSeconds) => {
@@ -667,29 +688,34 @@ useEffect(() => {
         setCurrentTime(next);
       };
 
-      const handlePlay = () => {
-        const audio = audioRef.current;
-        if (!audio) return;
-        audio.play()
-          .then(() => setIsPlaying(true))
-          .catch(() => {});
-      };
+      // --- PLAY ---
+const handlePlay = () => {
+  const audio = audioRef.current;
+  if (!audio) return;
 
-      const handlePause = () => {
-        const audio = audioRef.current;
-        if (!audio) return;
-        audio.pause();
-        setIsPlaying(false);   // keeps currentTime where it is
-      };
+  audio.play()
+    .then(() => setIsPlaying(true))
+    .catch(() => {});
+};
 
-      const handleStop = () => {
-        const audio = audioRef.current;
-        if (!audio) return;
-        audio.pause();
-        audio.currentTime = 0;
-        setCurrentTime(0);
-        setIsPlaying(false);
-      };
+// --- PAUSE (should NOT reset currentTime) ---
+const handlePause = () => {
+  const audio = audioRef.current;
+  if (!audio) return;
+  audio.pause();
+  setIsPlaying(false);  // keeps timeline where it is
+};
+
+// --- STOP (should reset to zero) ---
+const handleStop = () => {
+  const audio = audioRef.current;
+  if (!audio) return;
+
+  audio.pause();
+  audio.currentTime = 0;
+  setCurrentTime(0);
+  setIsPlaying(false);
+};
 
       const handleSkipBack = () => {
         setCurrentIndex(prev => (prev - 1 + TRACKS.length) % TRACKS.length);
