@@ -798,11 +798,11 @@ useEffect(() => {
   // Pause at the exact current position
   audio.pause();
 
-  // Explicitly cache the position so React never falls back to 0
+  // Explicitly remember where we are
   const t = audio.currentTime || 0;
   setCurrentTime(t);
 
-  // Simply mark as not playing
+  // Just mark it as not playing
   setIsPlaying(false);
 };
 
