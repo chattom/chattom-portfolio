@@ -781,14 +781,26 @@
       };
 
       const handlePause = () => {
-        const audio = audioRef.current;
-        if (!audio) return;
+  const audio = audioRef.current;
+  if (!audio) return;
 
-        audio.pause();
-        const t = audio.currentTime || 0;
-        setCurrentTime(t);
-        setIsPlaying(false);
-      };
+  if (isPlaying) {
+    // Currently playing → pause and remember position
+    audio.pause();
+    const t = audio.currentTime || 0;
+    setCurrentTime(t);
+    setIsPlaying(false);
+  } else {
+    // Currently paused → resume from current position
+    audio.play()
+      .then(() => {
+        setIsPlaying(true);
+      })
+      .catch(() => {
+        // swallow any play() errors (autoplay restrictions, etc.)
+      });
+  }
+};
 
       const handleStop = () => {
         const audio = audioRef.current;
