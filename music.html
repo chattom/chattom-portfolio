@@ -794,11 +794,19 @@
       };
 
       const handlePause = () => {
-        const audio = audioRef.current;
-        if (!audio) return;
-        audio.pause();
-        setIsPlaying(false);
-      };
+  const audio = audioRef.current;
+  if (!audio) return;
+
+  // Just pause and freeze at the exact spot
+  audio.pause();
+
+  // Explicitly store whatever the playhead is at *right now*
+  const t = audio.currentTime || 0;
+  setCurrentTime(t);
+
+  // Mark as not playing (Play will resume from t)
+  setIsPlaying(false);
+};
 
       const handleStop = () => {
         const audio = audioRef.current;
