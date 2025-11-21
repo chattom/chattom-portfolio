@@ -476,63 +476,92 @@
       );
     }
 
-    function TubeDeck({ trackName, currentTime, duration, theme, level, onSeekClick }){
-      const t = THEMES[theme];
-      const tubes = [0,1,2,3,4].map(() => level);
-      const glow = t.accentHex + "dd";
-      const progressPercent = duration ? Math.min(100, (currentTime / duration) * 100) : 0;
+   function TubeDeck({ trackName, currentTime, duration, theme, level, onSeekClick }){
+  const t = THEMES[theme];
 
-      return (
-        <div className={[
-          "w-full max-w-3xl mx-auto rounded-3xl border px-6 py-5 mb-6",
-          "bg-gradient-to-b", t.bg, t.border, "shadow-2xl"
-        ].join(" ")}>
-          <div className="tube-window mb-5">
-            {tubes.map((lvl, i) => {
-              const coreScale = 0.35 + lvl * 0.9;
-              return (
-                <div key={i} className="flex flex-col items-center">
-                  <div className="tube-shell">
-                    <div className="tube-glass">
-                      <div className="tube-electrodes" />
-                      <div
-                        className="tube-core"
-                        style={{
-                          transform: `scaleY(${coreScale})`,
-                          boxShadow: `0 0 ${10 + lvl * 24}px ${glow}`,
-                          opacity: 0.6 + lvl * 0.35,
-                        }}
-                      />
-                      <div className="tube-filament" />
-                    </div>
-                  </div>
-                  <div className="tube-foot" />
+  // Give each tube a slightly different "personality" using phase offsets
+  const time = currentTime || 0;
+  const tubes = [0, 1, 2, 3, 4].map((_, i) => {
+    const phase = i * 0.35; // small offset per tube
+    const wobble = Math.sin(time * 4 + phase) * 0.18; // extra shimmer
+    const raw = level + wobble;
+
+    // Boost and clamp so we get a nice visible range 0–1
+    const boosted = 0.12 + (raw - 0.12) * 1.8;
+    return Math.max(0.05, Math.min(1.0, boosted));
+  });
+
+  const glow = t.accentHex + "dd";
+  const progressPercent = duration ? Math.min(100, (currentTime / duration) * 100) : 0;
+
+  return (
+    <div className={[
+      "w-full max-w-3xl mx-auto rounded-3xl border px-6 py-5 mb-6",
+      "bg-gradient-to-b", t.bg, t.border, "shadow-2xl"
+    ].join(" ")}>
+      <div className="tube-window mb-5">
+        {tubes.map((lvl, i) => {
+          // Stronger vertical response
+          const coreScale = 0.25 + lvl * 1.6;
+
+          // Edge glow around the whole tube assembly
+          const edgeGlow = 6 + lvl * 26;
+
+          // Inner core glow intensity
+          const coreGlow = 12 + lvl * 40;
+
+          return (
+            <div
+              key={i}
+              className="flex flex-col items-center"
+              style={{
+                // This drop-shadow makes the *edges* of the tube glow
+                filter: `drop-shadow(0 0 ${edgeGlow}px ${glow})`
+              }}
+            >
+              <div className="tube-shell">
+                <div className="tube-glass">
+                  <div className="tube-electrodes" />
+
+                  <div
+                    className="tube-core"
+                    style={{
+                      transform: `scaleY(${coreScale})`,
+                      boxShadow: `0 0 ${coreGlow}px ${glow}`,
+                      opacity: 0.45 + lvl * 0.55,
+                    }}
+                  />
+
+                  <div className="tube-filament" />
                 </div>
-              );
-            })}
-          </div>
+              </div>
+              <div className="tube-foot" />
+            </div>
+          );
+        })}
+      </div>
 
-          <div className="text-center mb-4">
-            <div className={t.text + " text-lg font-semibold"}>
-              {trackName || "Select a track from the playlist"}
-            </div>
-          </div>
-
-          <div className="mt-2">
-            <div className="flex items-center justify-between text-[11px] text-slate-400 mb-1 px-0.5">
-              <span>{formatTime(currentTime)}</span>
-              <span>{formatTime(duration)}</span>
-            </div>
-            <div className="progress-rail" onClick={onSeekClick}>
-              <div
-                className="progress-fill"
-                style={{ width: progressPercent + "%" }}
-              />
-            </div>
-          </div>
+      <div className="text-center mb-4">
+        <div className={t.text + " text-lg font-semibold"}>
+          {trackName || "Select a track from the playlist"}
         </div>
-      );
-    }
+      </div>
+
+      <div className="mt-2">
+        <div className="flex items-center justify-between text-[11px] text-slate-400 mb-1 px-0.5">
+          <span>{formatTime(currentTime)}</span>
+          <span>{formatTime(duration)}</span>
+        </div>
+        <div className="progress-rail" onClick={onSeekClick}>
+          <div
+            className="progress-fill"
+            style={{ width: progressPercent + "%" }}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
 
     function VintageControls({
       onPlay,
