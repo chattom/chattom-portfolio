@@ -152,9 +152,6 @@
           rgba(148,163,184,0.25) 40%,
           rgba(15,23,42,0.85) 100%
         );
-      box-shadow:
-        inset 0 0 8px rgba(148,163,184,0.55),
-        0 0 14px rgba(15,23,42,0.9);
       overflow:hidden;
     }
 
@@ -501,43 +498,46 @@
     ].join(" ")}>
       <div className="tube-window mb-5">
         {tubes.map((lvl, i) => {
-          // Stronger vertical response
-          const coreScale = 0.25 + lvl * 1.6;
+  // Core column height
+  const coreScale = 0.35 + lvl * 0.9;
 
-          // Edge glow around the whole tube assembly
-          const edgeGlow = 6 + lvl * 26;
+  // Edge glow intensity for the glass envelope
+  const edgeBlur = 6 + lvl * 28;
 
-          // Inner core glow intensity
-          const coreGlow = 12 + lvl * 40;
+  // Core glow intensity at the bottom of the tube
+  const coreBlur = 16 + lvl * 40;
 
-          return (
-            <div
-              key={i}
-              className="flex flex-col items-center"
-              style={{
-                // This drop-shadow makes the *edges* of the tube glow
-                filter: `drop-shadow(0 0 ${edgeGlow}px ${glow})`
-              }}
-            >
-              <div className="tube-shell">
-                <div className="tube-glass">
-                  <div className="tube-electrodes" />
+  // Clamp opacity between 0.4 and 1 for safety
+  const coreOpacity = Math.max(0.4, Math.min(1, 0.65 + lvl * 0.45));
 
-                  <div
-                    className="tube-core"
-                    style={{
-                      transform: `scaleY(${coreScale})`,
-                      boxShadow: `0 0 ${coreGlow}px ${glow}`,
-                      opacity: 0.45 + lvl * 0.55,
-                    }}
-                  />
-
-                  <div className="tube-filament" />
-                </div>
-              </div>
-              <div className="tube-foot" />
-            </div>
-          );
+  return (
+    <div key={i} className="flex flex-col items-center">
+      <div className="tube-shell">
+        <div
+          className="tube-glass"
+          style={{
+            boxShadow: `
+              inset 0 0 8px rgba(148,163,184,0.55),
+              0 0 ${edgeBlur}px ${glow}
+            `,
+          }}
+        >
+          <div className="tube-electrodes" />
+          <div
+            className="tube-core"
+            style={{
+              transform: `scaleY(${coreScale})`,
+              boxShadow: `0 0 ${coreBlur}px ${glow}`,
+              opacity: coreOpacity,
+            }}
+          />
+          <div className="tube-filament" />
+        </div>
+      </div>
+      <div className="tube-foot" />
+    </div>
+  );
+})}
         })}
       </div>
 
@@ -608,15 +608,15 @@
             <span className="transport-icon text-sm">▶</span>
           </button>
 
-          {/* ⏸ PAUSE (toggle pause/resume) */}
-          <button
-            aria-label="Pause / Resume"
-            type="button"
-            onClick={() => (isPlaying ? onPause() : onPlay())}
-            className="transport-btn"
-          >
-            <span className="transport-icon text-sm">⏸</span>
-          </button>
+          {/* ⏸ PAUSE (pause only, resume with Play) */}
+<button
+  aria-label="Pause"
+  type="button"
+  onClick={onPause}
+  className="transport-btn"
+>
+  <span className="transport-icon text-sm">⏸</span>
+</button>
 
           {/* ■ STOP */}
           <button
