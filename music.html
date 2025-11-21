@@ -473,95 +473,84 @@
       );
     }
 
-   function TubeDeck({ trackName, currentTime, duration, theme, level, onSeekClick }){
-  const t = THEMES[theme];
+    function TubeDeck({ trackName, currentTime, duration, theme, level, onSeekClick }){
+      const t = THEMES[theme];
 
-  // Give each tube a slightly different "personality" using phase offsets
-  const time = currentTime || 0;
-  const tubes = [0, 1, 2, 3, 4].map((_, i) => {
-    const phase = i * 0.35; // small offset per tube
-    const wobble = Math.sin(time * 4 + phase) * 0.18; // extra shimmer
-    const raw = level + wobble;
+      const time = currentTime || 0;
+      const tubes = [0, 1, 2, 3, 4].map((_, i) => {
+        const phase = i * 0.35;
+        const wobble = Math.sin(time * 4 + phase) * 0.18;
+        const raw = level + wobble;
+        const boosted = 0.12 + (raw - 0.12) * 1.8;
+        return Math.max(0.05, Math.min(1.0, boosted));
+      });
 
-    // Boost and clamp so we get a nice visible range 0–1
-    const boosted = 0.12 + (raw - 0.12) * 1.8;
-    return Math.max(0.05, Math.min(1.0, boosted));
-  });
+      const glow = t.accentHex + "dd";
+      const progressPercent = duration ? Math.min(100, (currentTime / duration) * 100) : 0;
 
-  const glow = t.accentHex + "dd";
-  const progressPercent = duration ? Math.min(100, (currentTime / duration) * 100) : 0;
+      return (
+        <div className={[
+          "w-full max-w-3xl mx-auto rounded-3xl border px-6 py-5 mb-6",
+          "bg-gradient-to-b", t.bg, t.border, "shadow-2xl"
+        ].join(" ")}>
+          <div className="tube-window mb-5">
+            {tubes.map((lvl, i) => {
+              const coreScale = 0.35 + lvl * 0.9;
+              const edgeBlur = 6 + lvl * 28;
+              const coreBlur = 16 + lvl * 40;
+              const coreOpacity = Math.max(0.4, Math.min(1, 0.65 + lvl * 0.45));
 
-  return (
-    <div className={[
-      "w-full max-w-3xl mx-auto rounded-3xl border px-6 py-5 mb-6",
-      "bg-gradient-to-b", t.bg, t.border, "shadow-2xl"
-    ].join(" ")}>
-      <div className="tube-window mb-5">
-        {tubes.map((lvl, i) => {
-  // Core column height
-  const coreScale = 0.35 + lvl * 0.9;
+              return (
+                <div key={i} className="flex flex-col items-center">
+                  <div className="tube-shell">
+                    <div
+                      className="tube-glass"
+                      style={{
+                        boxShadow: `
+                          inset 0 0 8px rgba(148,163,184,0.55),
+                          0 0 ${edgeBlur}px ${glow}
+                        `,
+                      }}
+                    >
+                      <div className="tube-electrodes" />
+                      <div
+                        className="tube-core"
+                        style={{
+                          transform: `scaleY(${coreScale})`,
+                          boxShadow: `0 0 ${coreBlur}px ${glow}`,
+                          opacity: coreOpacity,
+                        }}
+                      />
+                      <div className="tube-filament" />
+                    </div>
+                  </div>
+                  <div className="tube-foot" />
+                </div>
+              );
+            })}
+          </div>
 
-  // Edge glow intensity for the glass envelope
-  const edgeBlur = 6 + lvl * 28;
+          <div className="text-center mb-4">
+            <div className={t.text + " text-lg font-semibold"}>
+              {trackName || "Select a track from the playlist"}
+            </div>
+          </div>
 
-  // Core glow intensity at the bottom of the tube
-  const coreBlur = 16 + lvl * 40;
-
-  // Clamp opacity between 0.4 and 1 for safety
-  const coreOpacity = Math.max(0.4, Math.min(1, 0.65 + lvl * 0.45));
-
-  return (
-    <div key={i} className="flex flex-col items-center">
-      <div className="tube-shell">
-        <div
-          className="tube-glass"
-          style={{
-            boxShadow: `
-              inset 0 0 8px rgba(148,163,184,0.55),
-              0 0 ${edgeBlur}px ${glow}
-            `,
-          }}
-        >
-          <div className="tube-electrodes" />
-          <div
-            className="tube-core"
-            style={{
-              transform: `scaleY(${coreScale})`,
-              boxShadow: `0 0 ${coreBlur}px ${glow}`,
-              opacity: coreOpacity,
-            }}
-          />
-          <div className="tube-filament" />
+          <div className="mt-2">
+            <div className="flex items-center justify-between text-[11px] text-slate-400 mb-1 px-0.5">
+              <span>{formatTime(currentTime)}</span>
+              <span>{formatTime(duration)}</span>
+            </div>
+            <div className="progress-rail" onClick={onSeekClick}>
+              <div
+                className="progress-fill"
+                style={{ width: progressPercent + "%" }}
+              />
+            </div>
+          </div>
         </div>
-      </div>
-      <div className="tube-foot" />
-    </div>
-  );
-})}
-        })}
-      </div>
-
-      <div className="text-center mb-4">
-        <div className={t.text + " text-lg font-semibold"}>
-          {trackName || "Select a track from the playlist"}
-        </div>
-      </div>
-
-      <div className="mt-2">
-        <div className="flex items-center justify-between text-[11px] text-slate-400 mb-1 px-0.5">
-          <span>{formatTime(currentTime)}</span>
-          <span>{formatTime(duration)}</span>
-        </div>
-        <div className="progress-rail" onClick={onSeekClick}>
-          <div
-            className="progress-fill"
-            style={{ width: progressPercent + "%" }}
-          />
-        </div>
-      </div>
-    </div>
-  );
-}
+      );
+    }
 
     function VintageControls({
       onPlay,
@@ -609,14 +598,14 @@
           </button>
 
           {/* ⏸ PAUSE (pause only, resume with Play) */}
-<button
-  aria-label="Pause"
-  type="button"
-  onClick={onPause}
-  className="transport-btn"
->
-  <span className="transport-icon text-sm">⏸</span>
-</button>
+          <button
+            aria-label="Pause"
+            type="button"
+            onClick={onPause}
+            className="transport-btn"
+          >
+            <span className="transport-icon text-sm">⏸</span>
+          </button>
 
           {/* ■ STOP */}
           <button
@@ -730,29 +719,29 @@
         level = Math.max(0.05, Math.min(1.0, raw));
       }
 
-     // time / metadata listeners (no auto-advance, no forced reset)
-useEffect(() => {
-  const audio = audioRef.current;
-  if (!audio) return;
+      // time / metadata listeners (no auto-advance, no forced reset)
+      useEffect(() => {
+        const audio = audioRef.current;
+        if (!audio) return;
 
-  const onTime = () => {
-    setCurrentTime(audio.currentTime || 0);
-  };
+        const onTime = () => {
+          setCurrentTime(audio.currentTime || 0);
+        };
 
-  const onMeta = () => {
-    setDuration(audio.duration || 0);
-  };
+        const onMeta = () => {
+          setDuration(audio.duration || 0);
+        };
 
-  audio.addEventListener("timeupdate", onTime);
-  audio.addEventListener("loadedmetadata", onMeta);
+        audio.addEventListener("timeupdate", onTime);
+        audio.addEventListener("loadedmetadata", onMeta);
 
-  return () => {
-    audio.removeEventListener("timeupdate", onTime);
-    audio.removeEventListener("loadedmetadata", onMeta);
-  };
-}, []);
+        return () => {
+          audio.removeEventListener("timeupdate", onTime);
+          audio.removeEventListener("loadedmetadata", onMeta);
+        };
+      }, []);
 
-      // Load track whenever index changes
+      // Load track whenever index changes (NOT when isPlaying changes)
       useEffect(() => {
         const audio = audioRef.current;
         if (!audio || !activeTrack) return;
@@ -765,7 +754,7 @@ useEffect(() => {
         if (isPlaying){
           audio.play().catch(() => setIsPlaying(false));
         }
-      }, [currentIndex, activeTrack, isPlaying]);
+      }, [currentIndex, activeTrack]); // <--- removed isPlaying from deps
 
       // Volume / mute -> audio element
       useEffect(() => {
@@ -792,19 +781,14 @@ useEffect(() => {
       };
 
       const handlePause = () => {
-  const audio = audioRef.current;
-  if (!audio) return;
+        const audio = audioRef.current;
+        if (!audio) return;
 
-  // Pause at the exact current position
-  audio.pause();
-
-  // Explicitly remember where we are
-  const t = audio.currentTime || 0;
-  setCurrentTime(t);
-
-  // Just mark it as not playing
-  setIsPlaying(false);
-};
+        audio.pause();
+        const t = audio.currentTime || 0;
+        setCurrentTime(t);
+        setIsPlaying(false);
+      };
 
       const handleStop = () => {
         const audio = audioRef.current;
