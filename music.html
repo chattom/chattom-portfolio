@@ -198,9 +198,23 @@
       filter:blur(1px);
     }
 
+    /* metal tube base (socket) */
+    .tube-base{
+      margin-top:0.22rem;
+      width:50px;
+      height:14px;
+      border-radius:999px;
+      background:
+        radial-gradient(circle at 30% 0%, rgba(255,255,255,0.45), transparent 55%),
+        linear-gradient(to bottom,#020617,#111827,#020617);
+      box-shadow:
+        0 4px 10px rgba(0,0,0,0.9),
+        inset 0 1px 3px rgba(255,255,255,0.18);
+    }
+
     /* rubber feet under tubes */
     .tube-foot{
-      margin-top:0.4rem;
+      margin-top:0.2rem;
       width:46px;
       height:7px;
       border-radius:999px;
@@ -447,13 +461,17 @@
       const s = Math.floor(sec%60);
       return m + ":" + (s < 10 ? "0"+s : s);
     }
-        // Web Audio gain engine: lets the volume slider work on iOS/mobile
-    // without changing any of the existing player behavior.
+
+    // Web Audio gain + analyser engine.
+    // - Keeps your iOS-friendly gain control.
+    // - Adds a live audioLevel (0–1) for the tubes.
     function useGainEngine(audioElement, volume, isMuted, isPlaying) {
       const ctxRef = React.useRef(null);
       const sourceRef = React.useRef(null);
       const gainRef = React.useRef(null);
+      const analyserRef = React.useRef(null);
       const [hasGain, setHasGain] = React.useState(false);
+      const [audioLevel, setAudioLevel] = React.useState(0);
 
       // Wire the graph once
       React.useEffect(() => {
@@ -461,33 +479,43 @@
         if (ctxRef.current) return; // already wired
 
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        if (!AudioCtx) return; // Web Audio not supported, fall back to element volume
+        if (!AudioCtx) return;
 
         try {
           const ctx = new AudioCtx();
           const source = ctx.createMediaElementSource(audioElement);
           const gain = ctx.createGain();
+          const analyser = ctx.createAnalyser();
+
+          analyser.fftSize = 256;
 
           gain.gain.value = isMuted ? 0 : volume;
 
+          // source -> gain -> analyser -> destination
           source.connect(gain);
-          gain.connect(ctx.destination);
+          gain.connect(analyser);
+          analyser.connect(ctx.destination);
 
           ctxRef.current = ctx;
           sourceRef.current = source;
           gainRef.current = gain;
+          analyserRef.current = analyser;
           setHasGain(true);
         } catch (err) {
-          // If anything fails, just don't use Web Audio
           console.warn("Web Audio gain wiring failed:", err);
         }
 
         return () => {
           if (sourceRef.current) sourceRef.current.disconnect();
+          if (analyserRef.current) analyserRef.current.disconnect();
           if (gainRef.current) gainRef.current.disconnect();
           if (ctxRef.current && ctxRef.current.state !== "closed") {
             ctxRef.current.close();
           }
+          ctxRef.current = null;
+          sourceRef.current = null;
+          gainRef.current = null;
+          analyserRef.current = null;
         };
       }, [audioElement]);
 
@@ -499,13 +527,42 @@
 
         gain.gain.value = isMuted ? 0 : volume;
 
-        // Make sure context is running once the user is playing audio
         if (isPlaying && ctx.state === "suspended") {
           ctx.resume().catch(() => {});
         }
       }, [volume, isMuted, isPlaying]);
 
-      return hasGain;
+      // Drive audioLevel from analyser
+      React.useEffect(() => {
+        const analyser = analyserRef.current;
+        if (!analyser) return;
+
+        const bufferLength = analyser.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+        let rafId;
+
+        const tick = () => {
+          analyser.getByteTimeDomainData(dataArray);
+          let sum = 0;
+          for (let i = 0; i < bufferLength; i++) {
+            const v = (dataArray[i] - 128) / 128; // -1..1
+            sum += v * v;
+          }
+          const rms = Math.sqrt(sum / bufferLength); // ~0..1
+          // Scale and clamp to a friendly 0–1 range for visuals
+          const scaled = Math.max(0, Math.min(1, rms * 5));
+          setAudioLevel(scaled);
+          rafId = requestAnimationFrame(tick);
+        };
+
+        tick();
+
+        return () => {
+          if (rafId) cancelAnimationFrame(rafId);
+        };
+      }, [hasGain]);
+
+      return { hasWebGain: hasGain, audioLevel };
     }
 
     function ThemeChips({ active, onChange }){
@@ -584,6 +641,7 @@
                       <div className="tube-filament" />
                     </div>
                   </div>
+                  <div className="tube-base" />
                   <div className="tube-foot" />
                 </div>
               );
@@ -657,7 +715,7 @@
             <span className="transport-icon text-sm">▶</span>
           </button>
 
-          {/* ⏸ PAUSE (pause only, resume with Play) */}
+          {/* ⏸ PAUSE (toggle pause/resume) */}
           <button
             aria-label="Pause"
             type="button"
@@ -752,7 +810,7 @@
       );
     }
 
-        function MusicApp(){
+    function MusicApp(){
       const [currentIndex,setCurrentIndex] = useState(0);
       const [theme,setTheme] = useState("nite life");
       const [isPlaying,setIsPlaying] = useState(false);
@@ -764,13 +822,23 @@
       const audioRef = useRef(null);
       const activeTrack = TRACKS[currentIndex];
 
-      const hasWebGain = useGainEngine(audioRef.current, volume, isMuted, isPlaying);
+      const { hasWebGain, audioLevel } = useGainEngine(
+        audioRef.current,
+        volume,
+        isMuted,
+        isPlaying
+      );
 
       // Visual tube intensity derived from playback state
       let level;
       if (!isPlaying || isMuted) {
         level = 0.12;
+      } else if (hasWebGain) {
+        // Drive tubes from real audio level
+        const base = 0.15 + audioLevel * (0.9 + volume * 0.6);
+        level = Math.max(0.05, Math.min(1.0, base));
       } else {
+        // Fallback animation if Web Audio isn't available
         const t = currentTime || 0;
         const base = 0.35 + 0.25 * Math.sin(t * 2.2);
         const wobble = 0.15 * Math.sin(t * 7.1 + 1.4);
@@ -816,19 +884,17 @@
         if (isPlaying){
           audio.play().catch(() => setIsPlaying(false));
         }
-      }, [currentIndex, activeTrack]); // <--- removed isPlaying from deps
+      }, [currentIndex, activeTrack]); // keep isPlaying out of deps
 
-            // Volume / mute -> audio element
+      // Volume / mute -> audio element
       // On browsers without Web Audio gain, fall back to audio.volume.
       useEffect(() => {
         const audio = audioRef.current;
         if (!audio) return;
 
         if (!hasWebGain) {
-          // Desktop / browsers where element volume works
           audio.volume = isMuted ? 0 : volume;
         }
-        // Muted flag is still honored everywhere
         audio.muted = isMuted;
       }, [volume, isMuted, hasWebGain]);
 
@@ -849,26 +915,24 @@
       };
 
       const handlePause = () => {
-  const audio = audioRef.current;
-  if (!audio) return;
+        const audio = audioRef.current;
+        if (!audio) return;
 
-  if (isPlaying) {
-    // Currently playing → pause and remember position
-    audio.pause();
-    const t = audio.currentTime || 0;
-    setCurrentTime(t);
-    setIsPlaying(false);
-  } else {
-    // Currently paused → resume from current position
-    audio.play()
-      .then(() => {
-        setIsPlaying(true);
-      })
-      .catch(() => {
-        // swallow any play() errors (autoplay restrictions, etc.)
-      });
-  }
-};
+        if (isPlaying) {
+          // pause and remember position
+          audio.pause();
+          const t = audio.currentTime || 0;
+          setCurrentTime(t);
+          setIsPlaying(false);
+        } else {
+          // resume from current position
+          audio.play()
+            .then(() => {
+              setIsPlaying(true);
+            })
+            .catch(() => {});
+        }
+      };
 
       const handleStop = () => {
         const audio = audioRef.current;
