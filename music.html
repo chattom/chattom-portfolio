@@ -448,121 +448,72 @@
       return m + ":" + (s < 10 ? "0"+s : s);
     }
 
-    // Web Audio hook: GainNode for volume + analyser for tubes
-// with a smooth fallback animation when analyser isn't available.
+    // Tube animation engine: smooth, volume-aware pseudo-VU
+// No Web Audio / analyser, so it works everywhere.
 function useAudioEngine(audioElement, isPlaying, volume, isMuted){
   const [level, setLevel] = useState(0.15);
-  const ctxRef = useRef(null);
-  const analyserRef = useRef(null);
-  const dataRef = useRef(null);
-  const sourceRef = useRef(null);
-  const gainRef = useRef(null);
   const rafRef = useRef(null);
 
-  // Set up audio graph once when we get an <audio> element
+  // Clean up on unmount
   useEffect(() => {
-    if (!audioElement) return;
-    if (ctxRef.current) return;
-
-    const AudioCtx = window.AudioContext || window.webkitAudioContext;
-    if (!AudioCtx) return;
-
-    const ctx = new AudioCtx();
-    const analyser = ctx.createAnalyser();
-    analyser.fftSize = 256;
-    const bufferLen = analyser.frequencyBinCount;
-    const dataArray = new Uint8Array(bufferLen);
-
-    const src = ctx.createMediaElementSource(audioElement);
-    const gain = ctx.createGain();
-    gain.gain.value = isMuted ? 0 : (typeof volume === "number" ? volume : 1);
-
-    src.connect(gain);
-    gain.connect(analyser);
-    analyser.connect(ctx.destination);
-
-    ctxRef.current = ctx;
-    analyserRef.current = analyser;
-    dataRef.current = dataArray;
-    sourceRef.current = src;
-    gainRef.current = gain;
-
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      if (sourceRef.current) sourceRef.current.disconnect();
-      if (gainRef.current) gainRef.current.disconnect();
-      if (analyserRef.current) analyserRef.current.disconnect();
-      if (ctxRef.current && ctxRef.current.state !== "closed") {
-        ctxRef.current.close();
-      }
     };
-  }, [audioElement]);
+  }, []);
 
-  // Respond to volume / mute changes
   useEffect(() => {
-    const gain = gainRef.current;
-    if (!gain) return;
-    gain.gain.value = isMuted ? 0 : (typeof volume === "number" ? volume : 1);
-  }, [volume, isMuted]);
-
-  // Animate tube level – analyser when available, otherwise a smooth pseudo-VU
-  useEffect(() => {
-    const ctx = ctxRef.current;
-    const analyser = analyserRef.current;
-    const dataArray = dataRef.current;
-
-    // clear any previous animation frame
+    // stop any previous animation loop
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
 
-    // when not playing or muted, gently fall back to idle glow
+    // If not playing or muted, gently settle back to an idle glow
     if (!isPlaying || isMuted) {
-      setLevel(0.12);
+      let current = level;
+
+      const settle = () => {
+        const target = 0.12;                // idle tube level
+        current += (target - current) * 0.18;
+        setLevel(current);
+
+        if (Math.abs(current - target) > 0.001) {
+          rafRef.current = requestAnimationFrame(settle);
+        }
+      };
+
+      rafRef.current = requestAnimationFrame(settle);
       return;
     }
 
-    let internalLevel = level; // start from current value
+    // Playing: create a musical, organic motion using layered waves + noise
+    let start = performance.now();
+    let current = level;
 
-    const analyserTick = () => {
-      if (!analyser || !dataArray) {
-        // analyser disappeared? fall back
-        fallbackTick();
-        return;
-      }
-      analyser.getByteFrequencyData(dataArray);
-      let sum = 0;
-      for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
-      const avg = sum / dataArray.length;
+    const tick = (now) => {
+      const t = (now - start) / 1000;      // seconds
 
-      // normalise and smooth
-      const norm = avg / 255;
-      const target = 0.15 + norm * 0.9 * (0.4 + volume * 0.6);
-      internalLevel += (target - internalLevel) * 0.18; // easing
-      setLevel(internalLevel);
+      // Base slow "breathing"
+      const base = 0.35 + 0.25 * Math.sin(t * 2.4);
 
-      rafRef.current = requestAnimationFrame(analyserTick);
+      // Faster shimmer
+      const wobble = 0.15 * Math.sin(t * 7.2 + 1.3);
+
+      // Small random variation to avoid looking too synthetic
+      const noise = (Math.random() - 0.5) * 0.12;
+
+      // Volume controls overall amplitude (quiet vs loud)
+      const amp = 0.25 + volume * 0.75;
+      const raw = 0.18 + amp * (base + wobble + noise);
+
+      // Clamp into a safe 0–1 range
+      const target = Math.max(0.05, Math.min(1.0, raw));
+
+      // Ease towards target for smooth motion
+      current += (target - current) * 0.18;
+      setLevel(current);
+
+      rafRef.current = requestAnimationFrame(tick);
     };
 
-    const fallbackTick = () => {
-      // pseudo-VU: more motion at higher volume, still feels musical
-      const base = volume;
-      const noise = 0.25 + Math.random() * 0.75; // random but bounded
-      const target = 0.15 + base * noise;
-      internalLevel += (target - internalLevel) * 0.18; // easing
-      setLevel(internalLevel);
-
-      rafRef.current = requestAnimationFrame(fallbackTick);
-    };
-
-    if (ctx && analyser && dataArray) {
-      ctx.resume().then(() => {
-        rafRef.current = requestAnimationFrame(analyserTick);
-      }).catch(() => {
-        // If resume fails (some iOS quirks), still show motion
-        rafRef.current = requestAnimationFrame(fallbackTick);
-      });
-    } else {
-      rafRef.current = requestAnimationFrame(fallbackTick);
-    }
+    rafRef.current = requestAnimationFrame(tick);
 
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
@@ -571,6 +522,7 @@ function useAudioEngine(audioElement, isPlaying, volume, isMuted){
 
   return level;
 }
+
 
     // ---------- Components ----------
     function ThemeChips({ active, onChange }){
