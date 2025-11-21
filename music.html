@@ -447,6 +447,66 @@
       const s = Math.floor(sec%60);
       return m + ":" + (s < 10 ? "0"+s : s);
     }
+        // Web Audio gain engine: lets the volume slider work on iOS/mobile
+    // without changing any of the existing player behavior.
+    function useGainEngine(audioElement, volume, isMuted, isPlaying) {
+      const ctxRef = React.useRef(null);
+      const sourceRef = React.useRef(null);
+      const gainRef = React.useRef(null);
+      const [hasGain, setHasGain] = React.useState(false);
+
+      // Wire the graph once
+      React.useEffect(() => {
+        if (!audioElement) return;
+        if (ctxRef.current) return; // already wired
+
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return; // Web Audio not supported, fall back to element volume
+
+        try {
+          const ctx = new AudioCtx();
+          const source = ctx.createMediaElementSource(audioElement);
+          const gain = ctx.createGain();
+
+          gain.gain.value = isMuted ? 0 : volume;
+
+          source.connect(gain);
+          gain.connect(ctx.destination);
+
+          ctxRef.current = ctx;
+          sourceRef.current = source;
+          gainRef.current = gain;
+          setHasGain(true);
+        } catch (err) {
+          // If anything fails, just don't use Web Audio
+          console.warn("Web Audio gain wiring failed:", err);
+        }
+
+        return () => {
+          if (sourceRef.current) sourceRef.current.disconnect();
+          if (gainRef.current) gainRef.current.disconnect();
+          if (ctxRef.current && ctxRef.current.state !== "closed") {
+            ctxRef.current.close();
+          }
+        };
+      }, [audioElement]);
+
+      // React to volume / mute / play state
+      React.useEffect(() => {
+        const ctx = ctxRef.current;
+        const gain = gainRef.current;
+        if (!ctx || !gain) return;
+
+        gain.gain.value = isMuted ? 0 : volume;
+
+        // Make sure context is running once the user is playing audio
+        if (isPlaying && ctx.state === "suspended") {
+          ctx.resume().catch(() => {});
+        }
+      }, [volume, isMuted, isPlaying]);
+
+      return hasGain;
+    }
 
     function ThemeChips({ active, onChange }){
       return (
@@ -692,7 +752,7 @@
       );
     }
 
-    function MusicApp(){
+        function MusicApp(){
       const [currentIndex,setCurrentIndex] = useState(0);
       const [theme,setTheme] = useState("nite life");
       const [isPlaying,setIsPlaying] = useState(false);
@@ -703,6 +763,8 @@
 
       const audioRef = useRef(null);
       const activeTrack = TRACKS[currentIndex];
+
+      const hasWebGain = useGainEngine(audioRef.current, volume, isMuted, isPlaying);
 
       // Visual tube intensity derived from playback state
       let level;
@@ -756,13 +818,19 @@
         }
       }, [currentIndex, activeTrack]); // <--- removed isPlaying from deps
 
-      // Volume / mute -> audio element
+            // Volume / mute -> audio element
+      // On browsers without Web Audio gain, fall back to audio.volume.
       useEffect(() => {
         const audio = audioRef.current;
         if (!audio) return;
-        audio.volume = isMuted ? 0 : volume;
+
+        if (!hasWebGain) {
+          // Desktop / browsers where element volume works
+          audio.volume = isMuted ? 0 : volume;
+        }
+        // Muted flag is still honored everywhere
         audio.muted = isMuted;
-      }, [volume, isMuted]);
+      }, [volume, isMuted, hasWebGain]);
 
       const handleNudge = (deltaSeconds) => {
         const audio = audioRef.current;
