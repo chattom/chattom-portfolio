@@ -730,29 +730,27 @@
         level = Math.max(0.05, Math.min(1.0, raw));
       }
 
-      // time / metadata / ended listeners
-      useEffect(() => {
-        const audio = audioRef.current;
-        if (!audio) return;
+     // time / metadata listeners (no auto-advance, no forced reset)
+useEffect(() => {
+  const audio = audioRef.current;
+  if (!audio) return;
 
-        const onTime = () => setCurrentTime(audio.currentTime || 0);
-        const onMeta = () => setDuration(audio.duration || 0);
-        const onEnd = () => {
-          setCurrentIndex(prev => (prev + 1) % TRACKS.length);
-          setCurrentTime(0);
-          setIsPlaying(true);
-        };
+  const onTime = () => {
+    setCurrentTime(audio.currentTime || 0);
+  };
 
-        audio.addEventListener("timeupdate", onTime);
-        audio.addEventListener("loadedmetadata", onMeta);
-        audio.addEventListener("ended", onEnd);
+  const onMeta = () => {
+    setDuration(audio.duration || 0);
+  };
 
-        return () => {
-          audio.removeEventListener("timeupdate", onTime);
-          audio.removeEventListener("loadedmetadata", onMeta);
-          audio.removeEventListener("ended", onEnd);
-        };
-      }, []);
+  audio.addEventListener("timeupdate", onTime);
+  audio.addEventListener("loadedmetadata", onMeta);
+
+  return () => {
+    audio.removeEventListener("timeupdate", onTime);
+    audio.removeEventListener("loadedmetadata", onMeta);
+  };
+}, []);
 
       // Load track whenever index changes
       useEffect(() => {
@@ -797,14 +795,14 @@
   const audio = audioRef.current;
   if (!audio) return;
 
-  // Just pause and freeze at the exact spot
+  // Pause at the exact current position
   audio.pause();
 
-  // Explicitly store whatever the playhead is at *right now*
+  // Explicitly cache the position so React never falls back to 0
   const t = audio.currentTime || 0;
   setCurrentTime(t);
 
-  // Mark as not playing (Play will resume from t)
+  // Simply mark as not playing
   setIsPlaying(false);
 };
 
