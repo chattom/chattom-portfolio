@@ -171,22 +171,22 @@
       opacity:0.9;
     }
 
+    /* glowing gas column reacting to level */
     .tube-core{
-  position:absolute;
-  left:6px;
-  right:6px;
-  bottom:10px;
-  transform-origin:bottom center;
-  border-radius:999px;
-  background:
-    radial-gradient(circle at 50% 120%, rgba(251,146,60,0.95), rgba(248,250,252,0.15)),
-    linear-gradient(to top, rgba(251,146,60,0.85), rgba(56,189,248,0.25));
-  box-shadow:0 0 14px rgba(251,146,60,0.9);
-  /* smooth motion when level changes */
-  transition: transform 140ms ease-out,
-              box-shadow 140ms ease-out,
-              opacity 140ms ease-out;
-}
+      position:absolute;
+      left:6px;
+      right:6px;
+      bottom:10px;
+      transform-origin:bottom center;
+      border-radius:999px;
+      background:
+        radial-gradient(circle at 50% 120%, rgba(251,146,60,0.95), rgba(248,250,252,0.15)),
+        linear-gradient(to top, rgba(251,146,60,0.85), rgba(56,189,248,0.25));
+      box-shadow:0 0 14px rgba(251,146,60,0.9);
+      transition: transform 140ms ease-out,
+                  box-shadow 140ms ease-out,
+                  opacity 140ms ease-out;
+    }
 
     /* filament at base */
     .tube-filament{
@@ -451,8 +451,6 @@
       return m + ":" + (s < 10 ? "0"+s : s);
     }
 
-    
-    // ---------- Components ----------
     function ThemeChips({ active, onChange }){
       return (
         <div className="flex flex-wrap justify-center gap-3 mb-6">
@@ -676,7 +674,6 @@
       );
     }
 
-    // ---------- Root app ----------
     function MusicApp(){
       const [currentIndex,setCurrentIndex] = useState(0);
       const [theme,setTheme] = useState("nite life");
@@ -689,34 +686,20 @@
       const audioRef = useRef(null);
       const activeTrack = TRACKS[currentIndex];
 
-      const audioRef = useRef(null);
-const activeTrack = TRACKS[currentIndex];
-
-// Visual tube intensity derived from playback state
-let level;
-if (!isPlaying || isMuted) {
-  // idle glow when stopped/paused/muted
-  level = 0.12;
-} else {
-  const t = currentTime || 0;
-
-  // slow “breathing” movement
-  const base = 0.35 + 0.25 * Math.sin(t * 2.2);
-
-  // faster shimmer
-  const wobble = 0.15 * Math.sin(t * 7.1 + 1.4);
-
-  // deterministic noise so it doesn’t look robotic
-  const noiseSeed = (Math.sin(t * 12.7) + 1) / 2;
-  const noise = (noiseSeed - 0.5) * 0.25;
-
-  // volume controls how intense everything is
-  const amp = 0.25 + volume * 0.75;
-  const raw = 0.18 + amp * (base + wobble + noise);
-
-  // clamp to safe range
-  level = Math.max(0.05, Math.min(1.0, raw));
-}
+      // Visual tube intensity derived from playback state
+      let level;
+      if (!isPlaying || isMuted) {
+        level = 0.12;
+      } else {
+        const t = currentTime || 0;
+        const base = 0.35 + 0.25 * Math.sin(t * 2.2);
+        const wobble = 0.15 * Math.sin(t * 7.1 + 1.4);
+        const noiseSeed = (Math.sin(t * 12.7) + 1) / 2;
+        const noise = (noiseSeed - 0.5) * 0.25;
+        const amp = 0.25 + volume * 0.75;
+        const raw = 0.18 + amp * (base + wobble + noise);
+        level = Math.max(0.05, Math.min(1.0, raw));
+      }
 
       // time / metadata / ended listeners
       useEffect(() => {
@@ -755,9 +738,9 @@ if (!isPlaying || isMuted) {
         if (isPlaying){
           audio.play().catch(() => setIsPlaying(false));
         }
-      }, [currentIndex, activeTrack]);
+      }, [currentIndex, activeTrack, isPlaying]);
 
-      // Fallback volume/mute for browsers without Web Audio
+      // Volume / mute -> audio element
       useEffect(() => {
         const audio = audioRef.current;
         if (!audio) return;
@@ -765,7 +748,6 @@ if (!isPlaying || isMuted) {
         audio.muted = isMuted;
       }, [volume, isMuted]);
 
-      // small +/- nudge in seconds
       const handleNudge = (deltaSeconds) => {
         const audio = audioRef.current;
         if (!audio || !duration) return;
@@ -786,7 +768,7 @@ if (!isPlaying || isMuted) {
         const audio = audioRef.current;
         if (!audio) return;
         audio.pause();
-        setIsPlaying(false);   // keeps currentTime where it is
+        setIsPlaying(false);
       };
 
       const handleStop = () => {
@@ -801,6 +783,7 @@ if (!isPlaying || isMuted) {
       const handleSkipBack = () => {
         setCurrentIndex(prev => (prev - 1 + TRACKS.length) % TRACKS.length);
       };
+
       const handleSkipForward = () => {
         setCurrentIndex(prev => (prev + 1) % TRACKS.length);
       };
@@ -810,14 +793,7 @@ if (!isPlaying || isMuted) {
 
       const handleSelectTrack = (idx) => {
         setCurrentIndex(idx);
-        const audio = audioRef.current;
-        if (audio){
-          audio.play()
-            .then(() => setIsPlaying(true))
-            .catch(() => {});
-        } else {
-          setIsPlaying(true);
-        }
+        setIsPlaying(true);
       };
 
       const handleSeekClick = (e) => {
@@ -863,8 +839,23 @@ if (!isPlaying || isMuted) {
             onSeekClick={handleSeekClick}
           />
 
-          {/* Volume + transport (stack on mobile, row on md+) */}
+          {/* Controls row: buttons on top (all breakpoints), volume below on mobile / to the side on desktop */}
           <div className="w-full max-w-3xl flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+            {/* Transport buttons */}
+            <div className="flex justify-center">
+              <VintageControls
+                onSkipBack={handleSkipBack}
+                onRewind={handleRewind}
+                onPlay={handlePlay}
+                onPause={handlePause}
+                onStop={handleStop}
+                onFastForward={handleFastForward}
+                onSkipForward={handleSkipForward}
+                isPlaying={isPlaying}
+              />
+            </div>
+
+            {/* Volume + mute (stacks under buttons on mobile) */}
             <div className="volume-wrap md:justify-start">
               <button
                 type="button"
@@ -891,19 +882,6 @@ if (!isPlaying || isMuted) {
                 {isMuted ? "0%" : volumePercent + "%"}
               </div>
             </div>
-
-            <div className="flex justify-center">
-              <VintageControls
-                onSkipBack={handleSkipBack}
-                onRewind={handleRewind}
-                onPlay={handlePlay}
-                onPause={handlePause}
-                onStop={handleStop}
-                onFastForward={handleFastForward}
-                onSkipForward={handleSkipForward}
-                isPlaying={isPlaying}
-              />
-            </div>
           </div>
 
           <Playlist
@@ -913,7 +891,6 @@ if (!isPlaying || isMuted) {
             theme={theme}
           />
 
-          {/* Hidden audio element */}
           <audio ref={audioRef} className="hidden">
             Your browser does not support the audio element.
           </audio>
