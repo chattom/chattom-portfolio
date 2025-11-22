@@ -200,76 +200,76 @@
 
     /* socket assembly under each tube */
     .tube-socket{
-      margin-top:0.46rem;              /* small gap under the bulb */
+      margin-top:0.38rem;              /* small gap under the glass */
       display:flex;
       flex-direction:column;
       align-items:center;
     }
 
-    /* top ring (horizontal base) – Illustrator gradient */
+    /* top ring – flatter, more “ring” than bowl */
     .tube-socket-top{
       position:relative;
-      width:44px;                      /* ~75–80% of 58px shell width */
-      height:16px;
-      border-radius:0 0 999px 999px;   /* square top, rounded bottom */
-      background:linear-gradient(to right,#3b3f48,#151b24);
+      width:38px;
+      height:10px;
+      border-radius:999px;
+      background:
+        linear-gradient(to right,#3b3f48,#151b24);
       box-shadow:
-        0 3px 8px rgba(0,0,0,0.9),
-        inset 0 1px 2px rgba(255,255,255,0.22),
-        inset 0 -1px 3px rgba(15,23,42,0.9);
+        0 3px 7px rgba(0,0,0,0.85),
+        inset 0 0 0 2px rgba(15,23,42,0.95),
+        inset 0 1px 1px rgba(255,255,255,0.2);
       overflow:hidden;
     }
 
-    /* vertical post under the ring */
+    /* vertical post – squared top corners, rounded bottom */
     .tube-socket-post{
       position:relative;
-      margin-top:3px;
-      width:24px;
+      margin-top:4px;
+      width:26px;              /* slightly wider than before */
       height:26px;
-      border-radius:6px;
-      background:linear-gradient(to bottom,#373c46,#151b24);
+      border-radius:4px 4px 999px 999px;
+      background:linear-gradient(to bottom,#3b3f48,#151b24);
       box-shadow:
-        0 4px 10px rgba(0,0,0,0.85),
+        0 4px 10px rgba(0,0,0,0.9),
         inset 0 1px 2px rgba(255,255,255,0.12),
         inset 0 -2px 3px rgba(15,23,42,0.95);
       overflow:hidden;
     }
 
-    /* shared highlight sweep – runs across ring + post in unison */
+    /* shared highlight sweep – soft, no hard edges */
     .tube-socket-top::before,
     .tube-socket-post::before{
       content:"";
       position:absolute;
-      top:-40%;
-      left:-60%;
-      width:72%;
-      height:200%;
-      border-radius:50%;
-      background:radial-gradient(
-        circle at 0 50%,
-        rgba(248,250,252,0.95) 0%,
-        rgba(203,213,225,0.55) 26%,
-        rgba(148,163,184,0.25) 50%,
-        transparent 80%
+      top:-30%;
+      left:-40%;
+      width:70%;
+      height:160%;
+      background:linear-gradient(
+        to right,
+        rgba(148,163,184,0) 0%,
+        rgba(248,250,252,0.9) 35%,
+        rgba(148,163,184,0.0) 70%,
+        rgba(15,23,42,0) 100%
       );
       opacity:0;
+      filter:blur(2px);
       animation:tubeBaseSweep 5.5s linear infinite;
     }
 
-    /* slow left-to-right orbit, Netscape-style */
     @keyframes tubeBaseSweep{
       0%{
         transform:translateX(0%);
         opacity:0;
       }
-      10%{
-        opacity:0.85;
+      15%{
+        opacity:0.8;
       }
-      40%{
-        opacity:0.7;
+      50%{
+        opacity:0.6;
       }
-      70%{
-        opacity:0.1;
+      80%{
+        opacity:0;
       }
       100%{
         transform:translateX(260%);
@@ -277,7 +277,7 @@
       }
     }
 
-    /* slight stagger so each base starts at a different phase */
+    /* stagger for each tube */
     .tube-window > div:nth-child(1) .tube-socket-top::before,
     .tube-window > div:nth-child(1) .tube-socket-post::before{
       animation-delay:0s;
@@ -549,7 +549,7 @@
       // Wire the graph once
       React.useEffect(() => {
         if (!audioElement) return;
-        if (ctxRef.current) return;
+        if (ctxRef.current) return; // already wired
 
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
         if (!AudioCtx) return;
@@ -563,6 +563,7 @@
           analyser.fftSize = 256;
           gain.gain.value = isMuted ? 0 : volume;
 
+          // source -> gain -> analyser -> destination
           source.connect(gain);
           gain.connect(analyser);
           analyser.connect(ctx.destination);
@@ -754,7 +755,6 @@
     }){
       return (
         <div className="flex items-center justify-center gap-3 sm:gap-4">
-          {/* ⏮ PREVIOUS TRACK */}
           <button
             aria-label="Previous track"
             type="button"
@@ -764,7 +764,6 @@
             <span className="transport-icon text-xs">⏮</span>
           </button>
 
-          {/* ⏪ REWIND */}
           <button
             aria-label="Rewind"
             type="button"
@@ -774,7 +773,6 @@
             <span className="transport-icon text-xs">⏪</span>
           </button>
 
-          {/* ▶ PLAY */}
           <button
             aria-label="Play"
             type="button"
@@ -787,7 +785,6 @@
             <span className="transport-icon text-sm">▶</span>
           </button>
 
-          {/* ⏸ PAUSE (toggle) */}
           <button
             aria-label="Pause"
             type="button"
@@ -797,7 +794,6 @@
             <span className="transport-icon text-sm">⏸</span>
           </button>
 
-          {/* ■ STOP */}
           <button
             aria-label="Stop"
             type="button"
@@ -807,7 +803,6 @@
             <span className="transport-icon text-xs">■</span>
           </button>
 
-          {/* ⏩ FAST FORWARD */}
           <button
             aria-label="Fast forward"
             type="button"
@@ -817,7 +812,6 @@
             <span className="transport-icon text-xs">⏩</span>
           </button>
 
-          {/* ⏭ NEXT TRACK */}
           <button
             aria-label="Next track"
             type="button"
@@ -901,7 +895,7 @@
         isPlaying
       );
 
-      // Visual tube intensity derived from playback state
+      // Visual tube intensity
       let level;
       if (!isPlaying || isMuted) {
         level = 0.12;
@@ -919,7 +913,7 @@
         level = Math.max(0.05, Math.min(1.0, raw));
       }
 
-      // time / metadata listeners + auto-advance on track end
+      // time / metadata listeners + auto-advance
       useEffect(() => {
         const audio = audioRef.current;
         if (!audio) return;
