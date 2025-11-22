@@ -200,18 +200,18 @@
 
     /* socket assembly under each tube */
     .tube-socket{
-      margin-top:0.45rem;              /* small gap under the bulb */
+      margin-top:0.46rem;              /* small gap under the bulb */
       display:flex;
       flex-direction:column;
       align-items:center;
     }
 
-    /* top ring (horizontal pill) – Illustrator gradient */
+    /* top ring (horizontal base) – Illustrator gradient */
     .tube-socket-top{
       position:relative;
-      width:54px;
+      width:44px;                      /* ~75–80% of 58px shell width */
       height:16px;
-      border-radius:999px;
+      border-radius:0 0 999px 999px;   /* square top, rounded bottom */
       background:linear-gradient(to right,#3b3f48,#151b24);
       box-shadow:
         0 3px 8px rgba(0,0,0,0.9),
@@ -242,13 +242,15 @@
       position:absolute;
       top:-40%;
       left:-60%;
-      width:70%;
+      width:72%;
       height:200%;
       border-radius:50%;
       background:radial-gradient(
         circle at 0 50%,
-        rgba(148,163,184,0.9),
-        transparent 55%
+        rgba(248,250,252,0.95) 0%,
+        rgba(203,213,225,0.55) 26%,
+        rgba(148,163,184,0.25) 50%,
+        transparent 80%
       );
       opacity:0;
       animation:tubeBaseSweep 5.5s linear infinite;
@@ -261,13 +263,13 @@
         opacity:0;
       }
       10%{
-        opacity:0.8;
+        opacity:0.85;
       }
-      45%{
-        opacity:0.6;
+      40%{
+        opacity:0.7;
       }
       70%{
-        opacity:0;
+        opacity:0.1;
       }
       100%{
         transform:translateX(260%);
@@ -535,8 +537,7 @@
       return m + ":" + (s < 10 ? "0"+s : s);
     }
 
-    // Web Audio gain + analyser engine.
-    // Keeps your iOS-friendly gain control and provides audioLevel for the tubes.
+    // Web Audio gain + analyser engine
     function useGainEngine(audioElement, volume, isMuted, isPlaying) {
       const ctxRef = React.useRef(null);
       const sourceRef = React.useRef(null);
@@ -562,7 +563,6 @@
           analyser.fftSize = 256;
           gain.gain.value = isMuted ? 0 : volume;
 
-          // source -> gain -> analyser -> destination
           source.connect(gain);
           gain.connect(analyser);
           analyser.connect(ctx.destination);
@@ -620,7 +620,7 @@
             sum += v * v;
           }
           const rms = Math.sqrt(sum / bufferLength);
-          const scaled = Math.max(0, Math.min(1, rms * 5)); // nicer visual range
+          const scaled = Math.max(0, Math.min(1, rms * 5));
           setAudioLevel(scaled);
           rafId = requestAnimationFrame(tick);
         };
@@ -676,12 +676,10 @@
       const progressPercent = duration ? Math.min(100, (currentTime / duration) * 100) : 0;
 
       return (
-        <div
-          className={[
-            "w-full max-w-3xl mx-auto rounded-3xl border px-6 py-5 mb-6",
-            "bg-gradient-to-b", t.bg, t.border, "shadow-2xl"
-          ].join(" ")}
-        >
+        <div className={[
+          "w-full max-w-3xl mx-auto rounded-3xl border px-6 py-5 mb-6",
+          "bg-gradient-to-b", t.bg, t.border, "shadow-2xl"
+        ].join(" ")}>
           <div className="tube-window mb-5">
             {tubes.map((lvl, i) => {
               const coreScale = 0.35 + lvl * 0.9;
@@ -713,8 +711,6 @@
                       <div className="tube-filament" />
                     </div>
                   </div>
-
-                  {/* New base that matches the Illustrator mock */}
                   <div className="tube-socket">
                     <div className="tube-socket-top" />
                     <div className="tube-socket-post" />
@@ -758,7 +754,7 @@
     }){
       return (
         <div className="flex items-center justify-center gap-3 sm:gap-4">
-          {/* ⏮ REVERSE SKIP (previous track) */}
+          {/* ⏮ PREVIOUS TRACK */}
           <button
             aria-label="Previous track"
             type="button"
@@ -768,7 +764,7 @@
             <span className="transport-icon text-xs">⏮</span>
           </button>
 
-          {/* ⏪ REWIND (small nudge back) */}
+          {/* ⏪ REWIND */}
           <button
             aria-label="Rewind"
             type="button"
@@ -791,7 +787,7 @@
             <span className="transport-icon text-sm">▶</span>
           </button>
 
-          {/* ⏸ PAUSE (toggle pause/resume) */}
+          {/* ⏸ PAUSE (toggle) */}
           <button
             aria-label="Pause"
             type="button"
@@ -811,7 +807,7 @@
             <span className="transport-icon text-xs">■</span>
           </button>
 
-          {/* ⏩ FAST FORWARD (small nudge forward) */}
+          {/* ⏩ FAST FORWARD */}
           <button
             aria-label="Fast forward"
             type="button"
@@ -821,7 +817,7 @@
             <span className="transport-icon text-xs">⏩</span>
           </button>
 
-          {/* ⏭ FORWARD SKIP (next track) */}
+          {/* ⏭ NEXT TRACK */}
           <button
             aria-label="Next track"
             type="button"
@@ -837,12 +833,10 @@
     function Playlist({ tracks, currentIndex, onSelect, theme }){
       const t = THEMES[theme];
       return (
-        <div
-          className={[
-            "w-full max-w-3xl mx-auto rounded-3xl border p-5 sm:p-6 shadow-2xl",
-            "bg-gradient-to-b", t.bg, t.border
-          ].join(" ")}
-        >
+        <div className={[
+          "w-full max-w-3xl mx-auto rounded-3xl border p-5 sm:p-6 shadow-2xl",
+          "bg-gradient-to-b", t.bg, t.border
+        ].join(" ")}>
           <div className="mb-2">
             <div className="text-[11px] tracking-[0.26em] text-slate-400 uppercase mb-1">
               PLAYLIST
@@ -915,7 +909,6 @@
         const base = 0.15 + audioLevel * (0.9 + volume * 0.6);
         level = Math.max(0.05, Math.min(1.0, base));
       } else {
-        // Fallback animation if Web Audio isn't available
         const t = currentTime || 0;
         const base = 0.35 + 0.25 * Math.sin(t * 2.2);
         const wobble = 0.15 * Math.sin(t * 7.1 + 1.4);
@@ -956,7 +949,7 @@
         };
       }, []);
 
-      // Load track whenever index changes (NOT when isPlaying changes)
+      // Load track whenever index changes
       useEffect(() => {
         const audio = audioRef.current;
         if (!audio || !activeTrack) return;
@@ -1084,7 +1077,6 @@
             onSeekClick={handleSeekClick}
           />
 
-          {/* Controls row */}
           <div className="w-full max-w-3xl flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
             <div className="flex justify-center">
               <VintageControls
@@ -1099,7 +1091,6 @@
               />
             </div>
 
-            {/* Volume + mute */}
             <div className="volume-wrap md:justify-start">
               <button
                 type="button"
