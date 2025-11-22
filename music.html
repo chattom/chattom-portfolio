@@ -250,23 +250,25 @@ inset 0 -1px 4px rgba(15,23,42,0.75);
     }
 
     /* shared highlight sweep – runs across ring + post in unison */
-    .tube-socket-top::before,
-    .tube-socket-post::before{
-      content:"";
-      position:absolute;
-      top:-40%;
-      left:-60%;
-      width:70%;
-      height:200%;
-      border-radius:50%;
-      background:radial-gradient(
-        circle at 0 50%,
-        rgba(226,232,240,0.9),
-        transparent 60%
-      );
-      opacity:0;
-      animation:tubeBaseSweep 5.5s linear infinite;
-    }
+.tube-socket-top::before,
+.tube-socket-post::before{
+  content:"";
+  position:absolute;
+  top:-40%;
+  left:-70%;
+  width:90%;
+  height:220%;
+  border-radius:50%;
+  background:radial-gradient(
+    circle at 0 50%,
+    rgba(226,232,240,0.85) 0%,
+    rgba(226,232,240,0.35) 25%,
+    rgba(226,232,240,0.0) 72%
+  );
+  opacity:0;
+  filter:blur(2px);              /* <- softens the edge of the sweep */
+  animation:tubeBaseSweep 5.5s linear infinite;
+}
 
     @keyframes tubeBaseSweep{
       0%{
