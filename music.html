@@ -200,60 +200,57 @@
 
     /* socket assembly under each tube */
     .tube-socket{
-      margin-top:0.38rem;              /* small gap under the glass */
+      margin-top:0.45rem;
       display:flex;
       flex-direction:column;
       align-items:center;
     }
 
-    /* top ring – flatter, more “ring” than bowl */
+    /* top ring (horizontal pill) – Illustrator gradient */
     .tube-socket-top{
       position:relative;
-      width:38px;
-      height:10px;
+      width:60px;
+      height:16px;
       border-radius:999px;
-      background:
-        linear-gradient(to right,#3b3f48,#151b24);
+      background:linear-gradient(to right,#3b3f48,#151b24);
       box-shadow:
-        0 3px 7px rgba(0,0,0,0.85),
-        inset 0 0 0 2px rgba(15,23,42,0.95),
-        inset 0 1px 1px rgba(255,255,255,0.2);
+        0 3px 8px rgba(0,0,0,0.9),
+        inset 0 1px 2px rgba(255,255,255,0.22),
+        inset 0 -1px 3px rgba(15,23,42,0.9);
       overflow:hidden;
     }
 
-    /* vertical post – squared top corners, rounded bottom */
+    /* vertical post under the ring */
     .tube-socket-post{
       position:relative;
-      margin-top:4px;
-      width:26px;              /* slightly wider than before */
+      margin-top:3px;
+      width:26px;
       height:26px;
-      border-radius:0px 0px 5px 5px;
-      background:linear-gradient(to bottom,#3b3f48,#151b24);
+      border-radius:8px 8px 4px 4px; /* top more rounded, bottom just a little */
+      background:linear-gradient(to bottom,#373c46,#151b24);
       box-shadow:
-        0 4px 10px rgba(0,0,0,0.9),
+        0 4px 10px rgba(0,0,0,0.85),
         inset 0 1px 2px rgba(255,255,255,0.12),
         inset 0 -2px 3px rgba(15,23,42,0.95);
       overflow:hidden;
     }
 
-    /* shared highlight sweep – soft, no hard edges */
+    /* shared highlight sweep – runs across ring + post in unison */
     .tube-socket-top::before,
     .tube-socket-post::before{
       content:"";
       position:absolute;
-      top:-30%;
-      left:-40%;
+      top:-40%;
+      left:-60%;
       width:70%;
-      height:160%;
-      background:linear-gradient(
-        to right,
-        rgba(148,163,184,0) 0%,
-        rgba(248,250,252,0.9) 35%,
-        rgba(148,163,184,0.0) 70%,
-        rgba(15,23,42,0) 100%
+      height:200%;
+      border-radius:50%;
+      background:radial-gradient(
+        circle at 0 50%,
+        rgba(209,213,219,0.9),
+        transparent 60%
       );
       opacity:0;
-      filter:blur(2px);
       animation:tubeBaseSweep 5.5s linear infinite;
     }
 
@@ -262,14 +259,14 @@
         transform:translateX(0%);
         opacity:0;
       }
-      15%{
-        opacity:0.8;
+      12%{
+        opacity:0.9;
       }
-      50%{
-        opacity:0.6;
+      45%{
+        opacity:0.65;
       }
-      80%{
-        opacity:0;
+      70%{
+        opacity:0.0;
       }
       100%{
         transform:translateX(260%);
@@ -277,27 +274,17 @@
       }
     }
 
-    /* stagger for each tube */
+    /* stagger for each tube base */
     .tube-window > div:nth-child(1) .tube-socket-top::before,
-    .tube-window > div:nth-child(1) .tube-socket-post::before{
-      animation-delay:0s;
-    }
+    .tube-window > div:nth-child(1) .tube-socket-post::before{ animation-delay:0s; }
     .tube-window > div:nth-child(2) .tube-socket-top::before,
-    .tube-window > div:nth-child(2) .tube-socket-post::before{
-      animation-delay:0.4s;
-    }
+    .tube-window > div:nth-child(2) .tube-socket-post::before{ animation-delay:0.4s; }
     .tube-window > div:nth-child(3) .tube-socket-top::before,
-    .tube-window > div:nth-child(3) .tube-socket-post::before{
-      animation-delay:0.8s;
-    }
+    .tube-window > div:nth-child(3) .tube-socket-post::before{ animation-delay:0.8s; }
     .tube-window > div:nth-child(4) .tube-socket-top::before,
-    .tube-window > div:nth-child(4) .tube-socket-post::before{
-      animation-delay:1.2s;
-    }
+    .tube-window > div:nth-child(4) .tube-socket-post::before{ animation-delay:1.2s; }
     .tube-window > div:nth-child(5) .tube-socket-top::before,
-    .tube-window > div:nth-child(5) .tube-socket-post::before{
-      animation-delay:1.6s;
-    }
+    .tube-window > div:nth-child(5) .tube-socket-post::before{ animation-delay:1.6s; }
 
     /* --- Progress strip --- */
     .progress-rail{
@@ -443,6 +430,218 @@
       font-size:14px;
       filter:drop-shadow(0 1px 1px rgba(0,0,0,0.9));
     }
+
+    /* --- Mini player overlay --- */
+
+    .mini-player{
+      position:fixed;
+      right:16px;
+      bottom:16px;
+      z-index:60;
+      width:340px;
+      max-width:calc(100vw - 32px);
+      border-radius:20px;
+      border:1px solid rgba(148,163,184,0.75);
+      background:
+        radial-gradient(circle at 0% 0%, rgba(148,163,184,0.16), transparent 55%),
+        linear-gradient(to bottom,#020617,#020617,#020617);
+      box-shadow:
+        0 18px 36px rgba(0,0,0,0.9),
+        0 0 24px rgba(15,23,42,0.9);
+      padding:12px 14px 14px;
+      backdrop-filter:blur(16px);
+      -webkit-backdrop-filter:blur(16px);
+    }
+
+    @media (max-width:640px){
+      .mini-player{
+        left:12px;
+        right:12px;
+        bottom:12px;
+        width:auto;
+      }
+    }
+
+    .mini-player-header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+      margin-bottom:8px;
+    }
+    .mini-player-title{
+      font-size:13px;
+      font-weight:600;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .mini-player-close{
+      border:none;
+      background:transparent;
+      color:#94a3b8;
+      cursor:pointer;
+      padding:2px 4px;
+      border-radius:999px;
+      font-size:13px;
+    }
+    .mini-player-close:hover{
+      color:#e5e7eb;
+      background:rgba(15,23,42,0.8);
+    }
+
+    .mini-vu-wrap{
+      display:flex;
+      gap:10px;
+      margin-bottom:10px;
+    }
+    .mini-vu{
+      flex:1;
+      position:relative;
+      height:70px;
+      border-radius:12px;
+      background:
+        linear-gradient(to bottom,#020617,#020617 35%,#020617 100%);
+      box-shadow:
+        inset 0 0 10px rgba(15,23,42,0.95),
+        0 0 12px rgba(15,23,42,0.9);
+      overflow:hidden;
+    }
+    .mini-vu-glow{
+      position:absolute;
+      inset:6px 6px 10px 6px;
+      border-radius:10px;
+      background:
+        radial-gradient(circle at 50% 110%, rgba(56,189,248,0.85), transparent 65%),
+        radial-gradient(circle at 50% -40%, rgba(148,163,184,0.8), transparent 70%);
+      opacity:0.2;
+      pointer-events:none;
+      mix-blend-mode:screen;
+    }
+    .mini-vu-scale{
+      position:absolute;
+      inset:10px 10px 16px 10px;
+      border-radius:8px;
+      border:1px solid rgba(148,163,184,0.35);
+      box-shadow:inset 0 0 6px rgba(15,23,42,0.95);
+    }
+    .mini-vu-needle{
+      position:absolute;
+      bottom:12px;
+      left:50%;
+      width:2px;
+      height:46px;
+      background:linear-gradient(to top,#f9fafb,#cbd5f5);
+      border-radius:99px;
+      transform-origin:bottom center;
+      box-shadow:
+        0 0 4px rgba(248,250,252,0.9),
+        0 -6px 6px rgba(15,23,42,0.85);
+    }
+    .mini-vu-pivot{
+      position:absolute;
+      bottom:10px;
+      left:50%;
+      width:10px;
+      height:10px;
+      border-radius:999px;
+      transform:translateX(-50%);
+      background:radial-gradient(circle, #f9fafb, #9ca3af);
+      box-shadow:0 0 4px rgba(15,23,42,0.9);
+    }
+
+    .mini-progress-rail{
+      width:100%;
+      height:6px;
+      border-radius:999px;
+      background:radial-gradient(circle at 50% 150%, rgba(15,23,42,0.9), #020617);
+      box-shadow:
+        inset 0 0 4px rgba(15,23,42,0.9),
+        0 0 10px rgba(15,23,42,0.7);
+      overflow:hidden;
+      margin-bottom:4px;
+    }
+    .mini-progress-fill{
+      height:100%;
+      border-radius:999px;
+      background:linear-gradient(to right,#e5e7eb,#f9fafb,#e5e7eb);
+      box-shadow:0 0 12px rgba(248,250,252,0.85);
+    }
+    .mini-times{
+      display:flex;
+      justify-content:space-between;
+      font-size:10px;
+      color:#94a3b8;
+      margin-bottom:6px;
+    }
+
+    .mini-controls-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:6px;
+    }
+    .mini-transport{
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+    .mini-btn{
+      width:30px;
+      height:30px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,0.7);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:
+        radial-gradient(circle at 30% 18%, rgba(255,255,255,0.22), transparent 55%),
+        radial-gradient(circle at 70% 82%, #020617, #020617);
+      box-shadow:
+        0 4px 10px rgba(0,0,0,0.7),
+        inset 0 1px 3px rgba(255,255,255,0.3);
+      color:#e5e7eb;
+      cursor:pointer;
+      font-size:11px;
+    }
+    .mini-btn-play{
+      width:34px;
+      height:34px;
+    }
+    .mini-btn:active{
+      transform:translateY(1px) scale(0.97);
+      box-shadow:
+        0 2px 6px rgba(0,0,0,0.9),
+        inset 0 1px 2px rgba(0,0,0,0.7);
+    }
+
+    .mini-theme-chips{
+      display:flex;
+      gap:4px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    .mini-theme-chip{
+      border-radius:999px;
+      padding:2px 8px;
+      font-size:9px;
+      letter-spacing:0.16em;
+      text-transform:uppercase;
+      border:1px solid rgba(148,163,184,0.7);
+      cursor:pointer;
+      opacity:0.8;
+    }
+    .mini-theme-chip.active{
+      opacity:1;
+      box-shadow:0 0 10px rgba(34,211,238,0.6);
+    }
+
+    .mini-popout-hint{
+      font-size:10px;
+      color:#64748b;
+      text-align:right;
+      margin-top:4px;
+    }
   </style>
 </head>
 <body>
@@ -537,7 +736,7 @@
       return m + ":" + (s < 10 ? "0"+s : s);
     }
 
-    // Web Audio gain + analyser engine
+    // Web Audio gain + analyser engine.
     function useGainEngine(audioElement, volume, isMuted, isPlaying) {
       const ctxRef = React.useRef(null);
       const sourceRef = React.useRef(null);
@@ -549,7 +748,7 @@
       // Wire the graph once
       React.useEffect(() => {
         if (!audioElement) return;
-        if (ctxRef.current) return; // already wired
+        if (ctxRef.current) return;
 
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
         if (!AudioCtx) return;
@@ -563,7 +762,6 @@
           analyser.fftSize = 256;
           gain.gain.value = isMuted ? 0 : volume;
 
-          // source -> gain -> analyser -> destination
           source.connect(gain);
           gain.connect(analyser);
           analyser.connect(ctx.destination);
@@ -678,7 +876,7 @@
 
       return (
         <div className={[
-          "w-full max-w-3xl mx-auto rounded-3xl border px-6 py-5 mb-6",
+          "w-full max-w-3xl mx-auto rounded-3xl border px-6 py-5 mb-3",
           "bg-gradient-to-b", t.bg, t.border, "shadow-2xl"
         ].join(" ")}>
           <div className="tube-window mb-5">
@@ -876,6 +1074,146 @@
       );
     }
 
+    // Mini Player component
+    function MiniPlayer({
+      trackName,
+      currentTime,
+      duration,
+      theme,
+      level,
+      isPlaying,
+      onPlay,
+      onPause,
+      onSkipBack,
+      onSkipForward,
+      onThemeChange,
+      onClose,
+    }){
+      const t = THEMES[theme];
+
+      // Normalize level 0–1 for needle rotation
+      const base = Math.max(0, Math.min(1, (level - 0.1) / 0.9));
+      const leftLevel = Math.max(0, Math.min(1, base * 1.05));
+      const rightLevel = Math.max(0, Math.min(1, base * 0.95));
+
+      const angleMin = -18;
+      const angleMax = 18;
+      const leftAngle = angleMin + (angleMax - angleMin) * leftLevel;
+      const rightAngle = angleMin + (angleMax - angleMin) * rightLevel;
+
+      const glowOpacity = 0.18 + base * 0.65;
+      const progressPercent = duration ? Math.min(100, (currentTime / duration) * 100) : 0;
+
+      return (
+        <div className="mini-player">
+          <div className="mini-player-header">
+            <div className="mini-player-title">
+              {trackName || "Original Audio Works"}
+            </div>
+            <button
+              type="button"
+              className="mini-player-close"
+              onClick={onClose}
+              aria-label="Close mini player"
+            >
+              ×
+            </button>
+          </div>
+
+          <div className="mini-vu-wrap">
+            {[leftAngle, rightAngle].map((angle, idx) => (
+              <div key={idx} className="mini-vu">
+                <div
+                  className="mini-vu-glow"
+                  style={{
+                    opacity: glowOpacity,
+                    background: `
+                      radial-gradient(circle at 50% 110%, rgba(56,189,248,${0.7 + base * 0.6}), transparent 65%),
+                      radial-gradient(circle at 50% -40%, rgba(148,163,184,${0.8 + base * 0.4}), transparent 70%)
+                    `
+                  }}
+                />
+                <div className="mini-vu-scale" />
+                <div
+                  className="mini-vu-needle"
+                  style={{ transform: `translateX(-50%) rotate(${angle}deg)` }}
+                />
+                <div className="mini-vu-pivot" />
+              </div>
+            ))}
+          </div>
+
+          <div className="mini-progress-rail">
+            <div
+              className="mini-progress-fill"
+              style={{ width: progressPercent + "%" }}
+            />
+          </div>
+          <div className="mini-times">
+            <span>{formatTime(currentTime)}</span>
+            <span>{formatTime(duration)}</span>
+          </div>
+
+          <div className="mini-controls-row">
+            <div className="mini-transport">
+              <button
+                type="button"
+                className="mini-btn"
+                aria-label="Previous track"
+                onClick={onSkipBack}
+              >
+                ⏮
+              </button>
+              <button
+                type="button"
+                className="mini-btn"
+                aria-label="Previous section"
+                onClick={() => { /* small nudge back feels too fiddly here, so skip */ }}
+              >
+                ‹
+              </button>
+              <button
+                type="button"
+                className={"mini-btn mini-btn-play"}
+                aria-label={isPlaying ? "Pause" : "Play"}
+                onClick={isPlaying ? onPause : onPlay}
+              >
+                {isPlaying ? "⏸" : "▶"}
+              </button>
+              <button
+                type="button"
+                className="mini-btn"
+                aria-label="Next track"
+                onClick={onSkipForward}
+              >
+                ⏭
+              </button>
+            </div>
+
+            <div className="mini-theme-chips">
+              {Object.entries(THEMES).map(([id, themeDef]) => (
+                <button
+                  key={id}
+                  type="button"
+                  className={
+                    "mini-theme-chip" +
+                    (id === theme ? " active" : "")
+                  }
+                  onClick={() => onThemeChange(id)}
+                >
+                  {themeDef.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="mini-popout-hint">
+            Mini player — keeps playing while you browse
+          </div>
+        </div>
+      );
+    }
+
     function MusicApp(){
       const [currentIndex,setCurrentIndex] = useState(0);
       const [theme,setTheme] = useState("nite life");
@@ -884,6 +1222,7 @@
       const [duration,setDuration] = useState(0);
       const [volume,setVolume] = useState(0.9);
       const [isMuted,setIsMuted] = useState(false);
+      const [showMini,setShowMini] = useState(false);
 
       const audioRef = useRef(null);
       const activeTrack = TRACKS[currentIndex];
@@ -895,7 +1234,7 @@
         isPlaying
       );
 
-      // Visual tube intensity
+      // Visual tube intensity derived from playback state
       let level;
       if (!isPlaying || isMuted) {
         level = 0.12;
@@ -904,16 +1243,16 @@
         level = Math.max(0.05, Math.min(1.0, base));
       } else {
         const t = currentTime || 0;
-        const base = 0.35 + 0.25 * Math.sin(t * 2.2);
+        const baseVal = 0.35 + 0.25 * Math.sin(t * 2.2);
         const wobble = 0.15 * Math.sin(t * 7.1 + 1.4);
         const noiseSeed = (Math.sin(t * 12.7) + 1) / 2;
         const noise = (noiseSeed - 0.5) * 0.25;
         const amp = 0.25 + volume * 0.75;
-        const raw = 0.18 + amp * (base + wobble + noise);
+        const raw = 0.18 + amp * (baseVal + wobble + noise);
         level = Math.max(0.05, Math.min(1.0, raw));
       }
 
-      // time / metadata listeners + auto-advance
+      // time / metadata listeners + auto-advance on track end
       useEffect(() => {
         const audio = audioRef.current;
         if (!audio) return;
@@ -1071,6 +1410,18 @@
             onSeekClick={handleSeekClick}
           />
 
+          {/* Mini player trigger button */}
+          <div className="w-full max-w-3xl mx-auto flex items-center justify-end mb-4">
+            <button
+              type="button"
+              onClick={() => setShowMini(true)}
+              className="px-3 py-1.5 rounded-full text-[11px] tracking-[0.18em] uppercase border border-cyan-400/70 text-cyan-200 bg-slate-900/80 shadow-[0_0_18px_rgba(34,211,238,0.45)] hover:bg-slate-800/80 transition-colors"
+            >
+              ⤢ Mini Player
+            </button>
+          </div>
+
+          {/* Controls row */}
           <div className="w-full max-w-3xl flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
             <div className="flex justify-center">
               <VintageControls
@@ -1119,6 +1470,23 @@
             onSelect={handleSelectTrack}
             theme={theme}
           />
+
+          {showMini && (
+            <MiniPlayer
+              trackName={activeTrack ? activeTrack.name : ""}
+              currentTime={currentTime}
+              duration={duration}
+              theme={theme}
+              level={level}
+              isPlaying={isPlaying}
+              onPlay={handlePlay}
+              onPause={handlePause}
+              onSkipBack={handleSkipBack}
+              onSkipForward={handleSkipForward}
+              onThemeChange={setTheme}
+              onClose={() => setShowMini(false)}
+            />
+          )}
 
           <audio ref={audioRef} className="hidden">
             Your browser does not support the audio element.
