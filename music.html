@@ -993,13 +993,35 @@
         audio.muted = isMuted;
       }, [volume, isMuted, hasWebGain]);
 
-      const handleNudge = (deltaSeconds) => {
+            const handleNudge = (deltaSeconds) => {
         const audio = audioRef.current;
         if (!audio || !duration) return;
         const next = Math.max(0, Math.min(duration, (audio.currentTime || 0) + deltaSeconds));
         audio.currentTime = next;
         setCurrentTime(next);
       };
+
+      const handlePlay = () => {
+        const audio = audioRef.current;
+        if (!audio) return;
+        audio.play()
+          .then(() => setIsPlaying(true))
+          .catch(() => {});
+      };
+
+      function MusicApp() {
+  // ...your existing state + refs...
+
+  const handleOpenMiniPlayer = () => {
+    const features =
+      "width=560,height=440,menubar=no,toolbar=no,location=no," +
+      "status=no,scrollbars=no,resizable=yes";
+    window.open("mini-player.html", "ccMiniPlayer", features);
+  };
+
+  // ...rest of MusicApp...
+}
+
 
       const handlePlay = () => {
         const audio = audioRef.current;
@@ -1159,31 +1181,28 @@
       const root = ReactDOM.createRoot(rootEl);
       root.render(<MusicApp />);
     }
-  </script>
-
-  <!-- Mini-player launcher script (plain JS) -->
   <script>
-    (function () {
-      const btn = document.getElementById("launch-mini-player");
-      if (!btn) return;
+  (function () {
+    const btn = document.getElementById("launch-mini-player");
+    if (!btn) return;
 
-      btn.addEventListener("click", function () {
-        const w = 420;
-        const h = 260;
-        const left = (window.screen.width - w) / 2;
-        const top = (window.screen.height - h) / 2;
+    btn.addEventListener("click", function () {
+      const w = 560;
+      const h = 440;
+      const left = (window.screen.width - w) / 2;
+      const top = (window.screen.height - h) / 2;
 
-        window.open(
-          "mini-player.html",
-          "ccMiniPlayer",
-          "width=" + w +
-          ",height=" + h +
-          ",left=" + left +
-          ",top=" + top +
-          ",resizable=yes,scrollbars=no"
-        );
-      });
-    })();
-  </script>
+      window.open(
+        "mini-player.html",
+        "ccMiniPlayer",
+        "width=" + w +
+        ",height=" + h +
+        ",left=" + left +
+        ",top=" + top +
+        ",menubar=no,toolbar=no,location=no,status=no,scrollbars=no,resizable=yes"
+      );
+    });
+  })();
+</script>
 </body>
 </html>
