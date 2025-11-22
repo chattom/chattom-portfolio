@@ -42,7 +42,7 @@
 
     .mini-shell{
       width:100%;
-      max-width:520px;              /* smaller overall width (~75–80%) */
+      max-width:520px;
       border-radius:26px;
       border:1px solid rgba(148,163,184,0.7);
       background:
@@ -80,9 +80,8 @@
 
     .vu-window{
       position:relative;
-      height:88px;                   /* shorter window */
+      height:88px;
       border-radius:12px;
-      /* background is overridden per-theme inline */
       box-shadow:
         inset 0 0 18px rgba(15,23,42,0.95),
         0 0 20px rgba(8,47,73,0.9);
@@ -92,7 +91,6 @@
     .vu-glow{
       position:absolute;
       inset:0;
-      /* background overridden per-theme inline */
       pointer-events:none;
       mix-blend-mode:screen;
       transition:opacity 110ms ease-out;
@@ -157,43 +155,40 @@
     }
 
     .vu-needle{
-  position:absolute;
-  bottom:13px;
-  left:50%;
-  width:70px;              /* a bit wider to give sweep room */
-  height:2px;
-  /* pivot is now at the CENTER of the needle container */
-  transform-origin:50% 50%;
-  transform:translateX(-50%) rotate(-40deg);
-  pointer-events:none;
-}
+      position:absolute;
+      bottom:13px;
+      left:50%;
+      width:70px;
+      height:2px;
+      transform-origin:50% 50%;
+      transform:translateX(-50%) rotate(-40deg);
+      pointer-events:none;
+    }
 
-.vu-needle-line{
-  position:absolute;
-  /* start the line at the pivot (center) and draw to the right */
-  left:50%;
-  top:0;
-  width:58px;
-  height:2px;
-  transform-origin:0% 50%;
-  transform:translateX(0);
-  background:linear-gradient(to right,#e5e7eb,#fefce8);
-  box-shadow:0 0 4px rgba(248,250,252,0.9);
-}
+    .vu-needle-line{
+      position:absolute;
+      left:50%;
+      top:0;
+      width:58px;
+      height:2px;
+      transform-origin:0% 50%;
+      background:linear-gradient(to right,#e5e7eb,#fefce8);
+      box-shadow:0 0 4px rgba(248,250,252,0.9);
+    }
 
-.vu-needle-pivot{
-  position:absolute;
-  left:50%;
-  top:-3px;
-  transform:translateX(-50%);
-  width:10px;
-  height:10px;
-  border-radius:999px;
-  background:radial-gradient(circle at 30% 30%,#f9fafb,#0f172a);
-  box-shadow:
-    0 0 4px rgba(15,23,42,0.9),
-    0 0 6px rgba(148,163,184,0.8);
-}
+    .vu-needle-pivot{
+      position:absolute;
+      left:50%;
+      top:-3px;
+      transform:translateX(-50%);
+      width:10px;
+      height:10px;
+      border-radius:999px;
+      background:radial-gradient(circle at 30% 30%,#f9fafb,#0f172a);
+      box-shadow:
+        0 0 4px rgba(15,23,42,0.9),
+        0 0 6px rgba(148,163,184,0.8);
+    }
 
     /* --- Transport buttons --- */
     .round-btn{
@@ -394,7 +389,6 @@
     ];
     const AUDIO_BASE = "assets/";
 
-    // themes now drive VU color
     const THEMES = {
       nite: {
         id:"nite",
@@ -502,7 +496,6 @@
             sum += v*v;
           }
           const rms = Math.sqrt(sum/bufferLength); // 0..~1
-          // conservative scaling so we rarely pin the red
           const scaled = Math.max(0,Math.min(1,rms*4));
           setLevel(scaled);
           rafId = requestAnimationFrame(tick);
@@ -515,31 +508,25 @@
     }
 
     function VUMeter({ label, level, theme }){
-  // Treat low levels as "resting" at far left, and cap at 0 dB (start of red)
+      // --- map WebAudio level -> VU angle ---
+      // anything below noiseFloor = needle resting far left
+      const noiseFloor = 0.18;
+      const effectiveMax = 0.9; // treat this as "0 dB" (start of red)
 
-  // 1) Knock out the noise floor so the needle can really rest left
-  const noiseFloor = 0.22;     // anything below this is considered silence
-  const effectiveMax = 0.9;    // typical loud peak, before real clipping
+      const trimmed = Math.max(0, Math.min(level, effectiveMax) - noiseFloor);
+      const normalized =
+        trimmed <= 0 ? 0 : trimmed / (effectiveMax - noiseFloor);
 
-  // Trim to [noiseFloor, effectiveMax], then normalize to 0..1
-  const trimmed = Math.max(0, Math.min(level, effectiveMax) - noiseFloor);
-  const normalized =
-    trimmed <= 0 ? 0 : trimmed / (effectiveMax - noiseFloor);
+      // ease so mid-range is lively, top end steadier
+      const eased = Math.pow(normalized, 0.85);
 
-  // 2) Ease curve: keeps mid-range lively, top end more stable
-  const eased = Math.pow(normalized, 0.8);
+      // 0 -> -40° (hard left), 1 -> +5° (0 dB at start of red)
+      const minDeg = -40;
+      const maxDeg = 5;
+      const angle = minDeg + (maxDeg - minDeg) * eased;
 
-  // 3) Map 0..1 → angle:
-  //    0   → -40° (resting at far left)
-  //    1.0 → +5°  (0 dB, right where the red starts)
-  const minDeg = -40;
-  const maxDeg = 5;
-  const angle = minDeg + (maxDeg - minDeg) * eased;
-
-  // red zone placement (0 dB to +3 dB) – leave this the same
-  const redWidthPct = 26;
-  ...
-}
+      // red zone width in % of arc baseline
+      const redWidthPct = 26;
 
       const windowStyle = {
         background: `radial-gradient(circle at 50% 0%, ${theme.accentSoft}, rgba(8,47,73,0.95) 55%, #020617 100%)`,
@@ -550,35 +537,50 @@
 
       const glowStyle = {
         background: `radial-gradient(circle at 50% 0%, ${theme.accentStrong}, transparent 55%)`,
+        opacity: 0.25 + normalized * 0.55,
       };
+
+      // tick layout along a gentle arc
+      const tickDefs = [
+        { value:-20, major:true },
+        { value:-10, major:true },
+        { value:-7,  major:true },
+        { value:-5,  major:true },
+        { value:-3,  major:true },
+        { value:0,   major:true }, // 0 dB
+        { value:3,   major:false }
+      ];
+      const arcStartDeg = -38;
+      const arcSpanDeg  = 58;
+      const baseStart   = 16;   // %
+      const baseSpan    = 68;   // %
+
+      const zeroIndex = tickDefs.findIndex(t => t.value === 0);
+      const zeroPos   = zeroIndex / (tickDefs.length - 1 || 1);
+      const redLeft   = baseStart + zeroPos * baseSpan;
 
       return (
         <div className="vu-frame">
           <div className="vu-window" style={windowStyle}>
-            <div
-              className="vu-glow"
-              style={{
-                ...glowStyle,
-                opacity: 0.25 + clamped * 0.55,
-              }}
-            />
+            <div className="vu-glow" style={glowStyle} />
 
             <div className="vu-scale">
               <div className="vu-scale-inner">
-                {/* ticks and labels – SINGLE 0, no extra at top */}
-                {[-20,-10,-7,-5,-3,0,3].map((val) => {
-                  const pos = (val + 20) / 23;
-                  const angleDeg = -38 + pos*58;
-                  const isMajor = [0,-10,-7,-5,-3].includes(val);
-                  const left = 50 + (Math.cos((angleDeg-90)*Math.PI/180))*48;
+                {tickDefs.map((t, idx) => {
+                  const pos = idx / (tickDefs.length - 1 || 1);
+                  const left = baseStart + pos * baseSpan;
+                  const ang = arcStartDeg + pos * arcSpanDeg;
+                  const isMajor = t.major;
 
                   return (
-                    <React.Fragment key={val}>
+                    <React.Fragment key={t.value}>
                       <div
-                        className={"tick " + (isMajor ? "tick--major" : "tick--minor")}
+                        className={
+                          "tick " + (isMajor ? "tick--major" : "tick--minor")
+                        }
                         style={{
                           left: left + "%",
-                          transform:`translateX(-50%) rotate(${angleDeg}deg)`
+                          transform:`translateX(-50%) rotate(${ang}deg)`
                         }}
                       />
                       {isMajor && (
@@ -586,20 +588,20 @@
                           className="tick-label"
                           style={{ left: left + "%" }}
                         >
-                          {val === -3 ? "−3" : val}
+                          {t.value === -3 ? "−3" : t.value}
                         </div>
                       )}
                     </React.Fragment>
                   );
                 })}
 
-                {/* red zone */}
+                {/* red zone: starts at 0 dB tick */}
                 <div
                   className="vu-red-zone"
                   style={{
-                    left:"64%",
-                    width:redWidthPct+"%",
-                    transform:`skewX(8deg)`
+                    left: redLeft + "%",
+                    width: redWidthPct + "%",
+                    transform:"skewX(8deg)"
                   }}
                 />
 
@@ -623,7 +625,7 @@
     }
 
     function MiniPlayerApp(){
-      const [currentIndex,setCurrentIndex] = useState(0); // start on track 1
+      const [currentIndex,setCurrentIndex] = useState(0);
       const [isPlaying,setIsPlaying] = useState(false);
       const [currentTime,setCurrentTime] = useState(0);
       const [duration,setDuration] = useState(0);
@@ -641,7 +643,6 @@
         isPlaying
       );
 
-      // plain element volume for browsers w/o WebAudio
       useEffect(() => {
         const audio = audioRef.current;
         if (!audio) return;
@@ -651,7 +652,6 @@
         audio.muted = isMuted;
       },[volume,isMuted,hasEngine]);
 
-      // time + metadata + auto-advance
       useEffect(() => {
         const audio = audioRef.current;
         if (!audio) return;
@@ -679,7 +679,6 @@
         };
       },[]);
 
-      // load track on index change
       useEffect(() => {
         const audio = audioRef.current;
         if (!audio || !activeTrack) return;
@@ -748,6 +747,13 @@
       };
 
       const theme = THEMES[themeId];
+
+      // ensure needle properly rests at left when not playing / muted
+      const leftLevel  = (!isPlaying || isMuted) ? 0 : level;
+      const rightLevel = (!isPlaying || isMuted)
+        ? 0
+        : Math.min(1, level*0.92 + 0.03);
+
       const progressPercent = duration ? (currentTime/duration)*100 : 0;
       const volPercent = Math.round(volume*100);
 
@@ -762,8 +768,8 @@
         >
           {/* VU meters */}
           <div className="vu-cluster">
-            <VUMeter label="LEFT"  level={level}                     theme={theme} />
-            <VUMeter label="RIGHT" level={Math.min(1, level*0.92+0.03)} theme={theme} />
+            <VUMeter label="LEFT"  level={leftLevel}  theme={theme} />
+            <VUMeter label="RIGHT" level={rightLevel} theme={theme} />
           </div>
 
           {/* Track title */}
@@ -804,7 +810,10 @@
               </button>
               <button
                 type="button"
-                className={"round-btn round-btn--primary " + (isPlaying ? "round-btn--active" : "")}
+                className={
+                  "round-btn round-btn--primary " +
+                  (isPlaying ? "round-btn--active" : "")
+                }
                 aria-label={isPlaying ? "Pause" : "Play"}
                 onClick={isPlaying ? handlePause : handlePlay}
               >
