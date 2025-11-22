@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Chris Chattom — Mini Player</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chris Chattom — Mini Player</title>
 
   <!-- Fonts & Tailwind -->
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- React + Babel -->
@@ -18,23 +18,22 @@
   <style>
     :root{
       --accent:#22d3ee;
-    }
-    *{box-sizing:border-box;}
-    html,body{
-      height:100%;
-      margin:0;
-      padding:0;
-    }
-    body{
-      background:#020617;
-      color:#e5e7eb;
-      font-family:Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      -webkit-font-smoothing:antialiased;
+      --accent-soft:rgba(34,211,238,0.2);
+      --accent-strong:rgba(34,211,238,0.8);
     }
 
-    .window-frame{
-      width:100%;
+    *{box-sizing:border-box;}
+    html,body{
+      margin:0;
+      padding:0;
       height:100%;
+      background:#020617;
+      color:#e5e7eb;
+      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    }
+
+    #root{
+      min-height:100vh;
       display:flex;
       align-items:center;
       justify-content:center;
@@ -42,263 +41,321 @@
     }
 
     .mini-shell{
-      width:480px;
-      max-width:100%;
-      border-radius:22px;
-      border:1px solid rgba(148,163,184,0.65);
-      background:
-        radial-gradient(circle at 50% -40%, rgba(148,163,184,0.32), transparent 55%),
-        radial-gradient(circle at 50% 120%, rgba(15,23,42,0.96), #020617 70%);
-      box-shadow:
-        0 24px 45px rgba(0,0,0,0.9),
-        inset 0 0 26px rgba(15,23,42,0.9);
-      padding:14px 18px 16px;
-    }
-
-    /* --- VU METERS --- */
-
-    .vu-row{
-      display:flex;
-      justify-content:space-between;
-      gap:12px;
-      margin-bottom:10px;
-    }
-
-    .vu-meter{
-      flex:1;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      gap:6px;
-    }
-
-    .vu-face{
-      position:relative;
       width:100%;
-      aspect-ratio: 16 / 9;
-      border-radius:14px;
-      padding:9px 10px 12px;
-      background:radial-gradient(circle at 50% 15%, #0ea5e9, #022c43 65%);
+      max-width:640px;
+      border-radius:30px;
+      border:1px solid rgba(148,163,184,0.7);
+      background:radial-gradient(circle at 20% 0%,rgba(148,163,184,0.18),transparent 55%),
+                 radial-gradient(circle at 80% 0%,rgba(56,189,248,0.18),transparent 60%),
+                 linear-gradient(to bottom,#020617,#020617,#020617,#020617);
       box-shadow:
-        0 0 14px rgba(56,189,248,0.6),
-        inset 0 0 12px rgba(15,23,42,0.95);
+        0 24px 80px rgba(0,0,0,0.95),
+        inset 0 0 40px rgba(15,23,42,0.9);
+      padding:18px 20px 14px;
+    }
+
+    /* --- VU cluster --- */
+    .vu-cluster{
+      display:flex;
+      gap:12px;
+      padding:12px 10px 14px;
+      border-radius:22px;
+      background:radial-gradient(circle at 50% 0%,rgba(15,23,42,0.9),rgba(15,23,42,0.95));
+      box-shadow:
+        inset 0 0 25px rgba(15,23,42,1),
+        0 12px 26px rgba(0,0,0,0.8);
+    }
+    .vu-frame{
+      flex:1;
+      border-radius:18px;
+      padding:8px 10px 10px;
+      background:radial-gradient(circle at 50% 0%,rgba(15,23,42,0.85),#020617);
+      box-shadow:
+        inset 0 0 18px rgba(15,23,42,0.95),
+        0 0 26px rgba(15,23,42,0.9);
+      position:relative;
       overflow:hidden;
     }
 
-    .vu-scale-band{
-      position:absolute;
-      left:10px;
-      right:10px;
-      top:34%;
-      height:34%;
-      pointer-events:none;
+    .vu-window{
+      position:relative;
+      height:110px;
+      border-radius:14px;
+      background:radial-gradient(circle at 50% 0%,rgba(56,189,248,0.7),rgba(8,47,73,0.95) 55%,#020617 100%);
+      box-shadow:
+        inset 0 0 20px rgba(15,23,42,0.95),
+        0 0 22px rgba(8,47,73,0.9);
+      overflow:hidden;
     }
 
-    .vu-scale-arc{
+    .vu-glow{
       position:absolute;
       inset:0;
-      border-bottom-left-radius:120px;
-      border-bottom-right-radius:120px;
-      border:1px solid rgba(15,23,42,0.5);
-      border-top:none;
+      background:radial-gradient(circle at 50% 0%,rgba(191,245,226,0.9),transparent 55%);
+      pointer-events:none;
+      mix-blend-mode:screen;
+      transition:opacity 110ms ease-out;
     }
 
-    .vu-ticks{
+    .vu-scale{
       position:absolute;
       inset:0;
       display:flex;
-      justify-content:space-between;
       align-items:flex-end;
-      padding:0 4px 0;
-      font-size:9px;
-      letter-spacing:0.02em;
-      color:#e2e8f0;
+      justify-content:center;
+      padding:0 16px 18px;
+      pointer-events:none;
     }
 
-    .vu-ticks span{
-      transform:translateY(10px);
-      font-variant-numeric:tabular-nums;
+    .vu-scale-inner{
+      position:relative;
+      width:100%;
+      height:40px;
+    }
+
+    .vu-label{
+      margin-top:6px;
+      font-size:10px;
+      letter-spacing:0.24em;
+      text-transform:uppercase;
+      text-align:center;
+      color:rgba(148,163,184,0.85);
+    }
+
+    .tick{
+      position:absolute;
+      bottom:14px;
+      width:1px;
+      background:rgba(226,232,240,0.85);
+      transform-origin:50% 100%;
+    }
+    .tick--major{
+      height:12px;
+    }
+    .tick--minor{
+      height:8px;
+      opacity:0.7;
+    }
+    .tick-label{
+      position:absolute;
+      bottom:0;
+      font-size:10px;
+      color:rgba(226,232,240,0.9);
+      transform:translateX(-50%);
     }
 
     .vu-red-zone{
       position:absolute;
-      right:9px;
-      bottom:4px;
-      width:26%;
-      height:26%;
-      background:
-        linear-gradient(to right, rgba(239,68,68,0.1), rgba(239,68,68,0.95));
-      clip-path:polygon(0 100%,10% 45%,40% 15%,80% 0,100% 0,100% 100%);
-      opacity:0.9;
+      bottom:13px;
+      height:12px;
+      border-radius:999px;
+      background:linear-gradient(to right,rgba(248,113,113,0.1),rgba(248,113,113,0.95));
+      transform-origin:0 100%;
+      pointer-events:none;
+      filter:drop-shadow(0 0 4px rgba(248,113,113,0.7));
     }
 
-    .vu-zero-label{
-      position:absolute;
-      bottom:10px;
-      right:32%;
-      font-size:9px;
-      color:#fecaca;
-      font-variant-numeric:tabular-nums;
-    }
-
-    /* centered, shorter needle */
     .vu-needle{
       position:absolute;
+      bottom:16px;
       left:50%;
-      bottom:10px;
-      width:60%;
+      width:70px;
       height:2px;
-      transform-origin:0% 50%;  /* pivot at left end, which sits under the pivot dot */
-      background:linear-gradient(to right,#e5e7eb,#facc15);
-      box-shadow:0 0 3px rgba(248,250,252,0.6);
-      border-radius:999px;
-      transition:transform 60ms linear;
-    }
-
-    .vu-pivot{
-      position:absolute;
-      left:50%;
-      bottom:9px;
-      width:8px;
-      height:8px;
-      border-radius:999px;
-      background:#020617;
-      transform:translateX(-50%);
-      box-shadow:
-        0 0 0 1px rgba(148,163,184,0.8),
-        0 0 4px rgba(15,23,42,0.9);
-    }
-
-    .vu-label{
-      font-size:10px;
-      letter-spacing:0.18em;
-      text-transform:uppercase;
-      color:#94a3b8;
-    }
-
-    /* --- transport / timeline --- */
-
-    .timeline-rail{
-      position:relative;
-      width:100%;
-      height:8px;
-      border-radius:999px;
-      margin-top:4px;
-      background:radial-gradient(circle at 50% 180%, rgba(15,23,42,0.9), #020617);
-      box-shadow:
-        inset 0 0 5px rgba(15,23,42,0.95),
-        0 0 10px rgba(15,23,42,0.7);
-      overflow:hidden;
-      cursor:pointer;
-    }
-
-    .timeline-fill{
-      position:absolute;
-      inset:0;
-      width:0%;
-      background:linear-gradient(to right,#f9fafb,#e5e7eb);
-      border-radius:999px;
-      box-shadow:0 0 16px rgba(248,250,252,0.9);
+      transform-origin:0% 50%;
+      transform:rotate(-40deg);
       pointer-events:none;
     }
-
-    .transport-btn{
-      width:34px;
-      height:34px;
+    .vu-needle-line{
+      position:absolute;
+      left:0;
+      top:0;
+      right:0;
+      height:2px;
+      background:linear-gradient(to right,#e5e7eb,#fefce8);
+      box-shadow:0 0 4px rgba(248,250,252,0.9);
+    }
+    .vu-needle-pivot{
+      position:absolute;
+      left:-5px;
+      top:-5px;
+      width:10px;
+      height:10px;
       border-radius:999px;
-      border:1px solid rgba(148,163,184,0.7);
+      border:1px solid rgba(15,23,42,0.95);
+      background:radial-gradient(circle at 30% 30%,#f9fafb,#6b7280);
+      box-shadow:
+        0 0 4px rgba(15,23,42,0.9),
+        inset 0 0 2px rgba(15,23,42,0.9);
+    }
+
+    /* --- Transport buttons --- */
+    .round-btn{
+      width:40px;
+      height:40px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,0.8);
+      background:
+        radial-gradient(circle at 30% 18%,rgba(255,255,255,0.20),transparent 55%),
+        radial-gradient(circle at 70% 82%,#020617,#020617);
       display:flex;
       align-items:center;
       justify-content:center;
-      background:
-        radial-gradient(circle at 30% 18%, rgba(255,255,255,0.25), transparent 55%),
-        radial-gradient(circle at 70% 82%, #020617, #020617);
-      box-shadow:
-        0 7px 14px rgba(0,0,0,0.8),
-        inset 0 2px 4px rgba(255,255,255,0.32);
       cursor:pointer;
+      box-shadow:
+        0 8px 18px rgba(0,0,0,0.9),
+        inset 0 2px 4px rgba(255,255,255,0.25);
+      transition:
+        transform 120ms ease,
+        box-shadow 140ms ease,
+        border-color 140ms ease,
+        filter 140ms ease;
       color:#e5e7eb;
-      font-size:12px;
-      transition:transform 120ms ease, box-shadow 140ms ease, filter 140ms ease;
-      filter:drop-shadow(0 0 3px rgba(34,211,238,0.15));
+      filter:drop-shadow(0 0 3px rgba(30,64,175,0.5));
     }
-
-    .transport-btn:hover{
+    .round-btn--primary{
+      width:46px;
+      height:46px;
+    }
+    .round-btn:hover,
+    .round-btn:focus-visible{
+      outline:none;
       transform:translateY(-1px);
-      filter:drop-shadow(0 0 12px rgba(34,211,238,0.55));
+      filter:drop-shadow(0 0 10px var(--accent-strong));
+      border-color:rgba(191,245,226,0.9);
     }
-
-    .transport-btn:active{
+    .round-btn:active{
       transform:translateY(1px) scale(0.97);
       box-shadow:
-        0 3px 8px rgba(0,0,0,0.9),
-        inset 0 1px 3px rgba(0,0,0,0.7);
+        0 3px 10px rgba(0,0,0,0.95),
+        inset 0 1px 3px rgba(0,0,0,0.8);
     }
 
-    .transport-btn--play{
-      width:40px;
-      height:40px;
-    }
-
-    .transport-active-ring{
+    .round-btn--active{
       box-shadow:
-        0 0 0 1px rgba(34,211,238,0.6),
-        0 0 14px rgba(34,211,238,0.75),
-        0 0 34px rgba(34,211,238,0.7);
+        0 0 0 1px rgba(148,163,184,0.9),
+        0 0 0 3px rgba(15,23,42,1),
+        0 0 22px var(--accent-strong),
+        inset 0 2px 4px rgba(255,255,255,0.32);
+      filter:drop-shadow(0 0 14px var(--accent-strong));
+      border-color:rgba(191,245,226,0.95);
     }
 
-    .time-label{
-      font-size:10px;
-      color:#94a3b8;
+    .icon{
+      font-size:13px;
+      filter:drop-shadow(0 1px 1px rgba(0,0,0,0.9));
     }
 
+    .scrub-rail{
+      position:relative;
+      width:100%;
+      height:10px;
+      border-radius:999px;
+      background:radial-gradient(circle at 50% 150%,rgba(15,23,42,0.9),#020617);
+      box-shadow:
+        inset 0 0 6px rgba(15,23,42,0.9),
+        0 0 16px rgba(15,23,42,0.7);
+      cursor:pointer;
+      overflow:hidden;
+    }
+    .scrub-fill{
+      height:100%;
+      border-radius:999px;
+      background:linear-gradient(to right,#e5e7eb,#f9fafb,#e5e7eb);
+      box-shadow:0 0 18px rgba(248,250,252,0.9);
+      pointer-events:none;
+    }
+
+    /* volume */
     .vol-slider{
-      width:110px;
+      width:160px;
       appearance:none;
       height:6px;
       border-radius:999px;
-      background:linear-gradient(to right,rgba(148,163,184,0.85),rgba(71,85,105,0.9));
+      background:linear-gradient(to right,rgba(148,163,184,0.9),rgba(71,85,105,0.95));
       outline:none;
       cursor:pointer;
     }
-
     .vol-slider::-webkit-slider-thumb{
       appearance:none;
-      width:14px;
-      height:14px;
+      width:16px;
+      height:16px;
       border-radius:999px;
       background:#e5e7eb;
-      border:1px solid rgba(148,163,184,0.85);
+      border:1px solid rgba(148,163,184,0.9);
       box-shadow:
-        0 0 8px rgba(148,163,184,0.8),
+        0 0 8px rgba(191,245,226,0.8),
         0 2px 4px rgba(0,0,0,0.8);
-      margin-top:-4px;
+      margin-top:-5px;
     }
-
     .vol-slider::-moz-range-thumb{
-      width:14px;
-      height:14px;
+      width:16px;
+      height:16px;
       border-radius:999px;
       background:#e5e7eb;
-      border:1px solid rgba(148,163,184,0.85);
+      border:1px solid rgba(148,163,184,0.9);
       box-shadow:
-        0 0 8px rgba(148,163,184,0.8),
+        0 0 8px rgba(191,245,226,0.8),
         0 2px 4px rgba(0,0,0,0.8);
     }
 
     .theme-dot{
-      width:10px;
-      height:10px;
+      width:12px;
+      height:12px;
       border-radius:999px;
       border:1px solid rgba(15,23,42,0.9);
-      box-shadow:0 0 3px rgba(15,23,42,0.9);
+      box-shadow:
+        0 0 0 1px rgba(15,23,42,1),
+        0 0 8px rgba(0,0,0,0.9);
       cursor:pointer;
+      transition:transform 120ms ease, box-shadow 140ms ease;
+    }
+    .theme-dot--active{
+      transform:scale(1.2);
+      box-shadow:
+        0 0 0 1px rgba(226,232,240,0.9),
+        0 0 14px rgba(191,245,226,0.85);
     }
 
-    .theme-dot--active{
-      box-shadow:
-        0 0 0 1px rgba(248,250,252,0.8),
-        0 0 8px rgba(248,250,252,0.9);
+    /* mini playlist */
+    .mini-playlist{
+      margin-top:10px;
+      border-radius:16px;
+      padding:6px 4px 2px;
+      max-height:90px;
+      overflow-y:auto;
+      scrollbar-width:thin;
+      scrollbar-color:rgba(148,163,184,0.7) transparent;
+    }
+    .mini-playlist::-webkit-scrollbar{
+      width:6px;
+    }
+    .mini-playlist::-webkit-scrollbar-track{
+      background:transparent;
+    }
+    .mini-playlist::-webkit-scrollbar-thumb{
+      background:rgba(148,163,184,0.7);
+      border-radius:999px;
+    }
+
+    .mini-track{
+      width:100%;
+      padding:4px 10px;
+      font-size:12px;
+      text-align:center;
+      color:rgba(226,232,240,0.90);
+      background:transparent;
+      border:none;
+      cursor:pointer;
+      transition:color 140ms ease, background 140ms ease;
+      border-radius:999px;
+    }
+    .mini-track:hover{
+      background:rgba(15,23,42,0.85);
+    }
+    .mini-track--active{
+      background:rgba(34,211,238,0.16);
+      color:#e0f2fe;
+      box-shadow:0 0 0 1px rgba(34,211,238,0.6);
     }
   </style>
 </head>
@@ -328,24 +385,29 @@
       { id: '17', name: 'American Sword',          file: 'American_Sword.mp3' },
       { id: '18', name: 'Go Driving Fast',         file: 'Go_Driving_Fast.mp3' },
     ];
-
     const AUDIO_BASE = "assets/";
 
     const THEMES = {
-      night: {
-        face: "radial-gradient(circle at 50% 15%, #38bdf8, #021524 70%)",
-        glowBase: "rgba(56,189,248,",
-        shellBorder: "rgba(148,163,184,0.75)"
+      nite: {
+        id:"nite",
+        accent:"#22d3ee",
+        accentSoft:"rgba(34,211,238,0.20)",
+        accentStrong:"rgba(34,211,238,0.85)",
+        dot:"#38bdf8"
       },
-      dawn: {
-        face: "radial-gradient(circle at 50% 15%, #fb923c, #3b1a02 70%)",
-        glowBase: "rgba(251,146,60,",
-        shellBorder: "rgba(251,146,60,0.75)"
+      day: {
+        id:"day",
+        accent:"#fb923c",
+        accentSoft:"rgba(251,146,60,0.18)",
+        accentStrong:"rgba(251,146,60,0.85)",
+        dot:"#fb923c"
       },
       fantasy: {
-        face: "radial-gradient(circle at 50% 15%, #e879f9, #3b0764 70%)",
-        glowBase: "rgba(232,121,249,",
-        shellBorder: "rgba(232,121,249,0.8)"
+        id:"fantasy",
+        accent:"#e879f9",
+        accentSoft:"rgba(232,121,249,0.20)",
+        accentStrong:"rgba(232,121,249,0.85)",
+        dot:"#e879f9"
       }
     };
 
@@ -356,19 +418,17 @@
       return m + ":" + (s < 10 ? "0"+s : s);
     }
 
-    // Web Audio engine returning stereo-ish levels
-    function useAudioEngine(audioEl, isPlaying, volume, isMuted){
+    // WebAudio engine giving us gain + level
+    function useAudioEngine(audioElement, volume, isMuted, isPlaying){
       const ctxRef = useRef(null);
       const sourceRef = useRef(null);
       const gainRef = useRef(null);
       const analyserRef = useRef(null);
-
-      const [hasAnalyser, setHasAnalyser] = useState(false);
-      const [leftLevel, setLeftLevel] = useState(0);
-      const [rightLevel, setRightLevel] = useState(0);
+      const [hasEngine,setHasEngine] = useState(false);
+      const [level,setLevel] = useState(0);
 
       useEffect(() => {
-        if (!audioEl) return;
+        if (!audioElement) return;
         if (ctxRef.current) return;
 
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -376,125 +436,166 @@
 
         try{
           const ctx = new AudioCtx();
-          const source = ctx.createMediaElementSource(audioEl);
+          const source = ctx.createMediaElementSource(audioElement);
           const gain = ctx.createGain();
           const analyser = ctx.createAnalyser();
-
           analyser.fftSize = 512;
+
+          gain.gain.value = isMuted ? 0 : volume;
 
           source.connect(gain);
           gain.connect(analyser);
           analyser.connect(ctx.destination);
 
-          gain.gain.value = isMuted ? 0 : volume;
-
           ctxRef.current = ctx;
           sourceRef.current = source;
           gainRef.current = gain;
           analyserRef.current = analyser;
-          setHasAnalyser(true);
-        } catch(err){
-          console.warn("Mini-player Web Audio failed:", err);
+          setHasEngine(true);
+        }catch(e){
+          console.warn("WebAudio failed",e);
         }
 
         return () => {
           if (sourceRef.current) sourceRef.current.disconnect();
           if (analyserRef.current) analyserRef.current.disconnect();
           if (gainRef.current) gainRef.current.disconnect();
-          if (ctxRef.current && ctxRef.current.state !== "closed") {
+          if (ctxRef.current && ctxRef.current.state !== "closed"){
             ctxRef.current.close();
           }
         };
-      }, [audioEl]);
+      },[audioElement]);
 
-      // react to vol/mute/play
       useEffect(() => {
         const ctx = ctxRef.current;
         const gain = gainRef.current;
         if (!ctx || !gain) return;
 
         gain.gain.value = isMuted ? 0 : volume;
+
         if (isPlaying && ctx.state === "suspended"){
-          ctx.resume().catch(()=>{});
+          ctx.resume().catch(() => {});
         }
-      }, [volume, isMuted, isPlaying]);
+      },[volume,isMuted,isPlaying]);
 
       useEffect(() => {
-        if (!hasAnalyser) return;
         const analyser = analyserRef.current;
         if (!analyser) return;
 
-        const buffer = new Uint8Array(analyser.frequencyBinCount);
+        const bufferLength = analyser.frequencyBinCount;
+        const data = new Uint8Array(bufferLength);
         let rafId;
-        let lastL = 0, lastR = 0;
 
         const tick = () => {
-          analyser.getByteTimeDomainData(buffer);
+          analyser.getByteTimeDomainData(data);
           let sum = 0;
-          for(let i=0;i<buffer.length;i++){
-            const v = (buffer[i] - 128) / 128;
+          for (let i=0;i<bufferLength;i++){
+            const v = (data[i]-128)/128;
             sum += v*v;
           }
-          const rms = Math.sqrt(sum / buffer.length); // ~0..1
-          // slightly gentler scaling so we don't live in the red
-          const base = Math.max(0, Math.min(1, rms * 3.5));
-
-          // fake gentle stereo variation while staying realistic
-          lastL = lastL * 0.75 + base * 0.25;
-          lastR = lastR * 0.78 + base * 0.22 + (Math.random()-0.5)*0.02;
-
-          setLeftLevel(Math.max(0, Math.min(1, lastL)));
-          setRightLevel(Math.max(0, Math.min(1, Math.abs(lastR))));
+          const rms = Math.sqrt(sum/bufferLength); // 0..~1
+          // Slightly conservative so we don't live in the red
+          const scaled = Math.max(0,Math.min(1,rms*4));
+          setLevel(scaled);
           rafId = requestAnimationFrame(tick);
         };
-
         tick();
         return () => { if (rafId) cancelAnimationFrame(rafId); };
-      }, [hasAnalyser]);
+      },[hasEngine]);
 
-      return { hasAnalyser, leftLevel, rightLevel };
+      return { hasEngine, level };
     }
 
-    function VUMeter({ label, level, theme }){
-      // angle: about -50° (rest) up to +10° (hot)
-      const angle = -50 + level * 60;
-      const faceTheme = THEMES[theme] || THEMES.night;
-      const glow = 10 + level * 30;
-      const glowAlpha = 0.45 + level * 0.4;
+    function VUMeter({ label, level }){
+      // Map level 0..1 to angle -40deg .. +18deg
+      const clamped = Math.max(0,Math.min(1,level));
+      // Slightly compress upper range so we rarely go deep red
+      const eased = Math.pow(clamped,0.75);
+      const minDeg = -40;
+      const maxDeg = 18;
+      const angle = minDeg + (maxDeg-minDeg)*eased;
+
+      // red zone placement (from 0dB to +3dB on arc)
+      const redStartDeg = 0;
+      const redEndDeg = maxDeg;
+      const redSpan = redEndDeg - redStartDeg;
+      const redWidthPct = 26; // visual width; rest is via rotation
 
       return (
-        <div className="vu-meter">
-          <div
-            className="vu-face"
-            style={{
-              background: faceTheme.face,
-              boxShadow: `
-                0 0 ${glow}px ${faceTheme.glowBase}${glowAlpha}),
-                inset 0 0 14px rgba(15,23,42,0.95)
-              `,
-              filter:`brightness(${0.9 + level * 0.7})`
-            }}
-          >
-            <div className="vu-scale-band">
-              <div className="vu-scale-arc" />
-              <div className="vu-ticks">
-                <span>-20</span>
-                <span>-10</span>
-                <span>-7</span>
-                <span>-5</span>
-                <span>-3</span>
-                {/* 0 dB right where red starts */}
-                <span style={{ color:"#fecaca" }}>0</span>
-                <span>+3</span>
-              </div>
-              <div className="vu-red-zone"></div>
-              <div className="vu-zero-label">0</div>
-            </div>
+        <div className="vu-frame">
+          <div className="vu-window">
             <div
-              className="vu-needle"
-              style={{ transform:`rotate(${angle}deg)` }}
+              className="vu-glow"
+              style={{ opacity: 0.25 + clamped*0.55 }}
             />
-            <div className="vu-pivot" />
+
+            <div className="vu-scale">
+              <div className="vu-scale-inner">
+                {/* ticks */}
+                {[-20,-10,-7,-5,-3,0,3].map((val, idx) => {
+                  const pos = (val + 20) / 23; // squeeze into arc
+                  const angleDeg = -38 + pos*58;
+                  const isMajor = [0,-10,-7,-5,-3].includes(val);
+                  const left = 50 + (Math.cos((angleDeg-90)*Math.PI/180))*48;
+                  const bottom = 14 + (Math.sin((angleDeg-90)*Math.PI/180))*0; // keep aligned
+
+                  return (
+                    <React.Fragment key={val}>
+                      <div
+                        className={"tick " + (isMajor ? "tick--major" : "tick--minor")}
+                        style={{
+                          left: left + "%",
+                          transform:`translateX(-50%) rotate(${angleDeg}deg)`
+                        }}
+                      />
+                      {isMajor && (
+                        <div
+                          className="tick-label"
+                          style={{
+                            left: left + "%",
+                          }}
+                        >
+                          {val === -3 ? "−3" : val}
+                        </div>
+                      )}
+                      {val === 0 && (
+                        <div
+                          className="tick-label"
+                          style={{
+                            left: left + "%",
+                            bottom: 22
+                          }}
+                        >
+                          0
+                        </div>
+                      )}
+                    </React.Fragment>
+                  );
+                })}
+
+                {/* red zone */}
+                <div
+                  className="vu-red-zone"
+                  style={{
+                    left:"64%",
+                    width:redWidthPct+"%",
+                    transform:`skewX(${8}deg)`
+                  }}
+                />
+
+                {/* needle */}
+                <div
+                  className="vu-needle"
+                  style={{
+                    width:"64px",
+                    transform:`translateX(-50%) rotate(${angle}deg)`
+                  }}
+                >
+                  <div className="vu-needle-line" />
+                  <div className="vu-needle-pivot" />
+                </div>
+              </div>
+            </div>
           </div>
           <div className="vu-label">{label}</div>
         </div>
@@ -502,26 +603,35 @@
     }
 
     function MiniPlayerApp(){
-      // 1) Start on track 1 (index 0)
-      const [currentIndex, setCurrentIndex] = useState(0);
-      const [isPlaying, setIsPlaying] = useState(false);
-      const [currentTime, setCurrentTime] = useState(0);
-      const [duration, setDuration] = useState(0);
-      const [volume, setVolume] = useState(0.9);
-      const [isMuted, setIsMuted] = useState(false);
-      const [theme, setTheme] = useState("night");
+      const [currentIndex,setCurrentIndex] = useState(0); // start on track 1
+      const [isPlaying,setIsPlaying] = useState(false);
+      const [currentTime,setCurrentTime] = useState(0);
+      const [duration,setDuration] = useState(0);
+      const [volume,setVolume] = useState(0.9);
+      const [isMuted,setIsMuted] = useState(false);
+      const [themeId,setThemeId] = useState("nite");
 
       const audioRef = useRef(null);
       const activeTrack = TRACKS[currentIndex];
 
-      const { hasAnalyser, leftLevel, rightLevel } = useAudioEngine(
+      const { hasEngine, level } = useAudioEngine(
         audioRef.current,
-        isPlaying,
         volume,
-        isMuted
+        isMuted,
+        isPlaying
       );
 
-      // setup listeners
+      // plain element volume for browsers w/o WebAudio
+      useEffect(() => {
+        const audio = audioRef.current;
+        if (!audio) return;
+        if (!hasEngine){
+          audio.volume = isMuted ? 0 : volume;
+        }
+        audio.muted = isMuted;
+      },[volume,isMuted,hasEngine]);
+
+      // time + metadata + auto-advance
       useEffect(() => {
         const audio = audioRef.current;
         if (!audio) return;
@@ -533,27 +643,26 @@
           setDuration(audio.duration || 0);
         };
         const onEnded = () => {
-          setCurrentTime(0);
           setCurrentIndex(prev => (prev + 1) % TRACKS.length);
+          setCurrentTime(0);
           setIsPlaying(true);
         };
 
-        audio.addEventListener("timeupdate", onTime);
-        audio.addEventListener("loadedmetadata", onMeta);
-        audio.addEventListener("ended", onEnded);
+        audio.addEventListener("timeupdate",onTime);
+        audio.addEventListener("loadedmetadata",onMeta);
+        audio.addEventListener("ended",onEnded);
 
         return () => {
-          audio.removeEventListener("timeupdate", onTime);
-          audio.removeEventListener("loadedmetadata", onMeta);
-          audio.removeEventListener("ended", onEnded);
+          audio.removeEventListener("timeupdate",onTime);
+          audio.removeEventListener("loadedmetadata",onMeta);
+          audio.removeEventListener("ended",onEnded);
         };
-      }, []);
+      },[]);
 
       // load track on index change
       useEffect(() => {
         const audio = audioRef.current;
         if (!audio || !activeTrack) return;
-
         audio.src = AUDIO_BASE + activeTrack.file;
         audio.load();
         audio.currentTime = 0;
@@ -562,51 +671,45 @@
         if (isPlaying){
           audio.play().catch(() => setIsPlaying(false));
         }
-      }, [currentIndex, activeTrack, isPlaying]);
+      },[currentIndex,activeTrack]);
 
-      // fallback plain element volume if no Web Audio
-      useEffect(() => {
+      const handlePlay = () => {
         const audio = audioRef.current;
         if (!audio) return;
-        if (!hasAnalyser){
-          audio.volume = isMuted ? 0 : volume;
-        }
-        audio.muted = isMuted;
-      }, [volume, isMuted, hasAnalyser]);
+        audio.play()
+          .then(() => setIsPlaying(true))
+          .catch(() => {});
+      };
 
-      const handlePlayPause = () => {
+      const handlePause = () => {
         const audio = audioRef.current;
         if (!audio) return;
-
         if (isPlaying){
           audio.pause();
           setIsPlaying(false);
-        } else {
+        }else{
           audio.play()
             .then(() => setIsPlaying(true))
-            .catch(()=>{});
+            .catch(() => {});
         }
       };
 
       const handleSkipBack = () => {
         setCurrentIndex(prev => (prev - 1 + TRACKS.length) % TRACKS.length);
-        setIsPlaying(true);
       };
-
       const handleSkipForward = () => {
         setCurrentIndex(prev => (prev + 1) % TRACKS.length);
-        setIsPlaying(true);
       };
 
-      const handleSeekClick = (e) => {
+      const handleSeek = (e) => {
         const audio = audioRef.current;
         if (!audio || !duration) return;
         const rect = e.currentTarget.getBoundingClientRect();
         const ratio = (e.clientX - rect.left) / rect.width;
-        const clamped = Math.max(0, Math.min(1, ratio));
-        const newTime = clamped * duration;
-        audio.currentTime = newTime;
-        setCurrentTime(newTime);
+        const clamped = Math.max(0,Math.min(1,ratio));
+        const t = clamped*duration;
+        audio.currentTime = t;
+        setCurrentTime(t);
       };
 
       const handleVolumeChange = (e) => {
@@ -615,81 +718,103 @@
           setVolume(v);
         }
       };
+      const handleToggleMute = () => {
+        setIsMuted(m => !m);
+      };
 
-      const volPercent = Math.round(isMuted ? 0 : volume * 100);
-      const progress = duration ? Math.min(100, (currentTime / duration) * 100) : 0;
-      const themeCfg = THEMES[theme] || THEMES.night;
+      const handleSelectTrack = (idx) => {
+        setCurrentIndex(idx);
+        setIsPlaying(true);
+      };
+
+      const theme = THEMES[themeId];
+      const progressPercent = duration ? (currentTime/duration)*100 : 0;
+      const volPercent = Math.round(volume*100);
 
       return (
-        <div className="window-frame">
-          <div
-            className="mini-shell"
-            style={{ borderColor: themeCfg.shellBorder }}
-          >
-            {/* meters */}
-            <div className="vu-row">
-              <VUMeter label="LEFT" level={leftLevel} theme={theme} />
-              <VUMeter label="RIGHT" level={rightLevel} theme={theme} />
-            </div>
+        <div
+          className="mini-shell"
+          style={{
+            "--accent":theme.accent,
+            "--accent-soft":theme.accentSoft,
+            "--accent-strong":theme.accentStrong
+          }}
+        >
+          {/* VU meters */}
+          <div className="vu-cluster">
+            <VUMeter label="LEFT" level={level} />
+            <VUMeter label="RIGHT" level={Math.min(1, level*0.92 + 0.03)} />
+          </div>
 
-            {/* track name */}
-            <div className="text-center text-sm font-medium mb-1 mt-1">
+          {/* Track title */}
+          <div className="mt-4 text-center">
+            <div className="text-sm tracking-[0.18em] text-slate-500 uppercase mb-1">
+              Now Playing
+            </div>
+            <div className="text-lg font-semibold text-slate-50">
               {activeTrack?.name || "—"}
             </div>
+          </div>
 
-            {/* timeline */}
-            <div className="flex items-center justify-between mt-1 mb-1">
-              <span className="time-label">{formatTime(currentTime)}</span>
-              <span className="time-label">{formatTime(duration)}</span>
+          {/* Time + progress */}
+          <div className="mt-4">
+            <div className="flex justify-between text-[11px] text-slate-400 mb-1 px-1">
+              <span>{formatTime(currentTime)}</span>
+              <span>{formatTime(duration)}</span>
             </div>
-            <div className="timeline-rail" onClick={handleSeekClick}>
+            <div className="scrub-rail" onClick={handleSeek}>
               <div
-                className="timeline-fill"
-                style={{ width: progress + "%" }}
+                className="scrub-fill"
+                style={{ width: progressPercent + "%" }}
               />
             </div>
+          </div>
 
-            {/* transport + volume */}
-            <div className="mt-3 flex items-center justify-between gap-3">
+          {/* Controls + volume + themes */}
+          <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            {/* transport */}
+            <div className="flex items-center justify-center gap-3">
+              <button
+                type="button"
+                className="round-btn"
+                aria-label="Previous track"
+                onClick={handleSkipBack}
+              >
+                <span className="icon">⏮</span>
+              </button>
+              <button
+                type="button"
+                className={"round-btn round-btn--primary " + (isPlaying ? "round-btn--active" : "")}
+                aria-label={isPlaying ? "Pause" : "Play"}
+                onClick={isPlaying ? handlePause : handlePlay}
+              >
+                <span className="icon">
+                  {isPlaying ? "⏸" : "▶"}
+                </span>
+              </button>
+              <button
+                type="button"
+                className="round-btn"
+                aria-label="Next track"
+                onClick={handleSkipForward}
+              >
+                <span className="icon">⏭</span>
+              </button>
+            </div>
+
+            {/* volume + mute + themes */}
+            <div className="flex flex-col items-center gap-2 sm:items-end">
               <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  aria-label="Previous track"
-                  className="transport-btn"
-                  onClick={handleSkipBack}
-                >⏮</button>
-
-                <button
-                  type="button"
-                  aria-label={isPlaying ? "Pause" : "Play"}
-                  className={
-                    "transport-btn transport-btn--play" +
-                    (isPlaying ? " transport-active-ring" : "")
-                  }
-                  onClick={handlePlayPause}
-                >
-                  {isPlaying ? "❚❚" : "▶"}
-                </button>
-
-                <button
-                  type="button"
-                  aria-label="Next track"
-                  className="transport-btn"
-                  onClick={handleSkipForward}
-                >⏭</button>
-              </div>
-
-              <div className="flex items-center gap-2">
-                {/* mute button */}
-                <button
-                  type="button"
+                  className="round-btn"
                   aria-label={isMuted ? "Unmute" : "Mute"}
-                  className="transport-btn"
-                  onClick={() => setIsMuted(m => !m)}
+                  onClick={handleToggleMute}
                 >
-                  {isMuted ? "🔇" : "🔊"}
+                  <span className="icon">
+                    {isMuted ? "🔇" : "🔊"}
+                  </span>
                 </button>
-
                 <input
                   type="range"
                   min="0"
@@ -699,53 +824,54 @@
                   onChange={handleVolumeChange}
                   className="vol-slider"
                 />
-                <span className="time-label" style={{ width: "32px", textAlign: "right" }}>
-                  {volPercent}%
-                </span>
+                <div className="text-[11px] text-slate-400 w-10 text-right">
+                  {isMuted ? "0%" : volPercent + "%"}
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 mt-1">
+                {Object.entries(THEMES).map(([id,t]) => (
+                  <button
+                    key={id}
+                    type="button"
+                    className={
+                      "theme-dot " + (themeId === id ? "theme-dot--active" : "")
+                    }
+                    style={{ background:t.dot }}
+                    aria-label={id + " theme"}
+                    onClick={() => setThemeId(id)}
+                  />
+                ))}
               </div>
             </div>
-
-            {/* tiny theme dots */}
-            <div className="mt-3 flex items-center justify-center gap-3">
-              <div
-                className={
-                  "theme-dot bg-sky-400" +
-                  (theme === "night" ? " theme-dot--active" : "")
-                }
-                onClick={() => setTheme("night")}
-                title="Night theme"
-              ></div>
-              <div
-                className={
-                  "theme-dot bg-orange-400" +
-                  (theme === "dawn" ? " theme-dot--active" : "")
-                }
-                onClick={() => setTheme("dawn")}
-                title="Day Break"
-              ></div>
-              <div
-                className={
-                  "theme-dot bg-fuchsia-400" +
-                  (theme === "fantasy" ? " theme-dot--active" : "")
-                }
-                onClick={() => setTheme("fantasy")}
-                title="Fantasy"
-              ></div>
-            </div>
-
-            <audio ref={audioRef} className="hidden">
-              Your browser does not support the audio element.
-            </audio>
           </div>
+
+          {/* Compact scrollable playlist */}
+          <div className="mini-playlist">
+            {TRACKS.map((trk, idx) => (
+              <button
+                key={trk.id}
+                type="button"
+                onClick={() => handleSelectTrack(idx)}
+                className={
+                  "mini-track " +
+                  (idx === currentIndex ? "mini-track--active" : "")
+                }
+              >
+                {trk.name}
+              </button>
+            ))}
+          </div>
+
+          <audio ref={audioRef} className="hidden">
+            Your browser does not support the audio element.
+          </audio>
         </div>
       );
     }
 
-    const rootEl = document.getElementById("root");
-    if (rootEl){
-      const root = ReactDOM.createRoot(rootEl);
-      root.render(<MiniPlayerApp />);
-    }
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+    root.render(<MiniPlayerApp />);
   </script>
 </body>
 </html>
