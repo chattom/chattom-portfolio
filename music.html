@@ -199,103 +199,103 @@
     }
 
     /* socket assembly under each tube */
-.tube-socket{
-  margin-top:0.45rem;              /* small gap under the bulb */
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-}
+    .tube-socket{
+      margin-top:0.45rem;              /* small gap under the bulb */
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+    }
 
-/* top ring (horizontal pill) – Illustrator gradient */
-.tube-socket-top{
-  position:relative;
-  width:54px;
-  height:16px;
-  border-radius:999px;
-  background:linear-gradient(to right,#3b3f48,#151b24);
-  box-shadow:
-    0 3px 8px rgba(0,0,0,0.9),
-    inset 0 1px 2px rgba(255,255,255,0.22),
-    inset 0 -1px 3px rgba(15,23,42,0.9);
-  overflow:hidden; /* clips highlight nicely */
-}
+    /* top ring (horizontal pill) – Illustrator gradient */
+    .tube-socket-top{
+      position:relative;
+      width:54px;
+      height:16px;
+      border-radius:999px;
+      background:linear-gradient(to right,#3b3f48,#151b24);
+      box-shadow:
+        0 3px 8px rgba(0,0,0,0.9),
+        inset 0 1px 2px rgba(255,255,255,0.22),
+        inset 0 -1px 3px rgba(15,23,42,0.9);
+      overflow:hidden;
+    }
 
-/* vertical post under the ring */
-.tube-socket-post{
-  position:relative;
-  margin-top:3px;
-  width:24px;
-  height:26px;
-  border-radius:6px;
-  background:linear-gradient(to bottom,#373c46,#151b24);
-  box-shadow:
-    0 4px 10px rgba(0,0,0,0.85),
-    inset 0 1px 2px rgba(255,255,255,0.12),
-    inset 0 -2px 3px rgba(15,23,42,0.95);
-  overflow:hidden;
-}
+    /* vertical post under the ring */
+    .tube-socket-post{
+      position:relative;
+      margin-top:3px;
+      width:24px;
+      height:26px;
+      border-radius:6px;
+      background:linear-gradient(to bottom,#373c46,#151b24);
+      box-shadow:
+        0 4px 10px rgba(0,0,0,0.85),
+        inset 0 1px 2px rgba(255,255,255,0.12),
+        inset 0 -2px 3px rgba(15,23,42,0.95);
+      overflow:hidden;
+    }
 
-/* shared highlight sweep – runs across ring + post in unison */
-.tube-socket-top::before,
-.tube-socket-post::before{
-  content:"";
-  position:absolute;
-  top:-40%;
-  left:-60%;
-  width:70%;
-  height:200%;
-  border-radius:50%;
-  background:radial-gradient(
-    circle at 0 50%,
-    rgba(148,163,184,0.9),
-    transparent 55%
-  );
-  opacity:0;
-  animation:tubeBaseSweep 5.5s linear infinite;
-}
+    /* shared highlight sweep – runs across ring + post in unison */
+    .tube-socket-top::before,
+    .tube-socket-post::before{
+      content:"";
+      position:absolute;
+      top:-40%;
+      left:-60%;
+      width:70%;
+      height:200%;
+      border-radius:50%;
+      background:radial-gradient(
+        circle at 0 50%,
+        rgba(148,163,184,0.9),
+        transparent 55%
+      );
+      opacity:0;
+      animation:tubeBaseSweep 5.5s linear infinite;
+    }
 
-/* slow left-to-right orbit, Netscape-style */
-@keyframes tubeBaseSweep{
-  0%{
-    transform:translateX(0%);
-    opacity:0;
-  }
-  10%{
-    opacity:0.8;
-  }
-  45%{
-    opacity:0.6;
-  }
-  70%{
-    opacity:0;
-  }
-  100%{
-    transform:translateX(260%);
-    opacity:0;
-  }
-}
+    /* slow left-to-right orbit, Netscape-style */
+    @keyframes tubeBaseSweep{
+      0%{
+        transform:translateX(0%);
+        opacity:0;
+      }
+      10%{
+        opacity:0.8;
+      }
+      45%{
+        opacity:0.6;
+      }
+      70%{
+        opacity:0;
+      }
+      100%{
+        transform:translateX(260%);
+        opacity:0;
+      }
+    }
 
-/* slight stagger so each base starts at a different phase */
-.tube-window > div:nth-child(1) .tube-socket-top::before,
-.tube-window > div:nth-child(1) .tube-socket-post::before{
-  animation-delay:0s;
-}
-.tube-window > div:nth-child(2) .tube-socket-top::before,
-.tube-window > div:nth-child(2) .tube-socket-post::before{
-  animation-delay:0.4s;
-}
-.tube-window > div:nth-child(3) .tube-socket-top::before,
-.tube-window > div:nth-child(3) .tube-socket-post::before{
-  animation-delay:0.8s;
-}
-.tube-window > div:nth-child(4) .tube-socket-top::before,
-.tube-window > div:nth-child(4) .tube-socket-post::before{
-  animation-delay:1.2s;
-}
-.tube-window > div:nth-child(5) .tube-socket-top::before,
-.tube-window > div:nth-child(5) .tube-socket-post::before{
-  animation-delay:1.6s;
-}
+    /* slight stagger so each base starts at a different phase */
+    .tube-window > div:nth-child(1) .tube-socket-top::before,
+    .tube-window > div:nth-child(1) .tube-socket-post::before{
+      animation-delay:0s;
+    }
+    .tube-window > div:nth-child(2) .tube-socket-top::before,
+    .tube-window > div:nth-child(2) .tube-socket-post::before{
+      animation-delay:0.4s;
+    }
+    .tube-window > div:nth-child(3) .tube-socket-top::before,
+    .tube-window > div:nth-child(3) .tube-socket-post::before{
+      animation-delay:0.8s;
+    }
+    .tube-window > div:nth-child(4) .tube-socket-top::before,
+    .tube-window > div:nth-child(4) .tube-socket-post::before{
+      animation-delay:1.2s;
+    }
+    .tube-window > div:nth-child(5) .tube-socket-top::before,
+    .tube-window > div:nth-child(5) .tube-socket-post::before{
+      animation-delay:1.6s;
+    }
 
     /* --- Progress strip --- */
     .progress-rail{
@@ -536,8 +536,7 @@
     }
 
     // Web Audio gain + analyser engine.
-    // - Keeps your iOS-friendly gain control.
-    // - Adds a live audioLevel (0–1) for the tubes.
+    // Keeps your iOS-friendly gain control and provides audioLevel for the tubes.
     function useGainEngine(audioElement, volume, isMuted, isPlaying) {
       const ctxRef = React.useRef(null);
       const sourceRef = React.useRef(null);
@@ -549,7 +548,7 @@
       // Wire the graph once
       React.useEffect(() => {
         if (!audioElement) return;
-        if (ctxRef.current) return; // already wired
+        if (ctxRef.current) return;
 
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
         if (!AudioCtx) return;
@@ -561,7 +560,6 @@
           const analyser = ctx.createAnalyser();
 
           analyser.fftSize = 256;
-
           gain.gain.value = isMuted ? 0 : volume;
 
           // source -> gain -> analyser -> destination
@@ -618,12 +616,11 @@
           analyser.getByteTimeDomainData(dataArray);
           let sum = 0;
           for (let i = 0; i < bufferLength; i++) {
-            const v = (dataArray[i] - 128) / 128; // -1..1
+            const v = (dataArray[i] - 128) / 128;
             sum += v * v;
           }
-          const rms = Math.sqrt(sum / bufferLength); // ~0..1
-          // Scale and clamp to a friendly 0–1 range for visuals
-          const scaled = Math.max(0, Math.min(1, rms * 5));
+          const rms = Math.sqrt(sum / bufferLength);
+          const scaled = Math.max(0, Math.min(1, rms * 5)); // nicer visual range
           setAudioLevel(scaled);
           rafId = requestAnimationFrame(tick);
         };
@@ -664,76 +661,65 @@
     }
 
     function TubeDeck({ trackName, currentTime, duration, theme, level, onSeekClick }){
-  const t = THEMES[theme];
+      const t = THEMES[theme];
 
-  const time = currentTime || 0;
-  const tubes = [0, 1, 2, 3, 4].map((_, i) => {
-    const phase = i * 0.35;
-    const wobble = Math.sin(time * 4 + phase) * 0.18;
-    const raw = level + wobble;
-    const boosted = 0.12 + (raw - 0.12) * 1.8;
-    return Math.max(0.05, Math.min(1.0, boosted));
-  });
+      const time = currentTime || 0;
+      const tubes = [0, 1, 2, 3, 4].map((_, i) => {
+        const phase = i * 0.35;
+        const wobble = Math.sin(time * 4 + phase) * 0.18;
+        const raw = level + wobble;
+        const boosted = 0.12 + (raw - 0.12) * 1.8;
+        return Math.max(0.05, Math.min(1.0, boosted));
+      });
 
-  const glow = t.accentHex + "dd";
-  const progressPercent = duration ? Math.min(100, (currentTime / duration) * 100) : 0;
+      const glow = t.accentHex + "dd";
+      const progressPercent = duration ? Math.min(100, (currentTime / duration) * 100) : 0;
 
-  return (
-    <div
-      className={[
-        "w-full max-w-3xl mx-auto rounded-3xl border px-6 py-5 mb-6",
-        "bg-gradient-to-b", t.bg, t.border, "shadow-2xl"
-      ].join(" ")}
-    >
-      <div className="tube-window mb-5">
-        {tubes.map((lvl, i) => {
-          const coreScale = 0.35 + lvl * 0.9;
-          const edgeBlur = 6 + lvl * 28;
-          const coreBlur = 16 + lvl * 40;
-          const coreOpacity = Math.max(0.4, Math.min(1, 0.65 + lvl * 0.45));
+      return (
+        <div
+          className={[
+            "w-full max-w-3xl mx-auto rounded-3xl border px-6 py-5 mb-6",
+            "bg-gradient-to-b", t.bg, t.border, "shadow-2xl"
+          ].join(" ")}
+        >
+          <div className="tube-window mb-5">
+            {tubes.map((lvl, i) => {
+              const coreScale = 0.35 + lvl * 0.9;
+              const edgeBlur = 6 + lvl * 28;
+              const coreBlur = 16 + lvl * 40;
+              const coreOpacity = Math.max(0.4, Math.min(1, 0.65 + lvl * 0.45));
 
-          return (
-            <div key={i} className="flex flex-col items-center">
-              <div className="tube-shell">
-                <div
-                  className="tube-glass"
-                  style={{
-                    boxShadow: `
-                      inset 0 0 8px rgba(148,163,184,0.55),
-                      0 0 ${edgeBlur}px ${glow}
-                    `,
-                  }}
-                >
-                  <div className="tube-electrodes" />
-                  <div
-                    className="tube-core"
-                    style={{
-                      transform: `scaleY(${coreScale})`,
-                      boxShadow: `0 0 ${coreBlur}px ${glow}`,
-                      opacity: coreOpacity,
-                    }}
-                  />
-                  <div className="tube-filament" />
+              return (
+                <div key={i} className="flex flex-col items-center">
+                  <div className="tube-shell">
+                    <div
+                      className="tube-glass"
+                      style={{
+                        boxShadow: `
+                          inset 0 0 8px rgba(148,163,184,0.55),
+                          0 0 ${edgeBlur}px ${glow}
+                        `,
+                      }}
+                    >
+                      <div className="tube-electrodes" />
+                      <div
+                        className="tube-core"
+                        style={{
+                          transform: `scaleY(${coreScale})`,
+                          boxShadow: `0 0 ${coreBlur}px ${glow}`,
+                          opacity: coreOpacity,
+                        }}
+                      />
+                      <div className="tube-filament" />
+                    </div>
+                  </div>
+
+                  {/* New base that matches the Illustrator mock */}
+                  <div className="tube-socket">
+                    <div className="tube-socket-top" />
+                    <div className="tube-socket-post" />
+                  </div>
                 </div>
-              </div>
-
-              {/* New base that matches the Illustrator mock */}
-              <div className="tube-socket">
-                <div className="tube-socket-top" />
-                <div className="tube-socket-post" />
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* rest of TubeDeck unchanged... */}
-
-                   {/* New base that matches the Illustrator mock */}
-      <div className="tube-socket">
-        <div className="tube-socket-top" />
-        <div className="tube-socket-post" />
-      </div>
               );
             })}
           </div>
@@ -851,10 +837,12 @@
     function Playlist({ tracks, currentIndex, onSelect, theme }){
       const t = THEMES[theme];
       return (
-        <div className={[
-          "w-full max-w-3xl mx-auto rounded-3xl border p-5 sm:p-6 shadow-2xl",
-          "bg-gradient-to-b", t.bg, t.border
-        ].join(" ")}>
+        <div
+          className={[
+            "w-full max-w-3xl mx-auto rounded-3xl border p-5 sm:p-6 shadow-2xl",
+            "bg-gradient-to-b", t.bg, t.border
+          ].join(" ")}
+        >
           <div className="mb-2">
             <div className="text-[11px] tracking-[0.26em] text-slate-400 uppercase mb-1">
               PLAYLIST
@@ -924,7 +912,6 @@
       if (!isPlaying || isMuted) {
         level = 0.12;
       } else if (hasWebGain) {
-        // Drive tubes from real audio level
         const base = 0.15 + audioLevel * (0.9 + volume * 0.6);
         level = Math.max(0.05, Math.min(1.0, base));
       } else {
@@ -940,35 +927,34 @@
       }
 
       // time / metadata listeners + auto-advance on track end
-useEffect(() => {
-  const audio = audioRef.current;
-  if (!audio) return;
+      useEffect(() => {
+        const audio = audioRef.current;
+        if (!audio) return;
 
-  const onTime = () => {
-    setCurrentTime(audio.currentTime || 0);
-  };
+        const onTime = () => {
+          setCurrentTime(audio.currentTime || 0);
+        };
 
-  const onMeta = () => {
-    setDuration(audio.duration || 0);
-  };
+        const onMeta = () => {
+          setDuration(audio.duration || 0);
+        };
 
-  const onEnded = () => {
-    // jump to next track and keep playing
-    setCurrentTime(0);
-    setCurrentIndex(prev => (prev + 1) % TRACKS.length);
-    setIsPlaying(true);
-  };
+        const onEnded = () => {
+          setCurrentTime(0);
+          setCurrentIndex(prev => (prev + 1) % TRACKS.length);
+          setIsPlaying(true);
+        };
 
-  audio.addEventListener("timeupdate", onTime);
-  audio.addEventListener("loadedmetadata", onMeta);
-  audio.addEventListener("ended", onEnded);
+        audio.addEventListener("timeupdate", onTime);
+        audio.addEventListener("loadedmetadata", onMeta);
+        audio.addEventListener("ended", onEnded);
 
-  return () => {
-    audio.removeEventListener("timeupdate", onTime);
-    audio.removeEventListener("loadedmetadata", onMeta);
-    audio.removeEventListener("ended", onEnded);
-  };
-}, []);
+        return () => {
+          audio.removeEventListener("timeupdate", onTime);
+          audio.removeEventListener("loadedmetadata", onMeta);
+          audio.removeEventListener("ended", onEnded);
+        };
+      }, []);
 
       // Load track whenever index changes (NOT when isPlaying changes)
       useEffect(() => {
@@ -983,10 +969,9 @@ useEffect(() => {
         if (isPlaying){
           audio.play().catch(() => setIsPlaying(false));
         }
-      }, [currentIndex, activeTrack]); // keep isPlaying out of deps
+      }, [currentIndex, activeTrack]);
 
       // Volume / mute -> audio element
-      // On browsers without Web Audio gain, fall back to audio.volume.
       useEffect(() => {
         const audio = audioRef.current;
         if (!audio) return;
@@ -1018,13 +1003,11 @@ useEffect(() => {
         if (!audio) return;
 
         if (isPlaying) {
-          // pause and remember position
           audio.pause();
           const t = audio.currentTime || 0;
           setCurrentTime(t);
           setIsPlaying(false);
         } else {
-          // resume from current position
           audio.play()
             .then(() => {
               setIsPlaying(true);
@@ -1101,9 +1084,8 @@ useEffect(() => {
             onSeekClick={handleSeekClick}
           />
 
-          {/* Controls row: buttons on top (all breakpoints), volume below on mobile / to the side on desktop */}
+          {/* Controls row */}
           <div className="w-full max-w-3xl flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-            {/* Transport buttons */}
             <div className="flex justify-center">
               <VintageControls
                 onSkipBack={handleSkipBack}
@@ -1117,7 +1099,7 @@ useEffect(() => {
               />
             </div>
 
-            {/* Volume + mute (stacks under buttons on mobile) */}
+            {/* Volume + mute */}
             <div className="volume-wrap md:justify-start">
               <button
                 type="button"
