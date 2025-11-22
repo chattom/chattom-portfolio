@@ -85,8 +85,6 @@
       overflow:hidden;
     }
 
-    /* glowing blue is intensified from inline style based on level */
-
     .vu-scale-band{
       position:absolute;
       left:10px;
@@ -143,13 +141,14 @@
       font-variant-numeric:tabular-nums;
     }
 
+    /* centered, shorter needle */
     .vu-needle{
       position:absolute;
-      left:12%;
+      left:50%;
       bottom:10px;
-      width:76%;
+      width:60%;
       height:2px;
-      transform-origin:8% 50%;
+      transform-origin:0% 50%;  /* pivot at left end, which sits under the pivot dot */
       background:linear-gradient(to right,#e5e7eb,#facc15);
       box-shadow:0 0 3px rgba(248,250,252,0.6);
       border-radius:999px;
@@ -158,12 +157,13 @@
 
     .vu-pivot{
       position:absolute;
-      left:12%;
+      left:50%;
       bottom:9px;
       width:8px;
       height:8px;
       border-radius:999px;
       background:#020617;
+      transform:translateX(-50%);
       box-shadow:
         0 0 0 1px rgba(148,163,184,0.8),
         0 0 4px rgba(15,23,42,0.9);
@@ -300,7 +300,6 @@
         0 0 0 1px rgba(248,250,252,0.8),
         0 0 8px rgba(248,250,252,0.9);
     }
-
   </style>
 </head>
 <body>
@@ -437,7 +436,8 @@
             sum += v*v;
           }
           const rms = Math.sqrt(sum / buffer.length); // ~0..1
-          const base = Math.max(0, Math.min(1, rms * 4.5));
+          // slightly gentler scaling so we don't live in the red
+          const base = Math.max(0, Math.min(1, rms * 3.5));
 
           // fake gentle stereo variation while staying realistic
           lastL = lastL * 0.75 + base * 0.25;
@@ -456,8 +456,8 @@
     }
 
     function VUMeter({ label, level, theme }){
-      // angle: -52° (rest) up to +18° (hot)
-      const angle = -52 + level * 70;
+      // angle: about -50° (rest) up to +10° (hot)
+      const angle = -50 + level * 60;
       const faceTheme = THEMES[theme] || THEMES.night;
       const glow = 10 + level * 30;
       const glowAlpha = 0.45 + level * 0.4;
@@ -502,7 +502,8 @@
     }
 
     function MiniPlayerApp(){
-      const [currentIndex, setCurrentIndex] = useState(1); // start on Moving Forward :)
+      // 1) Start on track 1 (index 0)
+      const [currentIndex, setCurrentIndex] = useState(0);
       const [isPlaying, setIsPlaying] = useState(false);
       const [currentTime, setCurrentTime] = useState(0);
       const [duration, setDuration] = useState(0);
@@ -561,7 +562,7 @@
         if (isPlaying){
           audio.play().catch(() => setIsPlaying(false));
         }
-      }, [currentIndex, activeTrack]);
+      }, [currentIndex, activeTrack, isPlaying]);
 
       // fallback plain element volume if no Web Audio
       useEffect(() => {
@@ -616,9 +617,7 @@
       };
 
       const volPercent = Math.round(isMuted ? 0 : volume * 100);
-
       const progress = duration ? Math.min(100, (currentTime / duration) * 100) : 0;
-
       const themeCfg = THEMES[theme] || THEMES.night;
 
       return (
