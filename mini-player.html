@@ -37,61 +37,62 @@
       display:flex;
       align-items:center;
       justify-content:center;
-      padding:16px;
+      padding:10px;
     }
 
     .mini-shell{
       width:100%;
-      max-width:640px;
-      border-radius:30px;
+      max-width:520px;              /* smaller overall width (~75–80%) */
+      border-radius:26px;
       border:1px solid rgba(148,163,184,0.7);
-      background:radial-gradient(circle at 20% 0%,rgba(148,163,184,0.18),transparent 55%),
-                 radial-gradient(circle at 80% 0%,rgba(56,189,248,0.18),transparent 60%),
-                 linear-gradient(to bottom,#020617,#020617,#020617,#020617);
+      background:
+        radial-gradient(circle at 20% 0%,rgba(148,163,184,0.16),transparent 55%),
+        radial-gradient(circle at 80% 0%,rgba(56,189,248,0.16),transparent 60%),
+        linear-gradient(to bottom,#020617,#020617,#020617,#020617);
       box-shadow:
-        0 24px 80px rgba(0,0,0,0.95),
-        inset 0 0 40px rgba(15,23,42,0.9);
-      padding:18px 20px 14px;
+        0 22px 72px rgba(0,0,0,0.95),
+        inset 0 0 32px rgba(15,23,42,0.9);
+      padding:14px 16px 10px;
     }
 
     /* --- VU cluster --- */
     .vu-cluster{
       display:flex;
-      gap:12px;
-      padding:12px 10px 14px;
-      border-radius:22px;
+      gap:10px;
+      padding:10px 8px 12px;
+      border-radius:20px;
       background:radial-gradient(circle at 50% 0%,rgba(15,23,42,0.9),rgba(15,23,42,0.95));
       box-shadow:
-        inset 0 0 25px rgba(15,23,42,1),
-        0 12px 26px rgba(0,0,0,0.8);
+        inset 0 0 22px rgba(15,23,42,1),
+        0 10px 24px rgba(0,0,0,0.85);
     }
     .vu-frame{
       flex:1;
-      border-radius:18px;
-      padding:8px 10px 10px;
+      border-radius:16px;
+      padding:6px 8px 8px;
       background:radial-gradient(circle at 50% 0%,rgba(15,23,42,0.85),#020617);
       box-shadow:
-        inset 0 0 18px rgba(15,23,42,0.95),
-        0 0 26px rgba(15,23,42,0.9);
+        inset 0 0 16px rgba(15,23,42,0.95),
+        0 0 22px rgba(15,23,42,0.9);
       position:relative;
       overflow:hidden;
     }
 
     .vu-window{
       position:relative;
-      height:110px;
-      border-radius:14px;
-      background:radial-gradient(circle at 50% 0%,rgba(56,189,248,0.7),rgba(8,47,73,0.95) 55%,#020617 100%);
+      height:88px;                   /* shorter window */
+      border-radius:12px;
+      /* background is overridden per-theme inline */
       box-shadow:
-        inset 0 0 20px rgba(15,23,42,0.95),
-        0 0 22px rgba(8,47,73,0.9);
+        inset 0 0 18px rgba(15,23,42,0.95),
+        0 0 20px rgba(8,47,73,0.9);
       overflow:hidden;
     }
 
     .vu-glow{
       position:absolute;
       inset:0;
-      background:radial-gradient(circle at 50% 0%,rgba(191,245,226,0.9),transparent 55%);
+      /* background overridden per-theme inline */
       pointer-events:none;
       mix-blend-mode:screen;
       transition:opacity 110ms ease-out;
@@ -103,19 +104,19 @@
       display:flex;
       align-items:flex-end;
       justify-content:center;
-      padding:0 16px 18px;
+      padding:0 14px 14px;
       pointer-events:none;
     }
 
     .vu-scale-inner{
       position:relative;
       width:100%;
-      height:40px;
+      height:36px;
     }
 
     .vu-label{
-      margin-top:6px;
-      font-size:10px;
+      margin-top:4px;
+      font-size:9px;
       letter-spacing:0.24em;
       text-transform:uppercase;
       text-align:center;
@@ -124,32 +125,32 @@
 
     .tick{
       position:absolute;
-      bottom:14px;
+      bottom:12px;
       width:1px;
       background:rgba(226,232,240,0.85);
       transform-origin:50% 100%;
     }
     .tick--major{
-      height:12px;
+      height:11px;
     }
     .tick--minor{
-      height:8px;
+      height:7px;
       opacity:0.7;
     }
     .tick-label{
       position:absolute;
       bottom:0;
-      font-size:10px;
+      font-size:9px;
       color:rgba(226,232,240,0.9);
       transform:translateX(-50%);
     }
 
     .vu-red-zone{
       position:absolute;
-      bottom:13px;
-      height:12px;
+      bottom:11px;
+      height:11px;
       border-radius:999px;
-      background:linear-gradient(to right,rgba(248,113,113,0.1),rgba(248,113,113,0.95));
+      background:linear-gradient(to right,rgba(248,113,113,0.12),rgba(248,113,113,0.95));
       transform-origin:0 100%;
       pointer-events:none;
       filter:drop-shadow(0 0 4px rgba(248,113,113,0.7));
@@ -157,9 +158,9 @@
 
     .vu-needle{
       position:absolute;
-      bottom:16px;
+      bottom:13px;
       left:50%;
-      width:70px;
+      width:58px;                   /* shorter needle */
       height:2px;
       transform-origin:0% 50%;
       transform:rotate(-40deg);
@@ -190,8 +191,8 @@
 
     /* --- Transport buttons --- */
     .round-btn{
-      width:40px;
-      height:40px;
+      width:34px;
+      height:34px;
       border-radius:999px;
       border:1px solid rgba(148,163,184,0.8);
       background:
@@ -202,7 +203,7 @@
       justify-content:center;
       cursor:pointer;
       box-shadow:
-        0 8px 18px rgba(0,0,0,0.9),
+        0 7px 16px rgba(0,0,0,0.9),
         inset 0 2px 4px rgba(255,255,255,0.25);
       transition:
         transform 120ms ease,
@@ -213,8 +214,8 @@
       filter:drop-shadow(0 0 3px rgba(30,64,175,0.5));
     }
     .round-btn--primary{
-      width:46px;
-      height:46px;
+      width:40px;
+      height:40px;
     }
     .round-btn:hover,
     .round-btn:focus-visible{
@@ -234,21 +235,21 @@
       box-shadow:
         0 0 0 1px rgba(148,163,184,0.9),
         0 0 0 3px rgba(15,23,42,1),
-        0 0 22px var(--accent-strong),
+        0 0 20px var(--accent-strong),
         inset 0 2px 4px rgba(255,255,255,0.32);
       filter:drop-shadow(0 0 14px var(--accent-strong));
       border-color:rgba(191,245,226,0.95);
     }
 
     .icon{
-      font-size:13px;
+      font-size:11px;
       filter:drop-shadow(0 1px 1px rgba(0,0,0,0.9));
     }
 
     .scrub-rail{
       position:relative;
       width:100%;
-      height:10px;
+      height:8px;
       border-radius:999px;
       background:radial-gradient(circle at 50% 150%,rgba(15,23,42,0.9),#020617);
       box-shadow:
@@ -267,7 +268,7 @@
 
     /* volume */
     .vol-slider{
-      width:160px;
+      width:140px;
       appearance:none;
       height:6px;
       border-radius:999px;
@@ -277,19 +278,19 @@
     }
     .vol-slider::-webkit-slider-thumb{
       appearance:none;
-      width:16px;
-      height:16px;
+      width:14px;
+      height:14px;
       border-radius:999px;
       background:#e5e7eb;
       border:1px solid rgba(148,163,184,0.9);
       box-shadow:
         0 0 8px rgba(191,245,226,0.8),
         0 2px 4px rgba(0,0,0,0.8);
-      margin-top:-5px;
+      margin-top:-4px;
     }
     .vol-slider::-moz-range-thumb{
-      width:16px;
-      height:16px;
+      width:14px;
+      height:14px;
       border-radius:999px;
       background:#e5e7eb;
       border:1px solid rgba(148,163,184,0.9);
@@ -299,8 +300,8 @@
     }
 
     .theme-dot{
-      width:12px;
-      height:12px;
+      width:11px;
+      height:11px;
       border-radius:999px;
       border:1px solid rgba(15,23,42,0.9);
       box-shadow:
@@ -318,10 +319,10 @@
 
     /* mini playlist */
     .mini-playlist{
-      margin-top:10px;
-      border-radius:16px;
-      padding:6px 4px 2px;
-      max-height:90px;
+      margin-top:8px;
+      border-radius:14px;
+      padding:4px 4px 2px;
+      max-height:80px;
       overflow-y:auto;
       scrollbar-width:thin;
       scrollbar-color:rgba(148,163,184,0.7) transparent;
@@ -339,8 +340,8 @@
 
     .mini-track{
       width:100%;
-      padding:4px 10px;
-      font-size:12px;
+      padding:3px 8px;
+      font-size:11px;
       text-align:center;
       color:rgba(226,232,240,0.90);
       background:transparent;
@@ -387,26 +388,27 @@
     ];
     const AUDIO_BASE = "assets/";
 
+    // themes now drive VU color
     const THEMES = {
       nite: {
         id:"nite",
         accent:"#22d3ee",
-        accentSoft:"rgba(34,211,238,0.20)",
-        accentStrong:"rgba(34,211,238,0.85)",
+        accentSoft:"rgba(34,211,238,0.45)",
+        accentStrong:"rgba(191,245,226,0.95)",
         dot:"#38bdf8"
       },
       day: {
         id:"day",
         accent:"#fb923c",
-        accentSoft:"rgba(251,146,60,0.18)",
-        accentStrong:"rgba(251,146,60,0.85)",
+        accentSoft:"rgba(251,146,60,0.55)",
+        accentStrong:"rgba(254,243,199,0.95)",
         dot:"#fb923c"
       },
       fantasy: {
         id:"fantasy",
         accent:"#e879f9",
-        accentSoft:"rgba(232,121,249,0.20)",
-        accentStrong:"rgba(232,121,249,0.85)",
+        accentSoft:"rgba(232,121,249,0.55)",
+        accentStrong:"rgba(245,243,255,0.95)",
         dot:"#e879f9"
       }
     };
@@ -494,7 +496,7 @@
             sum += v*v;
           }
           const rms = Math.sqrt(sum/bufferLength); // 0..~1
-          // Slightly conservative so we don't live in the red
+          // conservative scaling so we rarely pin the red
           const scaled = Math.max(0,Math.min(1,rms*4));
           setLevel(scaled);
           rafId = requestAnimationFrame(tick);
@@ -506,38 +508,48 @@
       return { hasEngine, level };
     }
 
-    function VUMeter({ label, level }){
+    function VUMeter({ label, level, theme }){
       // Map level 0..1 to angle -40deg .. +18deg
       const clamped = Math.max(0,Math.min(1,level));
-      // Slightly compress upper range so we rarely go deep red
+      // Slightly compress upper range so we don’t live in red
       const eased = Math.pow(clamped,0.75);
       const minDeg = -40;
       const maxDeg = 18;
       const angle = minDeg + (maxDeg-minDeg)*eased;
 
-      // red zone placement (from 0dB to +3dB on arc)
-      const redStartDeg = 0;
-      const redEndDeg = maxDeg;
-      const redSpan = redEndDeg - redStartDeg;
-      const redWidthPct = 26; // visual width; rest is via rotation
+      // red zone placement (0 dB to +3 dB)
+      const redWidthPct = 26;
+
+      const windowStyle = {
+        background: `radial-gradient(circle at 50% 0%, ${theme.accentSoft}, rgba(8,47,73,0.95) 55%, #020617 100%)`,
+        boxShadow:
+          `inset 0 0 18px rgba(15,23,42,0.95),
+           0 0 22px ${theme.accentSoft}`,
+      };
+
+      const glowStyle = {
+        background: `radial-gradient(circle at 50% 0%, ${theme.accentStrong}, transparent 55%)`,
+      };
 
       return (
         <div className="vu-frame">
-          <div className="vu-window">
+          <div className="vu-window" style={windowStyle}>
             <div
               className="vu-glow"
-              style={{ opacity: 0.25 + clamped*0.55 }}
+              style={{
+                ...glowStyle,
+                opacity: 0.25 + clamped * 0.55,
+              }}
             />
 
             <div className="vu-scale">
               <div className="vu-scale-inner">
-                {/* ticks */}
-                {[-20,-10,-7,-5,-3,0,3].map((val, idx) => {
-                  const pos = (val + 20) / 23; // squeeze into arc
+                {/* ticks and labels – SINGLE 0, no extra at top */}
+                {[-20,-10,-7,-5,-3,0,3].map((val) => {
+                  const pos = (val + 20) / 23;
                   const angleDeg = -38 + pos*58;
                   const isMajor = [0,-10,-7,-5,-3].includes(val);
                   const left = 50 + (Math.cos((angleDeg-90)*Math.PI/180))*48;
-                  const bottom = 14 + (Math.sin((angleDeg-90)*Math.PI/180))*0; // keep aligned
 
                   return (
                     <React.Fragment key={val}>
@@ -551,22 +563,9 @@
                       {isMajor && (
                         <div
                           className="tick-label"
-                          style={{
-                            left: left + "%",
-                          }}
+                          style={{ left: left + "%" }}
                         >
                           {val === -3 ? "−3" : val}
-                        </div>
-                      )}
-                      {val === 0 && (
-                        <div
-                          className="tick-label"
-                          style={{
-                            left: left + "%",
-                            bottom: 22
-                          }}
-                        >
-                          0
                         </div>
                       )}
                     </React.Fragment>
@@ -579,7 +578,7 @@
                   style={{
                     left:"64%",
                     width:redWidthPct+"%",
-                    transform:`skewX(${8}deg)`
+                    transform:`skewX(8deg)`
                   }}
                 />
 
@@ -587,7 +586,7 @@
                 <div
                   className="vu-needle"
                   style={{
-                    width:"64px",
+                    width:"58px",
                     transform:`translateX(-50%) rotate(${angle}deg)`
                   }}
                 >
@@ -742,23 +741,23 @@
         >
           {/* VU meters */}
           <div className="vu-cluster">
-            <VUMeter label="LEFT" level={level} />
-            <VUMeter label="RIGHT" level={Math.min(1, level*0.92 + 0.03)} />
+            <VUMeter label="LEFT"  level={level}                     theme={theme} />
+            <VUMeter label="RIGHT" level={Math.min(1, level*0.92+0.03)} theme={theme} />
           </div>
 
           {/* Track title */}
-          <div className="mt-4 text-center">
-            <div className="text-sm tracking-[0.18em] text-slate-500 uppercase mb-1">
+          <div className="mt-3 text-center">
+            <div className="text-[11px] tracking-[0.18em] text-slate-500 uppercase mb-0.5">
               Now Playing
             </div>
-            <div className="text-lg font-semibold text-slate-50">
+            <div className="text-base font-semibold text-slate-50">
               {activeTrack?.name || "—"}
             </div>
           </div>
 
           {/* Time + progress */}
-          <div className="mt-4">
-            <div className="flex justify-between text-[11px] text-slate-400 mb-1 px-1">
+          <div className="mt-3">
+            <div className="flex justify-between text-[10px] text-slate-400 mb-1 px-1">
               <span>{formatTime(currentTime)}</span>
               <span>{formatTime(duration)}</span>
             </div>
@@ -771,7 +770,7 @@
           </div>
 
           {/* Controls + volume + themes */}
-          <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             {/* transport */}
             <div className="flex items-center justify-center gap-3">
               <button
@@ -824,12 +823,12 @@
                   onChange={handleVolumeChange}
                   className="vol-slider"
                 />
-                <div className="text-[11px] text-slate-400 w-10 text-right">
+                <div className="text-[10px] text-slate-400 w-8 text-right">
                   {isMuted ? "0%" : volPercent + "%"}
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 mt-1">
+              <div className="flex items-center gap-3 mt-0.5">
                 {Object.entries(THEMES).map(([id,t]) => (
                   <button
                     key={id}
