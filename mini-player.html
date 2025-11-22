@@ -525,12 +525,12 @@
       // ease curve keeps mid-range lively
       const eased = Math.pow(meter, 0.9);
 
-      // Angle mapping:
-      // 0 -> -40deg (rest left / ~10 o'clock)
-      // 1 -> 0deg   (0 dB, just at edge of red)
-      const minDeg = -40;
-      const maxDeg = 0;
-      const angle = minDeg + (maxDeg - minDeg) * eased;
+     // Angle mapping:
+// 0 -> -140deg (rest left / ~10 o'clock)
+// 1 ->  -40deg (0 dB, just as red starts)
+const minDeg = -140;   // far-left rest
+const maxDeg = -40;    // 0 dB
+const angle = minDeg + (maxDeg - minDeg) * eased;
 
       // use unclipped raw level just for glow
       const glowLevel = Math.max(0, Math.min(1, raw));
