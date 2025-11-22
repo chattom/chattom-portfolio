@@ -198,40 +198,64 @@
       filter:blur(1px);
     }
 
-    /* metal tube base (socket) */
-.tube-base{
+    /* socket assembly under each tube */
+.tube-socket{
+  margin-top:0.45rem;              /* small gap under the bulb */
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+/* top ring (horizontal pill) – Illustrator gradient */
+.tube-socket-top{
   position:relative;
-  margin-top:0.22rem;
-  width:52px;
-  height:18px;
+  width:54px;
+  height:16px;
   border-radius:999px;
-  /* Illustrator-style left→right gradient */
   background:linear-gradient(to right,#3b3f48,#151b24);
   box-shadow:
     0 3px 8px rgba(0,0,0,0.9),
-    inset 0 1px 2px rgba(255,255,255,0.18),
+    inset 0 1px 2px rgba(255,255,255,0.22),
     inset 0 -1px 3px rgba(15,23,42,0.9);
-  overflow:hidden; /* so the highlight stays clipped to the base */
+  overflow:hidden; /* clips highlight nicely */
 }
 
-/* animated highlight that “orbits” around the base */
-.tube-base::before{
+/* vertical post under the ring */
+.tube-socket-post{
+  position:relative;
+  margin-top:3px;
+  width:24px;
+  height:26px;
+  border-radius:6px;
+  background:linear-gradient(to bottom,#373c46,#151b24);
+  box-shadow:
+    0 4px 10px rgba(0,0,0,0.85),
+    inset 0 1px 2px rgba(255,255,255,0.12),
+    inset 0 -2px 3px rgba(15,23,42,0.95);
+  overflow:hidden;
+}
+
+/* shared highlight sweep – runs across ring + post in unison */
+.tube-socket-top::before,
+.tube-socket-post::before{
   content:"";
   position:absolute;
   top:-40%;
   left:-60%;
-  width:60%;
-  height:180%;
+  width:70%;
+  height:200%;
   border-radius:50%;
   background:radial-gradient(
     circle at 0 50%,
-    rgba(148,163,184,0.85),
+    rgba(148,163,184,0.9),
     transparent 55%
   );
   opacity:0;
   animation:tubeBaseSweep 5.5s linear infinite;
 }
-    @keyframes tubeBaseSweep{
+
+/* slow left-to-right orbit, Netscape-style */
+@keyframes tubeBaseSweep{
   0%{
     transform:translateX(0%);
     opacity:0;
@@ -250,34 +274,28 @@
     opacity:0;
   }
 }
-    /*animated stagger just to check out*/
-    .tube-window > div:nth-child(1) .tube-base::before{
+
+/* slight stagger so each base starts at a different phase */
+.tube-window > div:nth-child(1) .tube-socket-top::before,
+.tube-window > div:nth-child(1) .tube-socket-post::before{
   animation-delay:0s;
 }
-.tube-window > div:nth-child(2) .tube-base::before{
+.tube-window > div:nth-child(2) .tube-socket-top::before,
+.tube-window > div:nth-child(2) .tube-socket-post::before{
   animation-delay:0.4s;
 }
-.tube-window > div:nth-child(3) .tube-base::before{
+.tube-window > div:nth-child(3) .tube-socket-top::before,
+.tube-window > div:nth-child(3) .tube-socket-post::before{
   animation-delay:0.8s;
 }
-.tube-window > div:nth-child(4) .tube-base::before{
+.tube-window > div:nth-child(4) .tube-socket-top::before,
+.tube-window > div:nth-child(4) .tube-socket-post::before{
   animation-delay:1.2s;
 }
-.tube-window > div:nth-child(5) .tube-base::before{
+.tube-window > div:nth-child(5) .tube-socket-top::before,
+.tube-window > div:nth-child(5) .tube-socket-post::before{
   animation-delay:1.6s;
 }
-
-    /* rubber feet under tubes */
-    .tube-foot{
-      margin-top:0.2rem;
-      width:46px;
-      height:7px;
-      border-radius:999px;
-      background:radial-gradient(circle at 50% 40%, #020617, #000);
-      box-shadow:
-        0 6px 12px rgba(0,0,0,0.9),
-        inset 0 1px 2px rgba(255,255,255,0.08);
-    }
 
     /* --- Progress strip --- */
     .progress-rail{
@@ -646,59 +664,76 @@
     }
 
     function TubeDeck({ trackName, currentTime, duration, theme, level, onSeekClick }){
-      const t = THEMES[theme];
+  const t = THEMES[theme];
 
-      const time = currentTime || 0;
-      const tubes = [0, 1, 2, 3, 4].map((_, i) => {
-        const phase = i * 0.35;
-        const wobble = Math.sin(time * 4 + phase) * 0.18;
-        const raw = level + wobble;
-        const boosted = 0.12 + (raw - 0.12) * 1.8;
-        return Math.max(0.05, Math.min(1.0, boosted));
-      });
+  const time = currentTime || 0;
+  const tubes = [0, 1, 2, 3, 4].map((_, i) => {
+    const phase = i * 0.35;
+    const wobble = Math.sin(time * 4 + phase) * 0.18;
+    const raw = level + wobble;
+    const boosted = 0.12 + (raw - 0.12) * 1.8;
+    return Math.max(0.05, Math.min(1.0, boosted));
+  });
 
-      const glow = t.accentHex + "dd";
-      const progressPercent = duration ? Math.min(100, (currentTime / duration) * 100) : 0;
+  const glow = t.accentHex + "dd";
+  const progressPercent = duration ? Math.min(100, (currentTime / duration) * 100) : 0;
 
-      return (
-        <div className={[
-          "w-full max-w-3xl mx-auto rounded-3xl border px-6 py-5 mb-6",
-          "bg-gradient-to-b", t.bg, t.border, "shadow-2xl"
-        ].join(" ")}>
-          <div className="tube-window mb-5">
-            {tubes.map((lvl, i) => {
-              const coreScale = 0.35 + lvl * 0.9;
-              const edgeBlur = 6 + lvl * 28;
-              const coreBlur = 16 + lvl * 40;
-              const coreOpacity = Math.max(0.4, Math.min(1, 0.65 + lvl * 0.45));
+  return (
+    <div
+      className={[
+        "w-full max-w-3xl mx-auto rounded-3xl border px-6 py-5 mb-6",
+        "bg-gradient-to-b", t.bg, t.border, "shadow-2xl"
+      ].join(" ")}
+    >
+      <div className="tube-window mb-5">
+        {tubes.map((lvl, i) => {
+          const coreScale = 0.35 + lvl * 0.9;
+          const edgeBlur = 6 + lvl * 28;
+          const coreBlur = 16 + lvl * 40;
+          const coreOpacity = Math.max(0.4, Math.min(1, 0.65 + lvl * 0.45));
 
-              return (
-                <div key={i} className="flex flex-col items-center">
-                  <div className="tube-shell">
-                    <div
-                      className="tube-glass"
-                      style={{
-                        boxShadow: `
-                          inset 0 0 8px rgba(148,163,184,0.55),
-                          0 0 ${edgeBlur}px ${glow}
-                        `,
-                      }}
-                    >
-                      <div className="tube-electrodes" />
-                      <div
-                        className="tube-core"
-                        style={{
-                          transform: `scaleY(${coreScale})`,
-                          boxShadow: `0 0 ${coreBlur}px ${glow}`,
-                          opacity: coreOpacity,
-                        }}
-                      />
-                      <div className="tube-filament" />
-                    </div>
-                  </div>
-                  <div className="tube-base" />
-                  <div className="tube-foot" />
+          return (
+            <div key={i} className="flex flex-col items-center">
+              <div className="tube-shell">
+                <div
+                  className="tube-glass"
+                  style={{
+                    boxShadow: `
+                      inset 0 0 8px rgba(148,163,184,0.55),
+                      0 0 ${edgeBlur}px ${glow}
+                    `,
+                  }}
+                >
+                  <div className="tube-electrodes" />
+                  <div
+                    className="tube-core"
+                    style={{
+                      transform: `scaleY(${coreScale})`,
+                      boxShadow: `0 0 ${coreBlur}px ${glow}`,
+                      opacity: coreOpacity,
+                    }}
+                  />
+                  <div className="tube-filament" />
                 </div>
+              </div>
+
+              {/* New base that matches the Illustrator mock */}
+              <div className="tube-socket">
+                <div className="tube-socket-top" />
+                <div className="tube-socket-post" />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* rest of TubeDeck unchanged... */}
+
+                   {/* New base that matches the Illustrator mock */}
+      <div className="tube-socket">
+        <div className="tube-socket-top" />
+        <div className="tube-socket-post" />
+      </div>
               );
             })}
           </div>
