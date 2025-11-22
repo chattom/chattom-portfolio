@@ -5,474 +5,310 @@
   <title>Chris Chattom — Mini Player</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Inter font (optional, matches your main site) -->
+  <!-- Fonts & Tailwind -->
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- React + Babel -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
   <style>
-    :root {
-      --bg: #020617;
-      --panel: #020617;
-      --panel-edge: #111827;
-      --accent: #22d3ee;
-      --text: #e5e7eb;
-      --soft: rgba(15,23,42,0.9);
+    :root{
+      --accent:#22d3ee;
+    }
+    *{box-sizing:border-box;}
+    html,body{
+      height:100%;
+      margin:0;
+      padding:0;
+    }
+    body{
+      background:#020617;
+      color:#e5e7eb;
+      font-family:Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      -webkit-font-smoothing:antialiased;
     }
 
-    * { box-sizing: border-box; }
-
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      background: #000;
-      color: var(--text);
-      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    .window-frame{
+      width:100%;
+      height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:16px;
     }
 
-    body {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .frame {
-      width: 380px;
-      max-width: 100%;
-      padding: 10px;
-      background: radial-gradient(circle at 50% 0%, #0f172a, #000);
-    }
-
-    .mini-shell {
-      border-radius: 18px;
+    .mini-shell{
+      width:480px;
+      max-width:100%;
+      border-radius:22px;
+      border:1px solid rgba(148,163,184,0.65);
       background:
-        radial-gradient(circle at 50% 0%, rgba(148,163,184,0.12), transparent 60%),
-        linear-gradient(to bottom, #020617, #020617 55%, #020617);
-      border: 1px solid #1e293b;
+        radial-gradient(circle at 50% -40%, rgba(148,163,184,0.32), transparent 55%),
+        radial-gradient(circle at 50% 120%, rgba(15,23,42,0.96), #020617 70%);
       box-shadow:
-        0 18px 40px rgba(0,0,0,0.9),
-        inset 0 0 26px rgba(15,23,42,1);
-      padding: 14px 16px 16px;
+        0 24px 45px rgba(0,0,0,0.9),
+        inset 0 0 26px rgba(15,23,42,0.9);
+      padding:14px 18px 16px;
     }
 
-    .mini-header {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 10px;
+    /* --- VU METERS --- */
+
+    .vu-row{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:10px;
     }
 
-    .mini-title {
-      font-size: 11px;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: #64748b;
+    .vu-meter{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:6px;
     }
 
-    .mini-track {
-      font-size: 13px;
-      font-weight: 500;
-      text-align: right;
-      color: #e5e7eb;
-      flex: 1;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+    .vu-face{
+      position:relative;
+      width:100%;
+      aspect-ratio: 16 / 9;
+      border-radius:14px;
+      padding:9px 10px 12px;
+      background:radial-gradient(circle at 50% 15%, #0ea5e9, #022c43 65%);
+      box-shadow:
+        0 0 14px rgba(56,189,248,0.6),
+        inset 0 0 12px rgba(15,23,42,0.95);
+      overflow:hidden;
     }
 
-    /* VU meters row */
-    .vu-row {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin-bottom: 12px;
+    /* glowing blue is intensified from inline style based on level */
+
+    .vu-scale-band{
+      position:absolute;
+      left:10px;
+      right:10px;
+      top:34%;
+      height:34%;
+      pointer-events:none;
     }
 
-    .vu-meter {
-      position: relative;
-      width: 150px;
-      height: 68px;
-      border-radius: 10px;
-      padding: 6px 8px 8px;
+    .vu-scale-arc{
+      position:absolute;
+      inset:0;
+      border-bottom-left-radius:120px;
+      border-bottom-right-radius:120px;
+      border:1px solid rgba(15,23,42,0.5);
+      border-top:none;
+    }
+
+    .vu-ticks{
+      position:absolute;
+      inset:0;
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      padding:0 4px 0;
+      font-size:9px;
+      letter-spacing:0.02em;
+      color:#e2e8f0;
+    }
+
+    .vu-ticks span{
+      transform:translateY(10px);
+      font-variant-numeric:tabular-nums;
+    }
+
+    .vu-red-zone{
+      position:absolute;
+      right:9px;
+      bottom:4px;
+      width:26%;
+      height:26%;
       background:
-        radial-gradient(circle at 50% -50%, rgba(15,23,42,0.9), transparent 70%),
-        linear-gradient(to bottom, #020617, #020617);
+        linear-gradient(to right, rgba(239,68,68,0.1), rgba(239,68,68,0.95));
+      clip-path:polygon(0 100%,10% 45%,40% 15%,80% 0,100% 0,100% 100%);
+      opacity:0.9;
+    }
+
+    .vu-zero-label{
+      position:absolute;
+      bottom:10px;
+      right:32%;
+      font-size:9px;
+      color:#fecaca;
+      font-variant-numeric:tabular-nums;
+    }
+
+    .vu-needle{
+      position:absolute;
+      left:12%;
+      bottom:10px;
+      width:76%;
+      height:2px;
+      transform-origin:8% 50%;
+      background:linear-gradient(to right,#e5e7eb,#facc15);
+      box-shadow:0 0 3px rgba(248,250,252,0.6);
+      border-radius:999px;
+      transition:transform 60ms linear;
+    }
+
+    .vu-pivot{
+      position:absolute;
+      left:12%;
+      bottom:9px;
+      width:8px;
+      height:8px;
+      border-radius:999px;
+      background:#020617;
       box-shadow:
-        0 6px 16px rgba(0,0,0,0.9),
-        inset 0 0 12px rgba(15,23,42,1);
-      overflow: hidden;
+        0 0 0 1px rgba(148,163,184,0.8),
+        0 0 4px rgba(15,23,42,0.9);
     }
 
-    .vu-inner {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      border-radius: 6px;
-      background: #111827;
-      border: 1px solid #020617;
+    .vu-label{
+      font-size:10px;
+      letter-spacing:0.18em;
+      text-transform:uppercase;
+      color:#94a3b8;
+    }
+
+    /* --- transport / timeline --- */
+
+    .timeline-rail{
+      position:relative;
+      width:100%;
+      height:8px;
+      border-radius:999px;
+      margin-top:4px;
+      background:radial-gradient(circle at 50% 180%, rgba(15,23,42,0.9), #020617);
       box-shadow:
-        inset 0 0 4px rgba(0,0,0,0.8),
-        inset 0 0 24px rgba(15,23,42,1);
-      overflow: hidden;
-    }
-
-    /* scale arc / ticks */
-    .vu-scale {
-      position: absolute;
-      left: 10px;
-      right: 10px;
-      top: 8px;
-      height: 32px;
-    }
-
-    .vu-tick {
-      position: absolute;
-      bottom: 0;
-      width: 1px;
-      background: #cbd5f5;
-      opacity: 0.75;
-    }
-
-    .vu-tick.label span {
-      position: absolute;
-      top: -10px;
-      left: -6px;
-      font-size: 8px;
-      color: #cbd5f5;
-    }
-
-    .vu-red-zone {
-      position: absolute;
-      right: 0;
-      bottom: 0;
-      width: 32px;
-      height: 16px;
-      background: linear-gradient(to right, #f97316, #ef4444);
-      clip-path: polygon(0 100%, 100% 100%, 100% 40%, 0 0);
-      opacity: 0.9;
-    }
-
-    .vu-label {
-      position: absolute;
-      bottom: 6px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 9px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: #e5e7eb;
-    }
-
-    .vu-peak-dot {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      width: 7px;
-      height: 7px;
-      border-radius: 999px;
-      background: radial-gradient(circle at 30% 20%, #fecaca, #b91c1c);
-      box-shadow: 0 0 3px #f87171;
-      opacity: 0.1;
-      transition: opacity 80ms ease-out;
-    }
-
-    /* backlight that glows with signal */
-    .vu-backlight {
-      position: absolute;
-      inset: 0;
-      border-radius: 6px;
-      background: radial-gradient(circle at 50% 80%, rgba(34,211,238,0.2), transparent 70%);
-      mix-blend-mode: screen;
-      opacity: 0;
-      transition: opacity 80ms ease-out;
-      pointer-events: none;
-    }
-
-    /* needle */
-    .vu-needle {
-      position: absolute;
-      bottom: 10px;
-      left: 50%;
-      width: 70px;
-      height: 70px;
-      transform-origin: 50% 80%;
-      transform: translateX(-50%) rotate(-25deg);
-      pointer-events: none;
-    }
-
-    .vu-needle-line {
-      position: absolute;
-      bottom: 14px;
-      left: 50%;
-      width: 1.5px;
-      height: 40px;
-      transform: translateX(-50%);
-      background: linear-gradient(to top, #e5e7eb, #cbd5f5);
-      box-shadow: 0 0 2px #e5e7eb;
-    }
-
-    .vu-needle-hub {
-      position: absolute;
-      bottom: 10px;
-      left: 50%;
-      width: 10px;
-      height: 10px;
-      border-radius: 999px;
-      transform: translateX(-50%);
-      background: radial-gradient(circle at 30% 20%, #f9fafb, #4b5563);
-      box-shadow:
-        0 0 3px rgba(0,0,0,0.8),
-        inset 0 0 2px rgba(0,0,0,0.9);
-    }
-
-    /* time + progress */
-    .time-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin: 6px 0 8px;
-      font-size: 10px;
-      color: #9ca3af;
-    }
-
-    .time-row span {
-      min-width: 32px;
-      text-align: center;
-    }
-
-    .progress-rail {
-      position: relative;
-      flex: 1;
-      height: 8px;
-      border-radius: 999px;
-      background: radial-gradient(circle at 50% 150%, rgba(15,23,42,0.9), #020617);
-      box-shadow:
-        inset 0 0 6px rgba(15,23,42,0.9),
+        inset 0 0 5px rgba(15,23,42,0.95),
         0 0 10px rgba(15,23,42,0.7);
-      cursor: pointer;
-      overflow: hidden;
+      overflow:hidden;
+      cursor:pointer;
     }
 
-    .progress-fill {
-      height: 100%;
-      border-radius: 999px;
-      background: linear-gradient(to right,#f9fafb,#e5e7eb,#f9fafb);
-      box-shadow: 0 0 12px rgba(248,250,252,0.9);
-      width: 0%;
+    .timeline-fill{
+      position:absolute;
+      inset:0;
+      width:0%;
+      background:linear-gradient(to right,#f9fafb,#e5e7eb);
+      border-radius:999px;
+      box-shadow:0 0 16px rgba(248,250,252,0.9);
+      pointer-events:none;
     }
 
-    /* transport + volume */
-    .controls-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin-top: 4px;
-    }
-
-    .btn-row {
-      display: flex;
-      gap: 8px;
-    }
-
-    .mini-btn {
-      width: 30px;
-      height: 30px;
-      border-radius: 999px;
-      border: 1px solid rgba(148,163,184,0.7);
+    .transport-btn{
+      width:34px;
+      height:34px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,0.7);
+      display:flex;
+      align-items:center;
+      justify-content:center;
       background:
-        radial-gradient(circle at 30% 20%, rgba(255,255,255,0.3), transparent 55%),
-        radial-gradient(circle at 70% 80%, #020617, #020617);
+        radial-gradient(circle at 30% 18%, rgba(255,255,255,0.25), transparent 55%),
+        radial-gradient(circle at 70% 82%, #020617, #020617);
       box-shadow:
-        0 6px 12px rgba(0,0,0,0.9),
+        0 7px 14px rgba(0,0,0,0.8),
         inset 0 2px 4px rgba(255,255,255,0.32);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #e5e7eb;
-      font-size: 11px;
-      cursor: pointer;
-      transition: transform 100ms ease, box-shadow 100ms ease, filter 120ms ease;
-      filter: drop-shadow(0 0 2px rgba(34,211,238,0.15));
+      cursor:pointer;
+      color:#e5e7eb;
+      font-size:12px;
+      transition:transform 120ms ease, box-shadow 140ms ease, filter 140ms ease;
+      filter:drop-shadow(0 0 3px rgba(34,211,238,0.15));
     }
 
-    .mini-btn:hover {
-      transform: translateY(-1px);
-      filter: drop-shadow(0 0 8px rgba(34,211,238,0.6));
+    .transport-btn:hover{
+      transform:translateY(-1px);
+      filter:drop-shadow(0 0 12px rgba(34,211,238,0.55));
     }
 
-    .mini-btn:active {
-      transform: translateY(1px) scale(0.96);
+    .transport-btn:active{
+      transform:translateY(1px) scale(0.97);
       box-shadow:
         0 3px 8px rgba(0,0,0,0.9),
-        inset 0 1px 3px rgba(0,0,0,0.8);
+        inset 0 1px 3px rgba(0,0,0,0.7);
     }
 
-    .mini-btn.playing {
+    .transport-btn--play{
+      width:40px;
+      height:40px;
+    }
+
+    .transport-active-ring{
       box-shadow:
-        0 0 0 2px rgba(34,211,238,0.3),
-        0 0 12px rgba(34,211,238,0.7),
-        inset 0 2px 4px rgba(255,255,255,0.32);
+        0 0 0 1px rgba(34,211,238,0.6),
+        0 0 14px rgba(34,211,238,0.75),
+        0 0 34px rgba(34,211,238,0.7);
     }
 
-    .vol-wrap {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      min-width: 0;
-      flex: 1;
-      justify-content: flex-end;
+    .time-label{
+      font-size:10px;
+      color:#94a3b8;
     }
 
-    .vol-slider {
-      width: 90px;
+    .vol-slider{
+      width:110px;
+      appearance:none;
+      height:6px;
+      border-radius:999px;
+      background:linear-gradient(to right,rgba(148,163,184,0.85),rgba(71,85,105,0.9));
+      outline:none;
+      cursor:pointer;
     }
 
-    .vol-slider input[type="range"] {
-      width: 100%;
-      appearance: none;
-      height: 6px;
-      border-radius: 999px;
-      background: linear-gradient(to right,
-        rgba(148,163,184,0.85),
-        rgba(71,85,105,0.9));
-      outline: none;
-      cursor: pointer;
-    }
-
-    .vol-slider input[type="range"]::-webkit-slider-thumb {
-      appearance: none;
-      width: 14px;
-      height: 14px;
-      border-radius: 999px;
-      background:#f9fafb;
-      border: 1px solid rgba(148,163,184,0.9);
+    .vol-slider::-webkit-slider-thumb{
+      appearance:none;
+      width:14px;
+      height:14px;
+      border-radius:999px;
+      background:#e5e7eb;
+      border:1px solid rgba(148,163,184,0.85);
       box-shadow:
-        0 0 6px rgba(34,211,238,0.5),
-        0 2px 4px rgba(0,0,0,0.7);
-      margin-top: -4px;
+        0 0 8px rgba(148,163,184,0.8),
+        0 2px 4px rgba(0,0,0,0.8);
+      margin-top:-4px;
     }
 
-    .vol-slider input[type="range"]::-moz-range-thumb {
-      width: 14px;
-      height: 14px;
-      border-radius: 999px;
-      background:#f9fafb;
-      border: 1px solid rgba(148,163,184,0.9);
+    .vol-slider::-moz-range-thumb{
+      width:14px;
+      height:14px;
+      border-radius:999px;
+      background:#e5e7eb;
+      border:1px solid rgba(148,163,184,0.85);
       box-shadow:
-        0 0 6px rgba(34,211,238,0.5),
-        0 2px 4px rgba(0,0,0,0.7);
+        0 0 8px rgba(148,163,184,0.8),
+        0 2px 4px rgba(0,0,0,0.8);
     }
 
-    .vol-pct {
-      font-size: 10px;
-      color:#9ca3af;
-      min-width: 30px;
-      text-align: right;
+    .theme-dot{
+      width:10px;
+      height:10px;
+      border-radius:999px;
+      border:1px solid rgba(15,23,42,0.9);
+      box-shadow:0 0 3px rgba(15,23,42,0.9);
+      cursor:pointer;
     }
 
-    .hidden { display:none; }
+    .theme-dot--active{
+      box-shadow:
+        0 0 0 1px rgba(248,250,252,0.8),
+        0 0 8px rgba(248,250,252,0.9);
+    }
+
   </style>
 </head>
 <body>
-  <div class="frame">
-    <div class="mini-shell">
-      <div class="mini-header">
-        <div class="mini-title">Mini Player</div>
-        <div id="trackTitle" class="mini-track">Loading…</div>
-      </div>
+  <div id="root"></div>
 
-      <div class="vu-row">
-        <div class="vu-meter">
-          <div class="vu-inner">
-            <div class="vu-backlight" id="vuBackL"></div>
-            <div class="vu-scale">
-              <!-- simple ticks -->
-              <div class="vu-tick" style="left:4%; height:10px;"></div>
-              <div class="vu-tick label" style="left:16%; height:14px;">
-                <span>-10</span>
-              </div>
-              <div class="vu-tick" style="left:28%; height:12px;"></div>
-              <div class="vu-tick label" style="left:40%; height:14px;">
-                <span>-3</span>
-              </div>
-              <div class="vu-tick label" style="left:56%; height:16px;">
-                <span>0</span>
-              </div>
-              <div class="vu-tick" style="left:68%; height:14px;"></div>
-              <div class="vu-tick" style="left:80%; height:14px;"></div>
-              <div class="vu-red-zone"></div>
-            </div>
-            <div class="vu-needle" id="vuNeedleL">
-              <div class="vu-needle-line"></div>
-              <div class="vu-needle-hub"></div>
-            </div>
-            <div class="vu-label">L</div>
-            <div class="vu-peak-dot" id="vuPeakL"></div>
-          </div>
-        </div>
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
 
-        <div class="vu-meter">
-          <div class="vu-inner">
-            <div class="vu-backlight" id="vuBackR"></div>
-            <div class="vu-scale">
-              <div class="vu-tick" style="left:4%; height:10px;"></div>
-              <div class="vu-tick label" style="left:16%; height:14px;">
-                <span>-10</span>
-              </div>
-              <div class="vu-tick" style="left:28%; height:12px;"></div>
-              <div class="vu-tick label" style="left:40%; height:14px;">
-                <span>-3</span>
-              </div>
-              <div class="vu-tick label" style="left:56%; height:16px;">
-                <span>0</span>
-              </div>
-              <div class="vu-tick" style="left:68%; height:14px;"></div>
-              <div class="vu-tick" style="left:80%; height:14px;"></div>
-              <div class="vu-red-zone"></div>
-            </div>
-            <div class="vu-needle" id="vuNeedleR">
-              <div class="vu-needle-line"></div>
-              <div class="vu-needle-hub"></div>
-            </div>
-            <div class="vu-label">R</div>
-            <div class="vu-peak-dot" id="vuPeakR"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="time-row">
-        <span id="timeCurrent">0:00</span>
-        <div class="progress-rail" id="seekRail">
-          <div class="progress-fill" id="seekFill"></div>
-        </div>
-        <span id="timeTotal">0:00</span>
-      </div>
-
-      <div class="controls-row">
-        <div class="btn-row">
-          <button class="mini-btn" id="btnPrev" title="Previous track">⏮</button>
-          <button class="mini-btn" id="btnPlay" title="Play / Pause">▶</button>
-          <button class="mini-btn" id="btnNext" title="Next track">⏭</button>
-        </div>
-        <div class="vol-wrap">
-          <div class="vol-slider">
-            <input id="volSlider" type="range" min="0" max="1" step="0.01" value="0.9">
-          </div>
-          <span class="vol-pct" id="volPct">90%</span>
-        </div>
-      </div>
-    </div>
-
-    <audio id="miniAudio" class="hidden">
-      Your browser does not support the audio element.
-    </audio>
-  </div>
-
-  <script>
-    // ------------- Track list (matches music.html) -------------
     const TRACKS = [
       { id: '01', name: 'The Copycat',             file: 'The_Copycat.mp3' },
       { id: '02', name: 'Moving Forward',          file: 'Moving_Forward.mp3' },
@@ -496,233 +332,421 @@
 
     const AUDIO_BASE = "assets/";
 
-    const audioEl     = document.getElementById('miniAudio');
-    const titleEl     = document.getElementById('trackTitle');
-    const btnPrev     = document.getElementById('btnPrev');
-    const btnPlay     = document.getElementById('btnPlay');
-    const btnNext     = document.getElementById('btnNext');
-    const volSlider   = document.getElementById('volSlider');
-    const volPct      = document.getElementById('volPct');
-
-    const timeCurEl   = document.getElementById('timeCurrent');
-    const timeTotEl   = document.getElementById('timeTotal');
-    const seekRail    = document.getElementById('seekRail');
-    const seekFill    = document.getElementById('seekFill');
-
-    const needleL     = document.getElementById('vuNeedleL');
-    const needleR     = document.getElementById('vuNeedleR');
-    const backL       = document.getElementById('vuBackL');
-    const backR       = document.getElementById('vuBackR');
-    const peakL       = document.getElementById('vuPeakL');
-    const peakR       = document.getElementById('vuPeakR');
-
-    let currentIndex  = 0;
-    let isPlaying     = false;
-
-    // Try to pick up state from opener (music.html)
-    try {
-      const cfg = window.opener && window.opener.miniplayerConfig;
-      if (cfg) {
-        if (typeof cfg.trackIndex === 'number') currentIndex = cfg.trackIndex;
-        if (typeof cfg.volume === 'number') {
-          volSlider.value = cfg.volume;
-        }
+    const THEMES = {
+      night: {
+        face: "radial-gradient(circle at 50% 15%, #38bdf8, #021524 70%)",
+        glowBase: "rgba(56,189,248,",
+        shellBorder: "rgba(148,163,184,0.75)"
+      },
+      dawn: {
+        face: "radial-gradient(circle at 50% 15%, #fb923c, #3b1a02 70%)",
+        glowBase: "rgba(251,146,60,",
+        shellBorder: "rgba(251,146,60,0.75)"
+      },
+      fantasy: {
+        face: "radial-gradient(circle at 50% 15%, #e879f9, #3b0764 70%)",
+        glowBase: "rgba(232,121,249,",
+        shellBorder: "rgba(232,121,249,0.8)"
       }
-    } catch (e) {
-      // cross-origin guard, ignore
+    };
+
+    function formatTime(sec){
+      if (!isFinite(sec) || sec < 0) return "0:00";
+      const m = Math.floor(sec/60);
+      const s = Math.floor(sec%60);
+      return m + ":" + (s < 10 ? "0"+s : s);
     }
 
-    // ---------- Web Audio: gain + analyser ----------
-    let audioCtx = null;
-    let gainNode = null;
-    let analyser = null;
-    let dataArray = null;
-    let rafId = null;
-    let vuHold = 0; // peak hold value
+    // Web Audio engine returning stereo-ish levels
+    function useAudioEngine(audioEl, isPlaying, volume, isMuted){
+      const ctxRef = useRef(null);
+      const sourceRef = useRef(null);
+      const gainRef = useRef(null);
+      const analyserRef = useRef(null);
 
-    function initAudioGraph() {
-      if (audioCtx) return;
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (!AudioCtx) return;
+      const [hasAnalyser, setHasAnalyser] = useState(false);
+      const [leftLevel, setLeftLevel] = useState(0);
+      const [rightLevel, setRightLevel] = useState(0);
 
-      audioCtx = new AudioCtx();
-      const source = audioCtx.createMediaElementSource(audioEl);
-      gainNode = audioCtx.createGain();
-      analyser = audioCtx.createAnalyser();
+      useEffect(() => {
+        if (!audioEl) return;
+        if (ctxRef.current) return;
 
-      analyser.fftSize = 512;
-      dataArray = new Uint8Array(analyser.frequencyBinCount);
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
 
-      source.connect(gainNode);
-      gainNode.connect(analyser);
-      analyser.connect(audioCtx.destination);
+        try{
+          const ctx = new AudioCtx();
+          const source = ctx.createMediaElementSource(audioEl);
+          const gain = ctx.createGain();
+          const analyser = ctx.createAnalyser();
 
-      updateGainFromSlider();
-      startMeterLoop();
-    }
+          analyser.fftSize = 512;
 
-    function startMeterLoop() {
-      if (!analyser) return;
-      if (rafId) cancelAnimationFrame(rafId);
+          source.connect(gain);
+          gain.connect(analyser);
+          analyser.connect(ctx.destination);
 
-      const minDeg = -23; // left stop
-      const maxDeg = 25;  // red
-      let smooth = 0;
+          gain.gain.value = isMuted ? 0 : volume;
 
-      const tick = () => {
-        analyser.getByteTimeDomainData(dataArray);
-        let sum = 0;
-        for (let i = 0; i < dataArray.length; i++) {
-          const v = (dataArray[i] - 128) / 128;
-          sum += v * v;
+          ctxRef.current = ctx;
+          sourceRef.current = source;
+          gainRef.current = gain;
+          analyserRef.current = analyser;
+          setHasAnalyser(true);
+        } catch(err){
+          console.warn("Mini-player Web Audio failed:", err);
         }
-        const rms = Math.sqrt(sum / dataArray.length);
-        const level = Math.min(1, rms * 5.5); // scale a bit hotter
 
-        // exponential smoothing for nice analog feel
-        const smoothing = 0.25;
-        smooth = smooth + (level - smooth) * smoothing;
+        return () => {
+          if (sourceRef.current) sourceRef.current.disconnect();
+          if (analyserRef.current) analyserRef.current.disconnect();
+          if (gainRef.current) gainRef.current.disconnect();
+          if (ctxRef.current && ctxRef.current.state !== "closed") {
+            ctxRef.current.close();
+          }
+        };
+      }, [audioEl]);
 
-        // convert to degrees
-        const deg = minDeg + (maxDeg - minDeg) * smooth;
+      // react to vol/mute/play
+      useEffect(() => {
+        const ctx = ctxRef.current;
+        const gain = gainRef.current;
+        if (!ctx || !gain) return;
 
-        needleL.style.transform = `translateX(-50%) rotate(${deg}deg)`;
-        needleR.style.transform = `translateX(-50%) rotate(${deg}deg)`;
+        gain.gain.value = isMuted ? 0 : volume;
+        if (isPlaying && ctx.state === "suspended"){
+          ctx.resume().catch(()=>{});
+        }
+      }, [volume, isMuted, isPlaying]);
 
-        // backlight glow
-        const glow = Math.min(1, level * 1.5);
-        backL.style.opacity = glow;
-        backR.style.opacity = glow;
+      useEffect(() => {
+        if (!hasAnalyser) return;
+        const analyser = analyserRef.current;
+        if (!analyser) return;
 
-        // simple peak indicator
-        vuHold = Math.max(vuHold * 0.92, level);
-        const peakOpacity = vuHold > 0.8 ? 0.9 : vuHold > 0.6 ? 0.5 : 0.12;
-        peakL.style.opacity = peakOpacity;
-        peakR.style.opacity = peakOpacity;
+        const buffer = new Uint8Array(analyser.frequencyBinCount);
+        let rafId;
+        let lastL = 0, lastR = 0;
 
-        rafId = requestAnimationFrame(tick);
+        const tick = () => {
+          analyser.getByteTimeDomainData(buffer);
+          let sum = 0;
+          for(let i=0;i<buffer.length;i++){
+            const v = (buffer[i] - 128) / 128;
+            sum += v*v;
+          }
+          const rms = Math.sqrt(sum / buffer.length); // ~0..1
+          const base = Math.max(0, Math.min(1, rms * 4.5));
+
+          // fake gentle stereo variation while staying realistic
+          lastL = lastL * 0.75 + base * 0.25;
+          lastR = lastR * 0.78 + base * 0.22 + (Math.random()-0.5)*0.02;
+
+          setLeftLevel(Math.max(0, Math.min(1, lastL)));
+          setRightLevel(Math.max(0, Math.min(1, Math.abs(lastR))));
+          rafId = requestAnimationFrame(tick);
+        };
+
+        tick();
+        return () => { if (rafId) cancelAnimationFrame(rafId); };
+      }, [hasAnalyser]);
+
+      return { hasAnalyser, leftLevel, rightLevel };
+    }
+
+    function VUMeter({ label, level, theme }){
+      // angle: -52° (rest) up to +18° (hot)
+      const angle = -52 + level * 70;
+      const faceTheme = THEMES[theme] || THEMES.night;
+      const glow = 10 + level * 30;
+      const glowAlpha = 0.45 + level * 0.4;
+
+      return (
+        <div className="vu-meter">
+          <div
+            className="vu-face"
+            style={{
+              background: faceTheme.face,
+              boxShadow: `
+                0 0 ${glow}px ${faceTheme.glowBase}${glowAlpha}),
+                inset 0 0 14px rgba(15,23,42,0.95)
+              `,
+              filter:`brightness(${0.9 + level * 0.7})`
+            }}
+          >
+            <div className="vu-scale-band">
+              <div className="vu-scale-arc" />
+              <div className="vu-ticks">
+                <span>-20</span>
+                <span>-10</span>
+                <span>-7</span>
+                <span>-5</span>
+                <span>-3</span>
+                {/* 0 dB right where red starts */}
+                <span style={{ color:"#fecaca" }}>0</span>
+                <span>+3</span>
+              </div>
+              <div className="vu-red-zone"></div>
+              <div className="vu-zero-label">0</div>
+            </div>
+            <div
+              className="vu-needle"
+              style={{ transform:`rotate(${angle}deg)` }}
+            />
+            <div className="vu-pivot" />
+          </div>
+          <div className="vu-label">{label}</div>
+        </div>
+      );
+    }
+
+    function MiniPlayerApp(){
+      const [currentIndex, setCurrentIndex] = useState(1); // start on Moving Forward :)
+      const [isPlaying, setIsPlaying] = useState(false);
+      const [currentTime, setCurrentTime] = useState(0);
+      const [duration, setDuration] = useState(0);
+      const [volume, setVolume] = useState(0.9);
+      const [isMuted, setIsMuted] = useState(false);
+      const [theme, setTheme] = useState("night");
+
+      const audioRef = useRef(null);
+      const activeTrack = TRACKS[currentIndex];
+
+      const { hasAnalyser, leftLevel, rightLevel } = useAudioEngine(
+        audioRef.current,
+        isPlaying,
+        volume,
+        isMuted
+      );
+
+      // setup listeners
+      useEffect(() => {
+        const audio = audioRef.current;
+        if (!audio) return;
+
+        const onTime = () => {
+          setCurrentTime(audio.currentTime || 0);
+        };
+        const onMeta = () => {
+          setDuration(audio.duration || 0);
+        };
+        const onEnded = () => {
+          setCurrentTime(0);
+          setCurrentIndex(prev => (prev + 1) % TRACKS.length);
+          setIsPlaying(true);
+        };
+
+        audio.addEventListener("timeupdate", onTime);
+        audio.addEventListener("loadedmetadata", onMeta);
+        audio.addEventListener("ended", onEnded);
+
+        return () => {
+          audio.removeEventListener("timeupdate", onTime);
+          audio.removeEventListener("loadedmetadata", onMeta);
+          audio.removeEventListener("ended", onEnded);
+        };
+      }, []);
+
+      // load track on index change
+      useEffect(() => {
+        const audio = audioRef.current;
+        if (!audio || !activeTrack) return;
+
+        audio.src = AUDIO_BASE + activeTrack.file;
+        audio.load();
+        audio.currentTime = 0;
+        setCurrentTime(0);
+
+        if (isPlaying){
+          audio.play().catch(() => setIsPlaying(false));
+        }
+      }, [currentIndex, activeTrack]);
+
+      // fallback plain element volume if no Web Audio
+      useEffect(() => {
+        const audio = audioRef.current;
+        if (!audio) return;
+        if (!hasAnalyser){
+          audio.volume = isMuted ? 0 : volume;
+        }
+        audio.muted = isMuted;
+      }, [volume, isMuted, hasAnalyser]);
+
+      const handlePlayPause = () => {
+        const audio = audioRef.current;
+        if (!audio) return;
+
+        if (isPlaying){
+          audio.pause();
+          setIsPlaying(false);
+        } else {
+          audio.play()
+            .then(() => setIsPlaying(true))
+            .catch(()=>{});
+        }
       };
 
-      tick();
+      const handleSkipBack = () => {
+        setCurrentIndex(prev => (prev - 1 + TRACKS.length) % TRACKS.length);
+        setIsPlaying(true);
+      };
+
+      const handleSkipForward = () => {
+        setCurrentIndex(prev => (prev + 1) % TRACKS.length);
+        setIsPlaying(true);
+      };
+
+      const handleSeekClick = (e) => {
+        const audio = audioRef.current;
+        if (!audio || !duration) return;
+        const rect = e.currentTarget.getBoundingClientRect();
+        const ratio = (e.clientX - rect.left) / rect.width;
+        const clamped = Math.max(0, Math.min(1, ratio));
+        const newTime = clamped * duration;
+        audio.currentTime = newTime;
+        setCurrentTime(newTime);
+      };
+
+      const handleVolumeChange = (e) => {
+        const v = parseFloat(e.target.value);
+        if (!Number.isNaN(v)){
+          setVolume(v);
+        }
+      };
+
+      const volPercent = Math.round(isMuted ? 0 : volume * 100);
+
+      const progress = duration ? Math.min(100, (currentTime / duration) * 100) : 0;
+
+      const themeCfg = THEMES[theme] || THEMES.night;
+
+      return (
+        <div className="window-frame">
+          <div
+            className="mini-shell"
+            style={{ borderColor: themeCfg.shellBorder }}
+          >
+            {/* meters */}
+            <div className="vu-row">
+              <VUMeter label="LEFT" level={leftLevel} theme={theme} />
+              <VUMeter label="RIGHT" level={rightLevel} theme={theme} />
+            </div>
+
+            {/* track name */}
+            <div className="text-center text-sm font-medium mb-1 mt-1">
+              {activeTrack?.name || "—"}
+            </div>
+
+            {/* timeline */}
+            <div className="flex items-center justify-between mt-1 mb-1">
+              <span className="time-label">{formatTime(currentTime)}</span>
+              <span className="time-label">{formatTime(duration)}</span>
+            </div>
+            <div className="timeline-rail" onClick={handleSeekClick}>
+              <div
+                className="timeline-fill"
+                style={{ width: progress + "%" }}
+              />
+            </div>
+
+            {/* transport + volume */}
+            <div className="mt-3 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  aria-label="Previous track"
+                  className="transport-btn"
+                  onClick={handleSkipBack}
+                >⏮</button>
+
+                <button
+                  type="button"
+                  aria-label={isPlaying ? "Pause" : "Play"}
+                  className={
+                    "transport-btn transport-btn--play" +
+                    (isPlaying ? " transport-active-ring" : "")
+                  }
+                  onClick={handlePlayPause}
+                >
+                  {isPlaying ? "❚❚" : "▶"}
+                </button>
+
+                <button
+                  type="button"
+                  aria-label="Next track"
+                  className="transport-btn"
+                  onClick={handleSkipForward}
+                >⏭</button>
+              </div>
+
+              <div className="flex items-center gap-2">
+                {/* mute button */}
+                <button
+                  type="button"
+                  aria-label={isMuted ? "Unmute" : "Mute"}
+                  className="transport-btn"
+                  onClick={() => setIsMuted(m => !m)}
+                >
+                  {isMuted ? "🔇" : "🔊"}
+                </button>
+
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value={volume}
+                  onChange={handleVolumeChange}
+                  className="vol-slider"
+                />
+                <span className="time-label" style={{ width: "32px", textAlign: "right" }}>
+                  {volPercent}%
+                </span>
+              </div>
+            </div>
+
+            {/* tiny theme dots */}
+            <div className="mt-3 flex items-center justify-center gap-3">
+              <div
+                className={
+                  "theme-dot bg-sky-400" +
+                  (theme === "night" ? " theme-dot--active" : "")
+                }
+                onClick={() => setTheme("night")}
+                title="Night theme"
+              ></div>
+              <div
+                className={
+                  "theme-dot bg-orange-400" +
+                  (theme === "dawn" ? " theme-dot--active" : "")
+                }
+                onClick={() => setTheme("dawn")}
+                title="Day Break"
+              ></div>
+              <div
+                className={
+                  "theme-dot bg-fuchsia-400" +
+                  (theme === "fantasy" ? " theme-dot--active" : "")
+                }
+                onClick={() => setTheme("fantasy")}
+                title="Fantasy"
+              ></div>
+            </div>
+
+            <audio ref={audioRef} className="hidden">
+              Your browser does not support the audio element.
+            </audio>
+          </div>
+        </div>
+      );
     }
 
-    function formatTime(sec) {
-      if (!isFinite(sec) || sec < 0) return '0:00';
-      const m = Math.floor(sec / 60);
-      const s = Math.floor(sec % 60);
-      return m + ':' + (s < 10 ? '0' + s : s);
+    const rootEl = document.getElementById("root");
+    if (rootEl){
+      const root = ReactDOM.createRoot(rootEl);
+      root.render(<MiniPlayerApp />);
     }
-
-    function loadTrack(index, startTime) {
-      const track = TRACKS[index];
-      if (!track) return;
-
-      currentIndex = index;
-      titleEl.textContent = track.name;
-
-      audioEl.src = AUDIO_BASE + track.file;
-      audioEl.load();
-      if (startTime && startTime > 0) {
-        audioEl.currentTime = startTime;
-      }
-
-      audioEl.volume = parseFloat(volSlider.value);
-    }
-
-    function updateGainFromSlider() {
-      const vol = parseFloat(volSlider.value);
-      audioEl.volume = vol;
-      if (gainNode) gainNode.gain.value = vol;
-      volPct.textContent = Math.round(vol * 100) + '%';
-    }
-
-    // ---------- Event wiring ----------
-    btnPrev.addEventListener('click', () => {
-      const nextIndex = (currentIndex - 1 + TRACKS.length) % TRACKS.length;
-      loadTrack(nextIndex, 0);
-      playAudio();
-    });
-
-    btnNext.addEventListener('click', () => {
-      const nextIndex = (currentIndex + 1) % TRACKS.length;
-      loadTrack(nextIndex, 0);
-      playAudio();
-    });
-
-    btnPlay.addEventListener('click', () => {
-      if (isPlaying) {
-        audioEl.pause();
-        isPlaying = false;
-        btnPlay.textContent = '▶';
-        btnPlay.classList.remove('playing');
-      } else {
-        playAudio();
-      }
-    });
-
-    function playAudio() {
-      initAudioGraph();
-      audioEl.play()
-        .then(() => {
-          isPlaying = true;
-          if (audioCtx && audioCtx.state === 'suspended') {
-            audioCtx.resume().catch(() => {});
-          }
-          btnPlay.textContent = '⏸';
-          btnPlay.classList.add('playing');
-        })
-        .catch(() => {});
-    }
-
-    audioEl.addEventListener('timeupdate', () => {
-      timeCurEl.textContent = formatTime(audioEl.currentTime || 0);
-      timeTotEl.textContent = formatTime(audioEl.duration || 0);
-      if (audioEl.duration) {
-        const pct = (audioEl.currentTime / audioEl.duration) * 100;
-        seekFill.style.width = pct + '%';
-      } else {
-        seekFill.style.width = '0%';
-      }
-    });
-
-    audioEl.addEventListener('loadedmetadata', () => {
-      timeTotEl.textContent = formatTime(audioEl.duration || 0);
-    });
-
-    audioEl.addEventListener('ended', () => {
-      // auto-advance like big player
-      const nextIndex = (currentIndex + 1) % TRACKS.length;
-      loadTrack(nextIndex, 0);
-      playAudio();
-    });
-
-    seekRail.addEventListener('click', (e) => {
-      if (!audioEl.duration) return;
-      const rect = seekRail.getBoundingClientRect();
-      const ratio = (e.clientX - rect.left) / rect.width;
-      const clamped = Math.max(0, Math.min(1, ratio));
-      audioEl.currentTime = clamped * audioEl.duration;
-    });
-
-    volSlider.addEventListener('input', updateGainFromSlider);
-
-    // ---------- Initial load ----------
-    // If opener gave us a start time, use it once metadata is ready.
-    let openerStartTime = 0;
-    try {
-      const cfg = window.opener && window.opener.miniplayerConfig;
-      if (cfg && typeof cfg.currentTime === 'number') openerStartTime = cfg.currentTime;
-    } catch (e) {}
-
-    loadTrack(currentIndex, openerStartTime);
-
-    // Autoplay if main player was playing
-    try {
-      const cfg = window.opener && window.opener.miniplayerConfig;
-      if (cfg && cfg.isPlaying) {
-        playAudio();
-      }
-    } catch (e) {}
   </script>
 </body>
 </html>
