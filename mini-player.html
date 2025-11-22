@@ -42,7 +42,7 @@
 
     .mini-shell{
       width:100%;
-      max-width:520px;              /* smaller overall width (~75–80%) */
+      max-width:520px;
       border-radius:26px;
       border:1px solid rgba(148,163,184,0.7);
       background:
@@ -80,9 +80,8 @@
 
     .vu-window{
       position:relative;
-      height:88px;                   /* shorter window */
+      height:88px;
       border-radius:12px;
-      /* background is overridden per-theme inline */
       box-shadow:
         inset 0 0 18px rgba(15,23,42,0.95),
         0 0 20px rgba(8,47,73,0.9);
@@ -92,7 +91,6 @@
     .vu-glow{
       position:absolute;
       inset:0;
-      /* background overridden per-theme inline */
       pointer-events:none;
       mix-blend-mode:screen;
       transition:opacity 110ms ease-out;
@@ -156,20 +154,20 @@
       filter:drop-shadow(0 0 4px rgba(248,113,113,0.7));
     }
 
+    /* needle + pivot */
     .vu-needle{
       position:absolute;
       bottom:13px;
       left:50%;
-      width:70px;              /* a bit wider to give sweep room */
+      width:70px;
       height:2px;
-      transform-origin:50% 50%;   /* pivot at center of container */
+      transform-origin:50% 50%;
       transform:translateX(-50%) rotate(-40deg);
       pointer-events:none;
     }
-
     .vu-needle-line{
       position:absolute;
-      left:50%;                /* start at pivot */
+      left:50%;
       top:0;
       width:58px;
       height:2px;
@@ -177,7 +175,6 @@
       background:linear-gradient(to right,#e5e7eb,#fefce8);
       box-shadow:0 0 4px rgba(248,250,252,0.9);
     }
-
     .vu-needle-pivot{
       position:absolute;
       left:50%;
@@ -498,7 +495,7 @@
             sum += v*v;
           }
           const rms = Math.sqrt(sum/bufferLength); // 0..~1
-          const scaled = Math.max(0,Math.min(1,rms*4)); // conservative
+          const scaled = Math.max(0,Math.min(1,rms*4));
           setLevel(scaled);
           rafId = requestAnimationFrame(tick);
         };
@@ -509,29 +506,24 @@
       return { hasEngine, level };
     }
 
-    // VU meter with proper resting-at-left + cap at 0 dB
+    // NEW VU METER LOGIC:
+    // - when level == 0 → fully left (-40°)
+    // - when level is loud → max around 0 dB (+5°), never into +3 region
+    // - small levels are treated as near-silence so the needle rests left
     function VUMeter({ label, level, theme }){
-      // --- map level (0..1-ish) to angle ---
-      const noiseFloor = 0.15;   // anything below this = visually at rest
-      const effectiveMax = 0.9;  // clamp so we don't bang past 0 dB
+      // squash very small values so "quiet" really looks quiet
+      const silenceThreshold = 0.12;
+      let usable = level <= silenceThreshold ? 0 : Math.min(level, 0.95);
 
-      const trimmed = Math.max(0, Math.min(level, effectiveMax) - noiseFloor);
-      const span = effectiveMax - noiseFloor;
-      const normalized = span > 0 ? trimmed / span : 0; // 0..1
+      // gentle easing so mid-range feels lively
+      const eased = Math.pow(usable, 0.8);
 
-      // slight easing so mid-range feels alive
-      const eased = Math.pow(normalized, 0.8);
-
-      // angles:
-      // 0   -> -40° (left peg)
-      // 1.0 ->  +5° (0 dB, start of red)
+      // sweep from about -40° (left) to +5° (0 dB line)
       const minDeg = -40;
       const maxDeg = 5;
       const angle = minDeg + (maxDeg - minDeg) * eased;
 
-      const vis = Math.max(0, Math.min(level,1)); // for glow intensity
-
-      // red zone (0 to +3 dB)
+      // red zone (0 dB to +3 dB) visually, unchanged
       const redWidthPct = 26;
 
       const windowStyle = {
@@ -545,6 +537,8 @@
         background: `radial-gradient(circle at 50% 0%, ${theme.accentStrong}, transparent 55%)`,
       };
 
+      const glowOpacity = 0.25 + Math.min(usable,1) * 0.55;
+
       return (
         <div className="vu-frame">
           <div className="vu-window" style={windowStyle}>
@@ -552,7 +546,7 @@
               className="vu-glow"
               style={{
                 ...glowStyle,
-                opacity: 0.18 + vis * 0.55,
+                opacity: glowOpacity,
               }}
             />
 
@@ -633,7 +627,10 @@
         isPlaying
       );
 
-      // plain element volume for browsers w/o WebAudio
+      // when not playing, force level 0 so needles rest at the far left
+      const displayLevel = isPlaying ? level : 0;
+
+      // element volume for browsers without WebAudio
       useEffect(() => {
         const audio = audioRef.current;
         if (!audio) return;
@@ -683,7 +680,7 @@
         if (isPlaying){
           audio.play().catch(() => setIsPlaying(false));
         }
-      },[currentIndex,activeTrack,isPlaying]);
+      },[currentIndex,activeTrack]);
 
       const handlePlay = () => {
         const audio = audioRef.current;
@@ -743,10 +740,6 @@
       const progressPercent = duration ? (currentTime/duration)*100 : 0;
       const volPercent = Math.round(volume*100);
 
-      // VU levels: rest hard-left when not playing or muted
-      const leftLevel  = (!isPlaying || isMuted) ? 0 : level;
-      const rightLevel = (!isPlaying || isMuted) ? 0 : Math.min(1, level*0.92+0.03);
-
       return (
         <div
           className="mini-shell"
@@ -758,8 +751,8 @@
         >
           {/* VU meters */}
           <div className="vu-cluster">
-            <VUMeter label="LEFT"  level={leftLevel}  theme={theme} />
-            <VUMeter label="RIGHT" level={rightLevel} theme={theme} />
+            <VUMeter label="LEFT"  level={displayLevel}                       theme={theme} />
+            <VUMeter label="RIGHT" level={Math.min(1, displayLevel*0.92+0.03)} theme={theme} />
           </div>
 
           {/* Track title */}
