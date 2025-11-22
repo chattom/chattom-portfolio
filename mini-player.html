@@ -515,20 +515,31 @@
     }
 
     function VUMeter({ label, level, theme }){
-     // Map level 0..1 to angle:
-//   0   -> ~ -40°  (needle resting at far left)
-//   1.0 -> ~  +5°  (0 dB, right at the start of the red zone)
-const clamped = Math.max(0, Math.min(1, level * 1.2));
-// Slightly emphasize lower levels and compress the top end
-const eased = Math.pow(clamped, 0.7);
+  // Treat low levels as "resting" at far left, and cap at 0 dB (start of red)
 
-const minDeg = -40;  // left edge of the scale
-const maxDeg = 5;    // stop around 0 dB, before the red region
+  // 1) Knock out the noise floor so the needle can really rest left
+  const noiseFloor = 0.22;     // anything below this is considered silence
+  const effectiveMax = 0.9;    // typical loud peak, before real clipping
 
-const angle = minDeg + (maxDeg - minDeg) * eased;
+  // Trim to [noiseFloor, effectiveMax], then normalize to 0..1
+  const trimmed = Math.max(0, Math.min(level, effectiveMax) - noiseFloor);
+  const normalized =
+    trimmed <= 0 ? 0 : trimmed / (effectiveMax - noiseFloor);
 
-// red zone placement (0 dB to +3 dB)
-const redWidthPct = 26;
+  // 2) Ease curve: keeps mid-range lively, top end more stable
+  const eased = Math.pow(normalized, 0.8);
+
+  // 3) Map 0..1 → angle:
+  //    0   → -40° (resting at far left)
+  //    1.0 → +5°  (0 dB, right where the red starts)
+  const minDeg = -40;
+  const maxDeg = 5;
+  const angle = minDeg + (maxDeg - minDeg) * eased;
+
+  // red zone placement (0 dB to +3 dB) – leave this the same
+  const redWidthPct = 26;
+  ...
+}
 
       const windowStyle = {
         background: `radial-gradient(circle at 50% 0%, ${theme.accentSoft}, rgba(8,47,73,0.95) 55%, #020617 100%)`,
