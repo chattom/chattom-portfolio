@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chris Chattom — Mini Player</title>
+  <meta name="description" content="Floating mini player for Chris Chattom music." />
+
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- React + Babel -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    *{box-sizing:border-box;}
+    html,body{
+      margin:0;
+      padding:0;
+      height:100%;
+      background:#020617;
+      color:#e5e7eb;
+      font-family:Inter, system-ui, -apple-system, Segoe UI, sans-serif;
+      -webkit-font-smoothing:antialiased;
+    }
+
+    #root{
+      height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .mini-shell{
+      width:100%;
+      max-width:380px;
+      border-radius:18px;
+      padding:12px 16px 14px;
+      background:radial-gradient(circle at 50% -30%, rgba(15,23,42,0.9), #020617);
+      box-shadow:
+        0 18px 40px rgba(0,0,0,0.9),
+        inset 0 0 0 1px rgba(148,163,184,0.45);
+    }
+
+    /* VU meter face */
+    .vu-pair{
+      display:flex;
+      gap:12px;
+      margin-bottom:10px;
+    }
+    .vu{
+      flex:1;
+      border-radius:10px;
+      background:#111827;
+      padding:6px 8px 8px;
+      box-shadow:
+        0 6px 14px rgba(0,0,0,0.8),
+        inset 0 0 0 1px rgba(15,23,42,0.9);
+      position:relative;
+      overflow:hidden;
+    }
+    .vu-inner{
+      border-radius:7px;
+      background:linear-gradient(to bottom,#fefce8,#fef9c3);
+      padding:6px 6px 5px;
+      position:relative;
+      overflow:hidden;
+    }
+    .vu-scale{
+      position:relative;
+      height:32px;
+    }
+    .vu-ticks{
+      position:absolute;
+      inset:0 4px;
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      font-size:8px;
+      color:#111827;
+    }
+    .vu-ticks span{
+      transform:translateY(2px);
+    }
+    .vu-arc{
+      position:absolute;
+      inset:2px 2px 0;
+      border-bottom:1px solid rgba(55,65,81,0.7);
+      border-radius:100% 100% 0 0 / 180% 180% 0 0;
+    }
+
+    .vu-red{
+      position:absolute;
+      right:6px;
+      bottom:6px;
+      width:28%;
+      height:6px;
+      border-radius:10px 10px 0 0;
+      background:linear-gradient(to right,#f97316,#ef4444);
+    }
+
+    .vu-label{
+      margin-top:2px;
+      font-size:7px;
+      letter-spacing:0.16em;
+      text-transform:uppercase;
+      color:#111827;
+      text-align:center;
+    }
+
+    /* needle */
+    .vu-needle{
+      position:absolute;
+      left:50%;
+      bottom:3px;
+      width:1.5px;
+      height:32px;
+      background:#111827;
+      transform-origin:bottom center;
+      box-shadow:0 0 1px rgba(0,0,0,0.9);
+    }
+    .vu-needle::after{
+      content:"";
+      position:absolute;
+      bottom:-2px;
+      left:-2px;
+      width:5px;
+      height:5px;
+      border-radius:999px;
+      background:#111827;
+    }
+
+    /* glowing blue “glass” behind scale */
+    .vu-glow{
+      position:absolute;
+      inset:0;
+      background:radial-gradient(circle at 50% 100%, rgba(56,189,248,0.85), transparent 70%);
+      opacity:0;
+      mix-blend-mode:multiply;
+      pointer-events:none;
+      transition:opacity 80ms ease-out;
+    }
+
+    /* peak LED */
+    .vu-peak{
+      position:absolute;
+      right:8px;
+      top:7px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:2px;
+      font-size:7px;
+      color:#b91c1c;
+    }
+    .vu-peak-dot{
+      width:7px;
+      height:7px;
+      border-radius:999px;
+      background:#7f1d1d;
+      box-shadow:0 0 0 1px rgba(127,29,29,0.6);
+      position:relative;
+    }
+    .vu-peak-dot::after{
+      content:"";
+      position:absolute;
+      inset:1px;
+      border-radius:999px;
+      background:radial-gradient(circle at 50% 40%, #fecaca, #b91c1c);
+      opacity:0;
+      transition:opacity 80ms ease-out, box-shadow 80ms ease-out;
+      box-shadow:none;
+    }
+    .vu-peak-dot--on::after{
+      opacity:1;
+      box-shadow:0 0 8px rgba(248,113,113,0.9);
+    }
+
+    /* mini controls */
+    .mini-title{
+      font-size:13px;
+      text-align:center;
+      margin:2px 0 6px;
+    }
+    .mini-time{
+      display:flex;
+      justify-content:space-between;
+      font-size:9px;
+      color:#9ca3af;
+      margin-bottom:3px;
+    }
+    .mini-progress{
+      position:relative;
+      height:6px;
+      border-radius:999px;
+      background:#020617;
+      box-shadow:
+        inset 0 0 3px rgba(15,23,42,0.9),
+        0 0 10px rgba(15,23,42,0.7);
+      overflow:hidden;
+      cursor:pointer;
+    }
+    .mini-progress-fill{
+      height:100%;
+      background:linear-gradient(to right,#e5e7eb,#f9fafb);
+      box-shadow:0 0 8px rgba(248,250,252,0.8);
+    }
+
+    .mini-transport{
+      display:flex;
+      justify-content:center;
+      gap:6px;
+      margin-top:8px;
+      margin-bottom:4px;
+    }
+    .mini-btn{
+      width:30px;
+      height:30px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,0.7);
+      background:
+        radial-gradient(circle at 30% 18%, rgba(255,255,255,0.24), transparent 55%),
+        radial-gradient(circle at 70% 82%, #020617, #020617);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:11px;
+      color:#e5e7eb;
+      cursor:pointer;
+      box-shadow:
+        0 5px 10px rgba(0,0,0,0.7),
+        inset 0 2px 3px rgba(255,255,255,0.3);
+      transition:transform 100ms ease, box-shadow 100ms ease, filter 100ms ease;
+      filter:drop-shadow(0 0 2px rgba(34,211,238,0.35));
+    }
+    .mini-btn:hover{
+      transform:translateY(-1px);
+      filter:drop-shadow(0 0 6px rgba(34,211,238,0.7));
+    }
+    .mini-btn:active{
+      transform:translateY(1px) scale(0.97);
+      box-shadow:
+        0 3px 8px rgba(0,0,0,0.9),
+        inset 0 1px 3px rgba(0,0,0,0.7);
+    }
+
+    .mini-footer{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-top:4px;
+      font-size:9px;
+      color:#9ca3af;
+    }
+    .mini-theme-dot{
+      width:10px;
+      height:10px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,0.7);
+      cursor:pointer;
+      box-shadow:0 0 4px rgba(15,23,42,0.8);
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    const TRACKS = [
+      { id: '01', name: 'The Copycat',             file: 'The_Copycat.mp3' },
+      { id: '02', name: 'Moving Forward',          file: 'Moving_Forward.mp3' },
+      { id: '03', name: 'Fleetwood National',      file: 'Fleetwood_National.mp3' },
+      { id: '04', name: 'Ashes and Aurora',        file: 'Ashes_and_Aurora.mp3' },
+      { id: '05', name: 'Sugartrain Voyage',       file: 'Sugartrain_Voyage.mp3' },
+      { id: '06', name: 'Car Crash in Cardiff',    file: 'Car_Crash_in_Cardiff.mp3' },
+      { id: '07', name: 'Dune Audio',              file: 'Dune_Audio.mp3' },
+      { id: '08', name: 'Slow Roast',              file: 'Slow_Roast.mp3' },
+      { id: '09', name: 'Bayou Moon',              file: 'Bayou_Moon.mp3' },
+      { id: '10', name: 'Lonely Carbon Lifeforms', file: 'Lonely_Carbon_Lifeforms.mp3' },
+      { id: '11', name: 'The Magical Third',       file: 'The_Magical_Third.mp3' },
+      { id: '12', name: 'Up and Down',             file: 'Up_and_Down.mp3' },
+      { id: '13', name: 'Arcadia Drive',           file: 'Arcadia_Drive.mp3' },
+      { id: '14', name: 'Ocean Post',              file: 'Ocean_Post.mp3' },
+      { id: '15', name: 'Covert Company',          file: 'Covert_Company.mp3' },
+      { id: '16', name: 'Too Many Lights',         file: 'Too_Many_Lights.mp3' },
+      { id: '17', name: 'American Sword',          file: 'American_Sword.mp3' },
+      { id: '18', name: 'Go Driving Fast',         file: 'Go_Driving_Fast.mp3' },
+    ];
+    const AUDIO_BASE = "assets/";
+
+    function formatTime(sec){
+      if (!isFinite(sec) || sec < 0) return "0:00";
+      const m = Math.floor(sec/60);
+      const s = Math.floor(sec%60);
+      return m + ":" + (s < 10 ? "0"+s : s);
+    }
+
+    // Web Audio engine reused: returns overall RMS & simple left/right variants
+    function useVuEngine(audioElement, volume, isMuted, isPlaying){
+      const ctxRef = useRef(null);
+      const sourceRef = useRef(null);
+      const gainRef = useRef(null);
+      const analyserRef = useRef(null);
+      const [level, setLevel] = useState(0);
+
+      useEffect(() => {
+        if (!audioElement) return;
+        if (ctxRef.current) return;
+
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+
+        const ctx = new AudioCtx();
+        const src = ctx.createMediaElementSource(audioElement);
+        const gain = ctx.createGain();
+        const analyser = ctx.createAnalyser();
+
+        analyser.fftSize = 512;
+
+        src.connect(gain);
+        gain.connect(analyser);
+        analyser.connect(ctx.destination);
+
+        gain.gain.value = isMuted ? 0 : volume;
+
+        ctxRef.current = ctx;
+        sourceRef.current = src;
+        gainRef.current = gain;
+        analyserRef.current = analyser;
+
+        return () => {
+          if (sourceRef.current) sourceRef.current.disconnect();
+          if (analyserRef.current) analyserRef.current.disconnect();
+          if (gainRef.current) gainRef.current.disconnect();
+          if (ctxRef.current && ctxRef.current.state !== "closed") ctxRef.current.close();
+        };
+      }, [audioElement]);
+
+      useEffect(() => {
+        const ctx = ctxRef.current;
+        const gain = gainRef.current;
+        if (!ctx || !gain) return;
+
+        gain.gain.value = isMuted ? 0 : volume;
+        if (isPlaying && ctx.state === "suspended"){
+          ctx.resume().catch(()=>{});
+        }
+      }, [volume, isMuted, isPlaying]);
+
+      useEffect(() => {
+        const analyser = analyserRef.current;
+        if (!analyser) return;
+
+        const bufferLength = analyser.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+        let rafId;
+
+        const tick = () => {
+          analyser.getByteTimeDomainData(dataArray);
+          let sum = 0;
+          for (let i=0;i<bufferLength;i++){
+            const v = (dataArray[i] - 128)/128;
+            sum += v*v;
+          }
+          const rms = Math.sqrt(sum / bufferLength); // 0..~1
+          const scaled = Math.max(0, Math.min(1, rms * 6)); // boost a bit
+          setLevel(scaled);
+          rafId = requestAnimationFrame(tick);
+        };
+        tick();
+        return () => rafId && cancelAnimationFrame(rafId);
+      }, []);
+
+      return level;
+    }
+
+    function VuMeter({ value, label }){
+      // convert 0..1 level to dB-ish
+      const db = 20 * Math.log10(value + 1e-4);  // -80..0-ish
+      const clampedDb = Math.max(-20, Math.min(3, db * 1.2 + 12)); // tune here
+      const minAngle = -50; // degrees (left end)
+      const maxAngle = 32;  // degrees (right / red)
+      const norm = (clampedDb + 20) / 23; // -20..+3 → 0..1
+      const angle = minAngle + (maxAngle - minAngle) * norm;
+
+      // glow & peak LED
+      const glowOpacity = Math.min(1, value * 2.4);
+      const isPeaking = clampedDb > 0.5;
+
+      return (
+        <div className="vu">
+          <div className="vu-inner">
+            <div className="vu-glow" style={{ opacity: glowOpacity }} />
+            <div className="vu-scale">
+              <div className="vu-arc" />
+              <div className="vu-ticks">
+                <span>-20</span>
+                <span>10</span>
+                <span>7</span>
+                <span>5</span>
+                <span>3</span>
+                <span>0</span>
+                <span style={{color:"#b91c1c"}}>+3</span>
+              </div>
+              <div
+                className="vu-needle"
+                style={{ transform:`translateX(-50%) rotate(${angle}deg)` }}
+              />
+              <div className="vu-red" />
+            </div>
+            <div className="vu-label">{label} VU</div>
+          </div>
+
+          <div className="vu-peak">
+            <div className={"vu-peak-dot" + (isPeaking ? " vu-peak-dot--on" : "")}/>
+            <span>PEAK</span>
+          </div>
+        </div>
+      );
+    }
+
+    function MiniPlayer(){
+      const [currentIndex,setCurrentIndex] = useState(1); // start on Moving Forward :)
+      const [isPlaying,setIsPlaying] = useState(false);
+      const [currentTime,setCurrentTime] = useState(0);
+      const [duration,setDuration] = useState(0);
+      const [volume,setVolume] = useState(0.9);
+      const [isMuted,setIsMuted] = useState(false);
+      const [theme,setTheme] = useState("nite"); // nite / day / fantasy
+
+      const audioRef = useRef(null);
+      const activeTrack = TRACKS[currentIndex];
+
+      const level = useVuEngine(audioRef.current, volume, isMuted, isPlaying);
+
+      // derive slightly different L/R from the same level
+      const t = currentTime;
+      const leftLevel  = Math.max(0, Math.min(1, level * (0.9 + 0.18 * Math.sin(t*3.3))));
+      const rightLevel = Math.max(0, Math.min(1, level * (0.95 + 0.2 * Math.cos(t*2.6+0.8))));
+
+      useEffect(() => {
+        const audio = audioRef.current;
+        if (!audio) return;
+
+        const onTime = () => setCurrentTime(audio.currentTime || 0);
+        const onMeta = () => setDuration(audio.duration || 0);
+        const onEnded = () => {
+          setCurrentTime(0);
+          setCurrentIndex(prev => (prev + 1) % TRACKS.length);
+          setIsPlaying(true);
+        };
+
+        audio.addEventListener("timeupdate", onTime);
+        audio.addEventListener("loadedmetadata", onMeta);
+        audio.addEventListener("ended", onEnded);
+
+        return () => {
+          audio.removeEventListener("timeupdate", onTime);
+          audio.removeEventListener("loadedmetadata", onMeta);
+          audio.removeEventListener("ended", onEnded);
+        };
+      }, []);
+
+      useEffect(() => {
+        const audio = audioRef.current;
+        if (!audio || !activeTrack) return;
+
+        audio.src = AUDIO_BASE + activeTrack.file;
+        audio.load();
+        audio.currentTime = 0;
+        setCurrentTime(0);
+
+        if (isPlaying){
+          audio.play().catch(() => setIsPlaying(false));
+        }
+      }, [currentIndex, activeTrack]);
+
+      useEffect(() => {
+        const audio = audioRef.current;
+        if (!audio) return;
+        audio.volume = isMuted ? 0 : volume;
+        audio.muted = isMuted;
+      }, [volume, isMuted]);
+
+      const handlePlay = () => {
+        const audio = audioRef.current;
+        if (!audio) return;
+        audio.play().then(() => setIsPlaying(true)).catch(()=>{});
+      };
+      const handlePause = () => {
+        const audio = audioRef.current;
+        if (!audio) return;
+        if (isPlaying){
+          audio.pause();
+          setIsPlaying(false);
+        } else {
+          audio.play().then(()=>setIsPlaying(true)).catch(()=>{});
+        }
+      };
+      const handleStop = () => {
+        const audio = audioRef.current;
+        if (!audio) return;
+        audio.pause();
+        audio.currentTime = 0;
+        setCurrentTime(0);
+        setIsPlaying(false);
+      };
+      const handleSkipBack = () => {
+        setCurrentIndex(p => (p - 1 + TRACKS.length) % TRACKS.length);
+      };
+      const handleSkipForward = () => {
+        setCurrentIndex(p => (p + 1) % TRACKS.length);
+      };
+      const handleSeek = (e) => {
+        const audio = audioRef.current;
+        if (!audio || !duration) return;
+        const rect = e.currentTarget.getBoundingClientRect();
+        const ratio = (e.clientX - rect.left) / rect.width;
+        const clamped = Math.max(0, Math.min(1, ratio));
+        const newTime = clamped * duration;
+        audio.currentTime = newTime;
+        setCurrentTime(newTime);
+      };
+
+      const bgByTheme = {
+        nite: "radial-gradient(circle at 50% -30%, rgba(15,23,42,0.9), #020617)",
+        day:  "radial-gradient(circle at 50% -30%, rgba(254,243,199,0.9), #1e293b)",
+        fantasy: "radial-gradient(circle at 50% -30%, rgba(147,51,234,0.65), #020617)"
+      };
+
+      return (
+        <div className="mini-shell" style={{ background:bgByTheme[theme] }}>
+          <div className="vu-pair">
+            <VuMeter value={leftLevel}  label="L" />
+            <VuMeter value={rightLevel} label="R" />
+          </div>
+
+          <div className="mini-title">
+            {activeTrack ? activeTrack.name : "—"}
+          </div>
+
+          <div className="mini-time">
+            <span>{formatTime(currentTime)}</span>
+            <span>{formatTime(duration)}</span>
+          </div>
+
+          <div className="mini-progress" onClick={handleSeek}>
+            <div
+              className="mini-progress-fill"
+              style={{ width: duration ? (currentTime / duration) * 100 + "%" : "0%" }}
+            />
+          </div>
+
+          <div className="mini-transport">
+            <button className="mini-btn" onClick={handleSkipBack} aria-label="Previous track">⏮</button>
+            <button className="mini-btn" onClick={handlePlay} aria-label="Play">▶</button>
+            <button className="mini-btn" onClick={handlePause} aria-label="Pause">⏸</button>
+            <button className="mini-btn" onClick={handleStop} aria-label="Stop">■</button>
+            <button className="mini-btn" onClick={handleSkipForward} aria-label="Next track">⏭</button>
+          </div>
+
+          <div className="mini-footer">
+            <div style={{ display:"flex", alignItems:"center", gap:4 }}>
+              <span style={{fontSize:9}}>Theme</span>
+              <div
+                className="mini-theme-dot"
+                style={{ background:"#0f172a", boxShadow:"0 0 5px rgba(56,189,248,0.9)" }}
+                onClick={() => setTheme("nite")}
+                title="Nite Life"
+              />
+              <div
+                className="mini-theme-dot"
+                style={{ background:"#fed7aa" }}
+                onClick={() => setTheme("day")}
+                title="Day Break"
+              />
+              <div
+                className="mini-theme-dot"
+                style={{ background:"#a855f7" }}
+                onClick={() => setTheme("fantasy")}
+                title="Fantasy"
+              />
+            </div>
+
+            <div>
+              <span style={{marginRight:4}}>Vol</span>
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={volume}
+                onChange={e => setVolume(parseFloat(e.target.value))}
+                style={{ verticalAlign:"middle" }}
+              />
+              <button
+                style={{
+                  marginLeft:4,
+                  border:"none",
+                  background:"transparent",
+                  color:"#e5e7eb",
+                  cursor:"pointer"
+                }}
+                onClick={() => setIsMuted(m => !m)}
+              >
+                {isMuted ? "🔇" : "🔊"}
+              </button>
+            </div>
+          </div>
+
+          <audio ref={audioRef} className="hidden">
+            Your browser does not support the audio element.
+          </audio>
+        </div>
+      );
+    }
+
+    const rootEl = document.getElementById("root");
+    ReactDOM.createRoot(rootEl).render(<MiniPlayer />);
+  </script>
+</body>
+</html>
