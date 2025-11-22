@@ -154,7 +154,6 @@
       filter:drop-shadow(0 0 4px rgba(248,113,113,0.7));
     }
 
-    /* needle + pivot */
     .vu-needle{
       position:absolute;
       bottom:13px;
@@ -165,6 +164,7 @@
       transform:translateX(-50%) rotate(-40deg);
       pointer-events:none;
     }
+
     .vu-needle-line{
       position:absolute;
       left:50%;
@@ -175,6 +175,7 @@
       background:linear-gradient(to right,#e5e7eb,#fefce8);
       box-shadow:0 0 4px rgba(248,250,252,0.9);
     }
+
     .vu-needle-pivot{
       position:absolute;
       left:50%;
@@ -419,7 +420,7 @@
       return m + ":" + (s < 10 ? "0"+s : s);
     }
 
-    // WebAudio engine giving us gain + level
+    // WebAudio engine
     function useAudioEngine(audioElement, volume, isMuted, isPlaying){
       const ctxRef = useRef(null);
       const sourceRef = useRef(null);
@@ -494,7 +495,7 @@
             const v = (data[i]-128)/128;
             sum += v*v;
           }
-          const rms = Math.sqrt(sum/bufferLength); // 0..~1
+          const rms = Math.sqrt(sum/bufferLength);
           const scaled = Math.max(0,Math.min(1,rms*4));
           setLevel(scaled);
           rafId = requestAnimationFrame(tick);
@@ -506,24 +507,34 @@
       return { hasEngine, level };
     }
 
-    // NEW VU METER LOGIC:
-    // - when level == 0 → fully left (-40°)
-    // - when level is loud → max around 0 dB (+5°), never into +3 region
-    // - small levels are treated as near-silence so the needle rests left
-    function VUMeter({ label, level, theme }){
-      // squash very small values so "quiet" really looks quiet
-      const silenceThreshold = 0.12;
-      let usable = level <= silenceThreshold ? 0 : Math.min(level, 0.95);
+    // NEW mapping with proper rest and 0 dB cap
+    function VUMeter({ label, level, theme, isActive }){
+      // raw engine level
+      const raw = (isActive ? level : 0) || 0;
 
-      // gentle easing so mid-range feels lively
-      const eased = Math.pow(usable, 0.8);
+      // Treat anything below this as silence so needle rests at far left
+      const noiseFloor = 0.20;
+      const peak = 0.90; // typical loud peak before clipping
 
-      // sweep from about -40° (left) to +5° (0 dB line)
+      let meter = 0;
+      if (raw > noiseFloor){
+        meter = (raw - noiseFloor) / (peak - noiseFloor);
+        meter = Math.max(0, Math.min(1, meter));
+      }
+
+      // ease curve keeps mid-range lively
+      const eased = Math.pow(meter, 0.9);
+
+      // Angle mapping:
+      // 0 -> -40deg (rest left / ~10 o'clock)
+      // 1 -> 0deg   (0 dB, just at edge of red)
       const minDeg = -40;
-      const maxDeg = 5;
+      const maxDeg = 0;
       const angle = minDeg + (maxDeg - minDeg) * eased;
 
-      // red zone (0 dB to +3 dB) visually, unchanged
+      // use unclipped raw level just for glow
+      const glowLevel = Math.max(0, Math.min(1, raw));
+
       const redWidthPct = 26;
 
       const windowStyle = {
@@ -537,8 +548,6 @@
         background: `radial-gradient(circle at 50% 0%, ${theme.accentStrong}, transparent 55%)`,
       };
 
-      const glowOpacity = 0.25 + Math.min(usable,1) * 0.55;
-
       return (
         <div className="vu-frame">
           <div className="vu-window" style={windowStyle}>
@@ -546,13 +555,12 @@
               className="vu-glow"
               style={{
                 ...glowStyle,
-                opacity: glowOpacity,
+                opacity: 0.15 + glowLevel * 0.6,
               }}
             />
 
             <div className="vu-scale">
               <div className="vu-scale-inner">
-                {/* ticks and labels */}
                 {[-20,-10,-7,-5,-3,0,3].map((val) => {
                   const pos = (val + 20) / 23;
                   const angleDeg = -38 + pos*58;
@@ -580,7 +588,6 @@
                   );
                 })}
 
-                {/* red zone */}
                 <div
                   className="vu-red-zone"
                   style={{
@@ -590,7 +597,6 @@
                   }}
                 />
 
-                {/* needle */}
                 <div
                   className="vu-needle"
                   style={{
@@ -627,10 +633,7 @@
         isPlaying
       );
 
-      // when not playing, force level 0 so needles rest at the far left
-      const displayLevel = isPlaying ? level : 0;
-
-      // element volume for browsers without WebAudio
+      // plain element volume for browsers w/o WebAudio
       useEffect(() => {
         const audio = audioRef.current;
         if (!audio) return;
@@ -740,6 +743,9 @@
       const progressPercent = duration ? (currentTime/duration)*100 : 0;
       const volPercent = Math.round(volume*100);
 
+      const vuActive = isPlaying && !isMuted && volume > 0.02;
+      const rightLevel = Math.min(1, level*0.92 + 0.03);
+
       return (
         <div
           className="mini-shell"
@@ -751,8 +757,18 @@
         >
           {/* VU meters */}
           <div className="vu-cluster">
-            <VUMeter label="LEFT"  level={displayLevel}                       theme={theme} />
-            <VUMeter label="RIGHT" level={Math.min(1, displayLevel*0.92+0.03)} theme={theme} />
+            <VUMeter
+              label="LEFT"
+              level={level}
+              theme={theme}
+              isActive={vuActive}
+            />
+            <VUMeter
+              label="RIGHT"
+              level={rightLevel}
+              theme={theme}
+              isActive={vuActive}
+            />
           </div>
 
           {/* Track title */}
