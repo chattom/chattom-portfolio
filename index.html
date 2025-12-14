@@ -426,6 +426,11 @@ img, picture, figure {
     bottom: 10px !important;
   }
 }
+    /* Let the Common Grounds slider shrink to its content */
+.media.slider.no-ar {
+  aspect-ratio: auto;
+  min-height: 0;
+}
 </style>
 </head
 <body id="top">
@@ -1070,12 +1075,15 @@ slider.setAttribute('tabindex', '0');
     // init
     imgs[0].classList.add('active');
 if (!imgs[0].src) { imgs[0].src = imgs[0].dataset.src || ''; }
-   /* --- Lock container aspect ratio to the first image (prevents vertical jump) --- */
-(function lockAspect() {
-  const sliderEl = slider; // use the existing slider variable
-  if (!sliderEl || !imgs[0]) return;
+       /* --- Lock container aspect ratio to the first image (prevents vertical jump) --- */
+    (function lockAspect() {
+      const sliderEl = slider; // use the existing slider variable
+      if (!sliderEl || !imgs[0]) return;
 
-  function setAR(w, h) {
+      // Skip AR locking for sliders marked "no-ar" (Common Grounds)
+      if (sliderEl.classList.contains('no-ar')) return;
+
+      function setAR(w, h) {
     if (!w || !h) return;
     if ('aspectRatio' in document.documentElement.style) {
       sliderEl.style.aspectRatio = `${w} / ${h}`;
