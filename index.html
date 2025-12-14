@@ -403,9 +403,9 @@ img, picture, figure {
 }
     /* Desktop-only: make the Common Grounds slider a bit shallower */
 @media (min-width: 1024px) {
-  .cg-slider {
-    aspect-ratio: 4 / 3;  /* not as tall as 1:1 */
-    min-height: 0;        /* override the global 320px min-height */
+  .media.slider.cg-slider {
+    aspect-ratio: 4 / 3;  /* shallower box */
+    min-height: 0;        /* don't force the extra height */
   }
 }
 </style>
@@ -618,7 +618,7 @@ img, picture, figure {
 
             <!-- Common Grounds – character logo series -->
       <figure class="work fade common-grounds" style="--delay:.32s">
-        <div class="media slider cg-slider" data-interval="5200">
+          <div class="media slider cg-slider no-ar" data-interval="5200">
           <img src="assets/01-Common-Grounds.jpg"
                alt="Common Grounds logo – primary lockup" loading="lazy" />
           <img data-src="assets/02-Common-Grounds.jpg"
