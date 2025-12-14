@@ -408,21 +408,22 @@ img, picture, figure {
     margin-bottom: 1.5rem; /* adjust as needed */
   }
 }
-    /* Desktop-only tightening for Common Grounds carousel */
+    /* Desktop-only tweaks for Common Grounds carousel */
 @media (min-width: 1024px) {
+  /* Slightly smaller card spacing below */
   figure.common-grounds {
-    margin-bottom: 0.5rem; /* much smaller margin */
+    margin-bottom: 0.5rem;
   }
 
-  /* Reduce extra vertical padding in the slider container */
+  /* Make the slider box less tall on desktop */
   figure.common-grounds .media.slider {
-    padding-bottom: 0 !important;
-    margin-bottom: 0 !important;
+    aspect-ratio: 4 / 3 !important;  /* wider than tall */
+    min-height: 0;                   /* don’t force a tall box */
   }
 
-  /* Pull the slider dots upward */
+  /* Keep dots closer to the image */
   figure.common-grounds .slider-dots {
-    bottom: 10px !important;   /* default is usually much lower */
+    bottom: 10px !important;
   }
 }
 </style>
