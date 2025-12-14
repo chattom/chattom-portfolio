@@ -401,35 +401,12 @@ img, picture, figure {
     pointer-events: none; /* lets touches scroll instead of selecting the image */
   }
 }
-
-/* Desktop-only tightening of whitespace for Common Grounds carousel */
+    /* Desktop-only: make the Common Grounds slider a bit shallower */
 @media (min-width: 1024px) {
-  figure.common-grounds {
-    margin-bottom: 1.5rem; /* adjust as needed */
+  .cg-slider {
+    aspect-ratio: 4 / 3;  /* not as tall as 1:1 */
+    min-height: 0;        /* override the global 320px min-height */
   }
-}
-    /* Desktop-only tweaks for Common Grounds carousel */
-@media (min-width: 1024px) {
-  /* Slightly smaller card spacing below */
-  figure.common-grounds {
-    margin-bottom: 0.5rem;
-  }
-
-  /* Make the slider box less tall on desktop */
-  figure.common-grounds .media.slider {
-    aspect-ratio: 4 / 3 !important;  /* wider than tall */
-    min-height: 0;                   /* don’t force a tall box */
-  }
-
-  /* Keep dots closer to the image */
-  figure.common-grounds .slider-dots {
-    bottom: 10px !important;
-  }
-}
-    /* Let the Common Grounds slider shrink to its content */
-.media.slider.no-ar {
-  aspect-ratio: auto;
-  min-height: 0;
 }
 </style>
 </head
@@ -641,7 +618,7 @@ img, picture, figure {
 
             <!-- Common Grounds – character logo series -->
       <figure class="work fade common-grounds" style="--delay:.32s">
-        <div class="media slider no-ar" data-interval="5200">
+        <div class="media slider cg-slider" data-interval="5200">
           <img src="assets/01-Common-Grounds.jpg"
                alt="Common Grounds logo – primary lockup" loading="lazy" />
           <img data-src="assets/02-Common-Grounds.jpg"
