@@ -396,13 +396,20 @@ img, picture, figure {
   }
 }
     /* Step 3: smoother touch scrolling on phones/tablets */
-  @media (hover: none) and (pointer: coarse) {
-    img, picture {
-      pointer-events: none; /* lets touches scroll instead of selecting the image */
-    }
+@media (hover: none) and (pointer: coarse) {
+  img, picture {
+    pointer-events: none; /* lets touches scroll instead of selecting the image */
   }
-  </style>
-</head>
+}
+
+/* Desktop-only tightening of whitespace for Common Grounds carousel */
+@media (min-width: 1024px) {
+  figure.common-grounds {
+    margin-bottom: 1.5rem; /* adjust as needed */
+  }
+}
+</style>
+</head
 <body id="top">
 <!-- NAVBAR -->
 <nav class="site-nav" aria-label="Main">
