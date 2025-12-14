@@ -408,6 +408,23 @@ img, picture, figure {
     margin-bottom: 1.5rem; /* adjust as needed */
   }
 }
+    /* Desktop-only tightening for Common Grounds carousel */
+@media (min-width: 1024px) {
+  figure.common-grounds {
+    margin-bottom: 0.5rem; /* much smaller margin */
+  }
+
+  /* Reduce extra vertical padding in the slider container */
+  figure.common-grounds .media.slider {
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+  }
+
+  /* Pull the slider dots upward */
+  figure.common-grounds .slider-dots {
+    bottom: 10px !important;   /* default is usually much lower */
+  }
+}
 </style>
 </head
 <body id="top">
