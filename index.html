@@ -408,6 +408,13 @@ img, picture, figure {
     min-height: 0;        /* don't force the extra height */
   }
 }
+    /* Desktop-only: trim extra whitespace on Absolut Hyakutake slider */
+@media (min-width: 1024px) {
+  .media.slider.hyakutake-slider {
+    aspect-ratio: 4 / 3;  /* adjust if you want it taller/shorter */
+    min-height: 0;        /* override the global 320px min-height */
+  }
+}
 </style>
 </head
 <body id="top">
@@ -509,7 +516,7 @@ img, picture, figure {
 </figure>
 
       <figure class="work fade" style="--delay:.17s">
-  <div class="media slider" data-interval="5000">
+    <div class="media slider hyakutake-slider no-ar" data-interval="5600">
     <img src="assets/01-Proximity.png" alt="Proximity — Gestalt principle illustrated by cats" class="active">
     <img src="assets/02-Similarity.png" alt="Similarity — Gestalt principle illustrated by cats">
     <img src="assets/03-Continuity.png" alt="Continuity — Gestalt principle illustrated by cats">
