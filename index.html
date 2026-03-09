@@ -415,6 +415,12 @@ img, picture, figure {
     min-height: 0;        /* override the global 320px min-height */
   }
 }
+    @media (min-width: 1024px) {
+  .media.slider.tight-slider {
+    aspect-ratio: 4 / 3;
+    min-height: 0;
+  }
+}
 </style>
 </head
 <body id="top">
@@ -510,7 +516,7 @@ img, picture, figure {
   </figcaption>
 </figure>
       <figure class="work fade" style="--delay:.14s">
-  <div class="media slider" data-interval="5400">
+  <div class="media slider tight-slider" data-interval="5400">
     <img src="assets/04-El-Camino-del-Sol-Cover.png?v=1" 
          alt="El Camino del Sol — Front Cover" loading="lazy">
     <img data-src="assets/El-Camino-del-Sol-Back-Cover.png?v=1" alt="">
@@ -544,7 +550,7 @@ img, picture, figure {
 </figure>
                   <!-- Mon Sablé – luxury skincare & fragrance system -->
       <figure class="work fade" style="--delay:.215s">
-        <div class="media slider" data-interval="5200">
+        <div class="media slider tight-slider" data-interval="5200">
           <img src="assets/01-Mon-Sable-Logo-Presentation.png"
                alt="Mon Sablé – primary logo and brand presentation" loading="lazy" />
           <img data-src="assets/Mon-Sable-Logo-2.png"
