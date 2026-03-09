@@ -4,8 +4,141 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Information Design | Chris Chattom</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: #ffffff;
+      color: #111111;
+    }
+
+    .page-wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 80px 20px;
+    }
+
+    h1 {
+      font-size: 36px;
+      font-weight: 700;
+      margin: 0 0 24px 0;
+    }
+
+    .intro {
+      max-width: 760px;
+      font-size: 18px;
+      line-height: 1.6;
+      font-weight: 400;
+      margin-bottom: 16px;
+    }
+
+    .intro-last {
+      max-width: 760px;
+      font-size: 18px;
+      line-height: 1.6;
+      font-weight: 400;
+      margin-bottom: 56px;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-bottom: 48px;
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      color: #111111;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 32px;
+      align-items: start;
+    }
+
+    .info-piece {
+      margin: 0;
+    }
+
+    .info-piece img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 8px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    }
+
+    .info-piece figcaption {
+      font-size: 14px;
+      line-height: 1.5;
+      color: #444444;
+      margin-top: 10px;
+    }
+
+    footer {
+      margin-top: 80px;
+      padding-top: 24px;
+      border-top: 1px solid #e5e5e5;
+      font-size: 14px;
+    }
+
+    footer a {
+      color: #111111;
+      text-decoration: none;
+      font-weight: 700;
+    }
+  </style>
 </head>
 <body>
-  <h1>Information Design Page</h1>
+  <div class="page-wrap">
+    <a class="back-link" href="index.html">← Back to Portfolio</a>
+
+    <h1>Visual Communication &amp; Information Design</h1>
+
+    <p class="intro">
+      Some projects require expressive branding.<br>
+      Others require translating complex information into clear visual communication.
+    </p>
+
+    <p class="intro-last">
+      A selection of information design work including data visualization, maps, diagrams, and technical graphics.
+    </p>
+
+    <div class="info-grid">
+      <figure class="info-piece">
+        <img src="assets/Best-Western-Fire-Evacuation.jpg" alt="Best Western fire evacuation diagram">
+        <figcaption>Fire evacuation diagram</figcaption>
+      </figure>
+
+      <figure class="info-piece">
+        <img src="assets/Green-New-American-vegetarian-Infographic.jpg" alt="Green New American Vegetarian infographic">
+        <figcaption>Information infographic</figcaption>
+      </figure>
+
+      <figure class="info-piece">
+        <img src="assets/SLMC-Admit-Backpage-Map.jpg" alt="St. Luke's Medical Center campus map">
+        <figcaption>Hospital campus map</figcaption>
+      </figure>
+
+      <figure class="info-piece">
+        <img src="assets/Superstition-Vistas.jpg" alt="Superstition Vistas regional planning visualization">
+        <figcaption>Regional planning visualization</figcaption>
+      </figure>
+
+      <figure class="info-piece">
+        <img src="assets/Waxie_Calendar.jpg" alt="Waxie calendar design">
+        <figcaption>Calendar system design</figcaption>
+      </figure>
+    </div>
+
+    <footer>
+      <a href="index.html">Home</a>
+    </footer>
+  </div>
 </body>
 </html>
