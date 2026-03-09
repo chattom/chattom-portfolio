@@ -1069,31 +1069,7 @@ slider.setAttribute('tabindex', '0');
     imgs[0].classList.add('active');
 if (!imgs[0].src) { imgs[0].src = imgs[0].dataset.src || ''; }
        /* --- Lock container aspect ratio to the first image (prevents vertical jump) --- */
-    (function lockAspect() {
-      const sliderEl = slider; // use the existing slider variable
-      if (!sliderEl || !imgs[0]) return;
-
-      // Skip AR locking for sliders marked "no-ar" (Common Grounds)
-      if (sliderEl.classList.contains('no-ar')) return;
-
-      function setAR(w, h) {
-    if (!w || !h) return;
-    if ('aspectRatio' in document.documentElement.style) {
-      sliderEl.style.aspectRatio = `${w} / ${h}`;
-    } else {
-      const apply = () => { sliderEl.style.height = (sliderEl.clientWidth * (h / w)) + 'px'; };
-      apply();
-      window.addEventListener('resize', apply, { passive: true });
-    }
-  }
-
-  if (imgs[0].complete && imgs[0].naturalWidth) {
-    setAR(imgs[0].naturalWidth, imgs[0].naturalHeight);
-  } else {
-    imgs[0].addEventListener('load', () => setAR(imgs[0].naturalWidth, imgs[0].naturalHeight), { once: true });
-    imgs[0].addEventListener('error', () => setAR(1200, 1200), { once: true });
-  }
-})();
+    
 
     slider.addEventListener('mouseenter', stop);
     slider.addEventListener('mouseleave', start);
