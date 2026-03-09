@@ -54,216 +54,127 @@ html { scroll-behavior: smooth; }
     gap: 1.2rem;
     margin-top: 1rem;
     font-size: 15px;
-    flex-wrap: wrap;
+    flex-wrap: wrap;                 /* wrap links if tight */
   }
   .site-nav a{
-    padding-bottom: 6px;
+    padding-bottom: 6px;             /* bigger tap target */
     -webkit-tap-highlight-color: rgba(0,0,0,0);
   }
 }
 
-:root{
-  --bg:#f7f8f9;
-  --fg:#222;
-  --muted:#5a5a5a;
-  --accent:#007f6e;
-  --rule:#d1d1d1;
-  --card:#ffffff;
-  --ring:#c9eae2;
-  --max: 980px;
-  --radius: 22px;
-  --shadow: 0 10px 25px rgba(0,0,0,.1);
-}
+    :root{
+      --bg:#f7f8f9;
+      --fg:#222;
+      --muted:#5a5a5a;
+      --accent:#007f6e;
+      --rule:#d1d1d1;
+      --card:#ffffff;
+      --ring:#c9eae2;
+      --max: 980px;
+      --radius: 22px;
+      --shadow: 0 10px 25px rgba(0,0,0,.1);
+    }
 
-*,*::before,*::after{box-sizing:border-box}
+    *,*::before,*::after{box-sizing:border-box}
 
-html,body{height:100%}
-body{
-  margin:0;
-  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-  background: var(--bg);
-  color: var(--fg);
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
-a{color:var(--accent); text-decoration: none}
-a:hover{text-decoration: underline}
-.wrap{max-width: var(--max); margin: 0 auto; padding: 48px 20px 120px}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+    a{color:var(--accent); text-decoration: none}
+    a:hover{text-decoration: underline}
+    .wrap{max-width: var(--max); margin: 0 auto; padding: 48px 20px 120px}
 
-header{
-  display:grid;
-  grid-template-columns: clamp(140px, 22vw, 280px) 1fr;
-  gap:32px;
-  align-items:center;
-  margin-top:14px
-}
+    header{display:grid; grid-template-columns: clamp(140px, 22vw, 280px) 1fr; gap:32px; align-items:center; margin-top:14px}
 
-.headshot-frame{
-  position: relative;
-  width: clamp(140px, 22vw, 280px);
-  height: clamp(140px, 22vw, 280px);
-  border-radius: var(--radius);
-  background: var(--card);
-  box-shadow: var(--shadow);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  overflow:hidden;
-  isolation:isolate;
-}
-.headshot-frame::before{
-  content:"";
-  position:absolute;
-  inset:-8px;
-  border-radius: calc(var(--radius) + 10px);
-  background: radial-gradient(100% 100% at 50% 50%, var(--ring) 0%, transparent 70%);
-  z-index: -1;
-}
-.headshot{
-  width:100%;
-  height:100%;
-  object-fit:contain;
-  border-radius: calc(var(--radius) - 6px);
-  display:block;
-}
+    .headshot-frame{
+      position: relative;
+      width: clamp(140px, 22vw, 280px);
+      height: clamp(140px, 22vw, 280px);
+      border-radius: var(--radius);
+      background: var(--card);
+      box-shadow: var(--shadow);
+      display:flex; align-items:center; justify-content:center;
+      overflow:hidden;
+      isolation:isolate;
+    }
+    .headshot-frame::before{
+      content:""; position:absolute; inset:-8px; border-radius: calc(var(--radius) + 10px);
+      background: radial-gradient(100% 100% at 50% 50%, var(--ring) 0%, transparent 70%);
+      z-index: -1;
+    }
+    .headshot{
+      width:100%; height:100%; object-fit:contain;
+      border-radius: calc(var(--radius) - 6px); display:block;
+    }
 
-.intro h1{
-  font-size: clamp(28px, 4vw, 40px);
-  line-height:1.15;
-  margin:0 0 10px 0;
-  font-weight:700
-}
-.intro p{
-  font-size: clamp(16px, 2vw, 18px);
-  color: var(--muted);
-  margin: 10px 0 0 0
-}
+    .intro h1{font-size: clamp(28px, 4vw, 40px); line-height:1.15; margin:0 0 10px 0; font-weight:700}
+    .intro p{font-size: clamp(16px, 2vw, 18px); color: var(--muted); margin: 10px 0 0 0}
 
-.fade{
-  opacity:0;
-  transform: translateY(10px);
-  transition: opacity .7s ease, transform .7s ease
-}
-.fade.revealed{
-  opacity:1;
-  transform:none
-}
+    .fade{opacity:0; transform: translateY(10px); transition: opacity .7s ease, transform .7s ease}
+    .fade.revealed{opacity:1; transform:none}
 
-.cta-row{
-  display:flex;
-  flex-wrap:wrap;
-  gap:14px;
-  margin: 24px 0 10px
-}
-.btn{
-  display:inline-flex;
-  align-items:center;
-  gap:10px;
-  padding:12px 16px;
-  background:var(--accent);
-  color:white;
-  border:none;
-  border-radius: 14px;
-  font-weight:600;
-  box-shadow: 0 4px 12px rgba(0,0,0,.15);
-  cursor:pointer;
-  min-height:44px;
-}
-.btn:hover{
-  background:#006b5d;
-  text-decoration:none
-}
+    .cta-row{display:flex; flex-wrap:wrap; gap:14px; margin: 24px 0 10px}
+    .btn{
+      display:inline-flex; align-items:center; gap:10px; padding:12px 16px;
+      background:var(--accent); color:white; border:none; border-radius: 14px;
+      font-weight:600; box-shadow: 0 4px 12px rgba(0,0,0,.15);
+      cursor:pointer;
+    }
+    .btn:hover{background:#006b5d; text-decoration:none}
 
-hr.rule{
-  border:none;
-  height:1px;
-  background: var(--rule);
-  margin: 30px 0 22px
-}
+    hr.rule{border:none; height:1px; background: var(--rule); margin: 30px 0 22px}
 
-.gallery{
-  display:grid;
-  gap: 28px;
-  margin-top: 28px;
-  justify-items:center
-}
+    .gallery{display:grid; gap: 28px; margin-top: 28px; justify-items:center}
 
-figure.work{
-  margin:0;
-  background: var(--card);
-  border:1px solid var(--rule);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  overflow:hidden;
-  width:min(80vw, 900px);
-}
+    figure.work{
+      margin:0; background: var(--card); border:1px solid var(--rule); border-radius: var(--radius);
+      box-shadow: var(--shadow); overflow:hidden; width:min(80vw, 900px);
+    }
 
-.media{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  width:100%;
-  background:#f7f8f9
-}
-.media img,
-.media video{
-  display:block;
-  max-width:100%;
-  height:auto;
-  object-fit:contain;
-  max-height:80vh
-}
+    .media{display:flex; align-items:center; justify-content:center; width:100%; background:#f7f8f9}
+    .media img, .media video{display:block; max-width:100%; height:auto; object-fit:contain; max-height:80vh}
 
-.embed-square{position:relative; width:100%;}
-.embed-square::before{content:""; display:block; padding-top:100%;}
-.embed-square > iframe{position:absolute; inset:0; width:100%; height:100%; border:0;}
+    .embed-square{position:relative; width:100%;}
+    .embed-square::before{content:""; display:block; padding-top:100%;}
+    .embed-square > iframe{position:absolute; inset:0; width:100%; height:100%; border:0;}
 
-.work-15 .embed-square { width: 88%; margin: 0 auto; }
-@media (max-width: 800px) {
-  .work-15 .embed-square { width: 92%; }
-}
+    .work-15 .embed-square { width: 88%; margin: 0 auto; }
+    @media (max-width: 800px) {
+      .work-15 .embed-square { width: 92%; }
+    }
 
-figcaption{
-  padding:16px 18px 18px;
-  font-size:15px;
-  color: var(--muted);
-  text-align:center;
-}
-figcaption strong{
-  color: var(--fg);
-  font-weight:600;
-  display:block;
-  margin-bottom:4px
-}
+    figcaption{
+      padding:16px 18px 18px; font-size:15px; color: var(--muted);
+      text-align:center;
+    }
+    figcaption strong{color: var(--fg); font-weight:600; display:block; margin-bottom:4px}
 
-.contact-card{
-  width:min(80vw, 900px);
-  background:var(--card);
-  border:1px solid var(--rule);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding:20px;
-  margin:34px auto 0;
-}
-.contact-card h2{
-  margin:0 0 12px 0;
-  font-size:18px;
-  font-weight:700;
-}
-.contact-grid{display:grid; gap:12px}
-.contact-grid label{font-size:14px; color:var(--muted)}
-.contact-grid input, .contact-grid textarea{
-  width:100%;
-  padding:12px 12px;
-  border:1px solid var(--rule);
-  border-radius:12px;
-  font: inherit;
-  background:#fff;
-  color:var(--fg);
-  min-height:44px;
-}
-.contact-grid textarea{min-height:120px; resize:vertical}
-.contact-actions{display:flex; justify-content:flex-end; margin-top:8px}
+    .contact-card{
+      width:min(80vw, 900px);
+      background:var(--card);
+      border:1px solid var(--rule);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding:20px;
+      margin:34px auto 0;
+    }
+    .contact-card h2{ margin:0 0 12px 0; font-size:18px; font-weight:700; }
+    .contact-grid{display:grid; gap:12px}
+    .contact-grid label{font-size:14px; color:var(--muted)}
+    .contact-grid input, .contact-grid textarea{
+      width:100%; padding:12px 12px; border:1px solid var(--rule); border-radius:12px;
+      font: inherit; background:#fff; color:var(--fg);
+      min-height:44px; /* comfy tap size */
+    }
+    .contact-grid textarea{min-height:120px; resize:vertical}
+    .contact-actions{display:flex; justify-content:flex-end; margin-top:8px}
+    .btn{ min-height:44px; padding:12px 18px; }
 
 .contact-foot {
   display: flex;
@@ -283,133 +194,88 @@ figcaption strong{
   text-decoration: underline;
 }
 
-.flash{
-  position:fixed;
-  left:50%;
-  bottom:18px;
-  transform:translateX(-50%);
-  background:var(--accent);
-  color:#fff;
-  padding:10px 14px;
-  border-radius:12px;
-  box-shadow:0 6px 20px rgba(0,0,0,.2);
-  opacity:0;
-  pointer-events:none;
-  transition:opacity .25s ease;
-}
-.flash.show{opacity:1}
-.flash.error{background:#b54141}
 
-footer{
-  margin-top: 64px;
-  color: var(--muted);
-  font-size: 14px
-}
-footer .small{opacity:.8}
+    .flash{
+      position:fixed; left:50%; bottom:18px; transform:translateX(-50%);
+      background:var(--accent); color:#fff; padding:10px 14px; border-radius:12px;
+      box-shadow:0 6px 20px rgba(0,0,0,.2); opacity:0; pointer-events:none;
+      transition:opacity .25s ease;
+    }
+    .flash.show{opacity:1}
+    .flash.error{background:#b54141}
 
-@media (max-width: 800px){
-  header{
-    grid-template-columns: 1fr;
-    text-align:center;
-  }
-  .headshot-frame{
-    margin:0 auto 20px;
-    width: clamp(140px, 45vw, 220px);
-    height: clamp(140px, 45vw, 220px);
-  }
-  .intro h1{font-size:clamp(24px,6vw,34px)}
-  .intro p{font-size:clamp(15px,4vw,17px)}
-  figure.work{width:94vw}
-  .media img, .media video{max-height:72vh}
-  .contact-card{width:94vw}
-}
+    footer{margin-top: 64px; color: var(--muted); font-size: 14px}
+    footer .small{opacity:.8}
 
-:root{ --gutter: clamp(12px, 4vw, 24px); }
-.wrap{
-  padding-left:  calc(var(--gutter) + env(safe-area-inset-left));
-  padding-right: calc(var(--gutter) + env(safe-area-inset-right));
-}
-@media (max-width: 800px){
-  figure.work, .contact-card{ width: 100%; }
-}
-img, video, canvas, svg{
-  display:block;
-  max-width:100%;
-  height:auto;
-}
+    @media (max-width: 800px){
+      header{grid-template-columns: 1fr; text-align:center;}
+      .headshot-frame{margin:0 auto 20px; width: clamp(140px, 45vw, 220px); height: clamp(140px, 45vw, 220px);}
+      .intro h1{font-size:clamp(24px,6vw,34px)}
+      .intro p{font-size:clamp(15px,4vw,17px)}
+      figure.work{width:94vw}
+      .media img, .media video{max-height:72vh}
+      .contact-card{width:94vw}
+    }
+
+    :root{ --gutter: clamp(12px, 4vw, 24px); }
+    .wrap{
+      padding-left:  calc(var(--gutter) + env(safe-area-inset-left));
+      padding-right: calc(var(--gutter) + env(safe-area-inset-right));
+    }
+    @media (max-width: 800px){
+      figure.work, .contact-card{ width: 100%; }
+    }
+    img, video, canvas, svg{ display:block; max-width:100%; height:auto; }
 
 /* --- Lightbox (homepage) --- */
 .lb-overlay{
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.75);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
+  position: fixed; inset: 0; background: rgba(0,0,0,.75);
+  display: none; align-items: center; justify-content: center; z-index: 9999;
   padding: clamp(12px, 4vw, 28px);
 }
 .lb-overlay.show{ display:flex; animation: lbFade .18s ease-out }
 @keyframes lbFade{from{opacity:0} to{opacity:1}}
 .lb-frame{
-  max-width: min(96vw, 1200px);
-  max-height: 90vh;
-  position: relative;
-  background:#fff;
-  border-radius:16px;
-  box-shadow: 0 20px 60px rgba(0,0,0,.35);
+  max-width: min(96vw, 1200px); max-height: 90vh; position: relative;
+  background:#fff; border-radius:16px; box-shadow: 0 20px 60px rgba(0,0,0,.35);
   overflow:hidden;
 }
 .lb-frame img{ display:block; max-width:100%; height:auto }
 .lb-cap{
-  position:absolute;
-  left:0;
-  right:48px;
-  bottom:0;
-  padding:10px 14px;
-  background:linear-gradient(transparent, rgba(0,0,0,.55));
-  color:#fff;
-  font-size:14px;
+  position:absolute; left:0; right:48px; bottom:0;
+  padding:10px 14px; background:linear-gradient(transparent, rgba(0,0,0,.55));
+  color:#fff; font-size:14px;
 }
 .lb-close{
-  position:absolute;
-  top:8px;
-  right:8px;
-  width:36px;
-  height:36px;
-  display:grid;
-  place-items:center;
-  border:0;
-  border-radius:10px;
-  background:rgba(255,255,255,.9);
-  cursor:pointer;
+  position:absolute; top:8px; right:8px; width:36px; height:36px;
+  display:grid; place-items:center; border:0; border-radius:10px;
+  background:rgba(255,255,255,.9); cursor:pointer;
 }
 .lb-close:hover{ background:#fff }
-
+    /* put this in index.html's <style> block */
 #contact {
   scroll-margin-top: 24px;
-  margin-bottom: 28vh;
+  margin-bottom: 28vh;   /* gives enough space to scroll the whole form into view */
 }
-
-/* Deterrents: reduce long-press/drag/context-menu on images */
+    /* Deterrents: reduce long-press/drag/context-menu on images */
 img, picture, figure {
   -webkit-user-drag: none;
-  -webkit-touch-callout: none;
+  -webkit-touch-callout: none; /* iOS long-press menu */
   user-select: none;
 }
 
 /* Keep links clickable on desktop while still deterring saves */
 .mason img {
-  pointer-events: auto;
+  pointer-events: auto; /* keep lightbox clicks working on desktop */
 }
-
-/* --- Mini slider (dynamic height to active image) --- */
+    /* --- Mini slider (auto-fade) --- */
+/* --- Mini slider (stabilized, prevents jump) --- */
 .media.slider {
   position: relative;
   overflow: hidden;
-  min-height: 320px;
-  background: var(--bg);
-  transition: height 320ms ease;
+  aspect-ratio: 1 / 1;   /* lock box before JS runs */
+  min-height: 320px;     /* keeps visible box even before load */
+  background: #fff;
 }
 
 .media.slider img {
@@ -418,8 +284,8 @@ img, picture, figure {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  object-position: center;
-  background: var(--bg);
+  object-position: center;  /* ⭐ Centers all images neatly */
+  background: #fff;         /* ⭐ Clean white background behind non-square images */
   opacity: 0;
   transition: opacity 800ms ease;
 }
@@ -429,7 +295,7 @@ img, picture, figure {
   opacity: 1;
 }
 
-/* ✨ CoralStation intro line: stays hidden until scrolled into view */
+  /* ✨ CoralStation intro line: stays hidden until scrolled into view */
 .figure-intro {
   text-align: center;
   font-size: 1.1rem;
@@ -456,7 +322,8 @@ img, picture, figure {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Dots */
+
+/* Dots (optional) */
 .slider-dots {
   position: absolute;
   left: 0;
@@ -466,31 +333,29 @@ img, picture, figure {
   justify-content: center;
   gap: 6px;
   pointer-events: none;
-  z-index: 2;
 }
 
 .slider-dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: rgba(255,255,255,.7);
-  outline: 1px solid rgba(0,0,0,.25);
+  background: rgba(255,255,255,.7);   /* white by default */
+  outline: 1px solid rgba(0,0,0,.25); /* subtle edge */
   transition: background 0.2s ease, transform 0.2s ease;
 }
 
 .slider-dot.active {
-  background: #666;
-  transform: scale(1.2);
+  background: #666; /* medium gray when active */
+  transform: scale(1.2); /* slight pop for feedback */
 }
-
-/* Arrow nav */
+    /* Arrow nav */
 .slider-nav {
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  pointer-events: none;
+  pointer-events: none;        /* let clicks pass except on buttons */
   z-index: 3;
 }
 .slider-btn {
@@ -505,7 +370,7 @@ img, picture, figure {
   place-items: center;
   font: 700 18px/1 Inter, system-ui, sans-serif;
   color: #111;
-  background: var(--bg, #f6f7f8);
+  background: var(--bg, #f6f7f8); /* matches your site background */
   box-shadow: 0 6px 14px rgba(0,0,0,.18);
   cursor: pointer;
   opacity: .96;
@@ -517,29 +382,47 @@ img, picture, figure {
 .slider-btn.prev { margin-left: 8px; }
 .slider-btn.next { margin-right: 8px; }
 
+/* keep dots above the image but below buttons */
+.slider-dots { z-index: 2; }
+
+
 /* Hover pause hint (desktop only) */
 @media (hover:hover) and (pointer:fine){
   .media.slider:hover::after{
-    content:"▐▐";
-    position:absolute;
-    top:8px;
-    right:10px;
+    content:"▐▐"; position:absolute; top:8px; right:10px;
     font:600 11px/1 Inter,system-ui,sans-serif;
-    color:rgba(255,255,255,.85);
-    background:rgba(0,0,0,.35);
-    padding:3px 6px;
-    border-radius:6px;
+    color:rgba(255,255,255,.85); background:rgba(0,0,0,.35);
+    padding:3px 6px; border-radius:6px;
   }
 }
-
-/* Step 3: smoother touch scrolling on phones/tablets */
+    /* Step 3: smoother touch scrolling on phones/tablets */
 @media (hover: none) and (pointer: coarse) {
   img, picture {
-    pointer-events: none;
+    pointer-events: none; /* lets touches scroll instead of selecting the image */
+  }
+}
+    /* Desktop-only: make the Common Grounds slider a bit shallower */
+@media (min-width: 1024px) {
+  .media.slider.cg-slider {
+    aspect-ratio: 4 / 3;  /* shallower box */
+    min-height: 0;        /* don't force the extra height */
+  }
+}
+    /* Desktop-only: trim extra whitespace on Absolut Hyakutake slider */
+@media (min-width: 1024px) {
+  .media.slider.hyakutake-slider {
+    aspect-ratio: 4 / 3;  /* adjust if you want it taller/shorter */
+    min-height: 0;        /* override the global 320px min-height */
+  }
+}
+    @media (min-width: 1024px) {
+  .media.slider.tight-slider {
+    aspect-ratio: 4 / 3;
+    min-height: 0;
   }
 }
 </style>
-</head>
+</head
 <body id="top">
 <!-- NAVBAR -->
 <nav class="site-nav" aria-label="Main">
@@ -549,379 +432,418 @@ img, picture, figure {
   <a href="/#contact">Contact</a>
 </nav>
 
-<div class="wrap">
-  <header>
-    <div class="headshot-frame fade" style="--delay:0s">
-      <img class="headshot" src="assets/cc4-square.jpg" alt="Headshot of Chris Chattom" loading="eager" />
-    </div>
-
-    <div class="intro">
-      <h1 class="fade" style="--delay:.05s;">Hi, I’m Chris.<br>I’m a designer, storyteller, and someone who still believes good work speaks louder than buzzwords.</h1>
-      <p class="fade" style="--delay:.15s;">I’ve worked with brands you know — and poured just as much heart into the ones you don’t. At this simple site you will find some of my work and a little glimpse into the way I think. Welcome.</p>
-
-      <div class="cta-row fade" style="--delay:.25s;">
-        <a class="btn" href="assets/Chris-Chattom-Resume.pdf" target="_blank" rel="noopener noreferrer">
-          Download Résumé (PDF)
-        </a>
-      </div>
-    </div>
-  </header>
-
-  <hr class="rule" />
-
-  <section class="gallery" aria-label="Selected Works">
-    <!-- Portfolio pieces -->
-    <figure class="work fade" style="--delay:.05s"><div class="media"><video src="assets/01-Chattom-Design-Logomotion.mp4" autoplay muted loop playsinline preload="metadata"></video></div><figcaption><strong>Chattom Design Animated Logo</strong></figcaption></figure>
-
-    <figure class="work fade" style="--delay:.08s"><div class="media"><img src="assets/08-Barry-Goldwater-Spread.jpg" alt="Barry Goldwater — Spread" loading="lazy" /></div><figcaption><strong>Barry Goldwater feature for Times Media Group</strong></figcaption></figure>
-
-    <figure class="work fade" style="--delay:.11s">
-      <div class="media slider hyakutake-slider" data-interval="5400">
-        <img src="assets/02-Cactus-Gospel-Album-Cover.png?v=1" alt="Cactus Gospel — Front cover" loading="lazy">
-        <img data-src="assets/Cactus-Gospel-Album-Back-Cover.png?v=1" alt="">
-        <img data-src="assets/Cactus-Gospel-Sunbird-Static-Color-Palette.png?v=1" alt="">
-      </div>
-      <figcaption><strong>Cactus Gospel Album Cover</strong></figcaption>
-    </figure>
-
-    <figure class="work fade" style="--delay:.14s"><div class="media"><img src="assets/03-Paloma-Picasso.jpg" alt="Paloma Picasso — Advertising/Design" loading="lazy" /></div><figcaption><strong>Paloma Picasso Catalog Cover</strong></figcaption></figure>
-
-    <!-- CoralStation 3D Flyaround -->
-    <figure class="work fade" style="--delay:.17s">
-      <div class="media">
-        <video
-          autoplay
-          muted
-          loop
-          playsinline
-          preload="metadata"
-          poster=""
-          style="display:block; max-width:100%; height:auto; background:#f7f8f9">
-          <source src="assets/CoralStation-360%20Flyaround-640x640.mp4" type="video/mp4">
-          <source src="assets/CoralStation-360 Flyaround-640x640.mp4" type="video/mp4">
-          Sorry, your browser can’t play this video.
-        </video>
-      </div>
-      <figcaption>
-        <strong>CoralStation™ Quantum Computer concept design built in Blender 3D and After Effects</strong>
-      </figcaption>
-    </figure>
-
-    <!-- CoralStation – from sketch to finished model (10-image carousel) -->
-    <figure class="work fade" style="--delay:.135s">
-      <div class="figure-intro">
-        <strong>Every design begins as an idea. Here’s how CoralStation™ evolved from concept to reality.</strong>
+  <div class="wrap">
+    <header>
+      <div class="headshot-frame fade" style="--delay:0s">
+        <img class="headshot" src="assets/cc4-square.jpg" alt="Headshot of Chris Chattom" loading="eager" />
       </div>
 
-      <div class="media slider" data-interval="5200">
-        <img data-src="assets/01-CoralStation-Drawing.jpg" alt="CoralStation – initial sketch" loading="lazy" />
-        <img data-src="assets/02-CoralStation-Prototype-1.jpg" alt="CoralStation – early vector prototype" />
-        <img data-src="assets/03-CoralStation-Prototype-2.jpg" alt="CoralStation – prototype refinement" />
-        <img data-src="assets/04-CoralStation-Prototype-3.jpg" alt="CoralStation – mesh exploration" />
-        <img data-src="assets/05-CoralStation-ComfyUI-1.jpg" alt="CoralStation – ComfyUI concept pass 1" />
-        <img data-src="assets/06-CoralStation-ComfyUI-2.jpg" alt="CoralStation – ComfyUI concept pass 2 (annotated)" />
-        <img data-src="assets/07-CoralStation-ComfyUI-3.jpg" alt="CoralStation – ComfyUI concept pass 3" />
-        <img data-src="assets/08-CoralStation-Blender-1.jpg" alt="CoralStation – Blender scene setup" />
-        <img data-src="assets/09-CoralStation-Blender-2.jpg" alt="CoralStation – Blender camera & lights" />
-        <img data-src="assets/10-Final-Shot.jpg" alt="CoralStation – final render" />
-      </div>
-      <figcaption>
-        <strong>Creating the CoralStation™ — from sketch to finished 3D model</strong>
-      </figcaption>
-    </figure>
+      <div class="intro">
+        <h1 class="fade" style="--delay:.05s;">Hi, I’m Chris.<br>I’m a designer, storyteller, and someone who still believes good work speaks louder than buzzwords.</h1>
+        <p class="fade" style="--delay:.15s;">I’ve worked with brands you know — and poured just as much heart into the ones you don’t. At this simple site you will find some of my work and a little glimpse into the way I think. Welcome.</p>
 
-    <figure class="work fade" style="--delay:.14s">
-      <div class="media slider tight-slider" data-interval="5400">
-        <img src="assets/04-El-Camino-del-Sol-Cover.png?v=1" alt="El Camino del Sol — Front Cover" loading="lazy">
-        <img data-src="assets/El-Camino-del-Sol-Back-Cover.png?v=1" alt="">
-        <img data-src="assets/El-Camino-del-Sol-Color-Palette.png?v=1" alt="">
-      </div>
-      <figcaption><strong>El Camino del Sol Album Cover</strong></figcaption>
-    </figure>
-
-    <figure class="work fade" style="--delay:.17s">
-      <div class="media slider hyakutake-slider no-ar" data-interval="5600">
-        <img src="assets/01-Proximity.png" alt="Proximity — Gestalt principle illustrated by cats" class="active">
-        <img src="assets/02-Similarity.png" alt="Similarity — Gestalt principle illustrated by cats">
-        <img src="assets/03-Continuity.png" alt="Continuity — Gestalt principle illustrated by cats">
-        <img src="assets/04-Closure.png" alt="Closure — Gestalt principle illustrated by cats">
-        <img src="assets/05-Figure-Ground.png" alt="Figure–Ground — Gestalt principle illustrated by cats">
-        <img src="assets/06-Common-Fate.png" alt="Common Fate — Gestalt principle illustrated by cats">
-        <img src="assets/07-Symmetry.png" alt="Symmetry — Gestalt principle illustrated by cats">
-        <img src="assets/08-Common-Region.png" alt="Common Region — Gestalt principle illustrated by cats">
-      </div>
-      <figcaption>
-        <strong>THE CAT-ALYST OF PERCEPTION: GESTALT PRINCIPLES ILLUSTRATED</strong>
-      </figcaption>
-    </figure>
-
-    <figure class="work fade" style="--delay:.20s">
-      <div class="media slider hyakutake-slider no-ar" data-interval="5600">
-        <img src="assets/06-Absolut-Hyakutake-Ad.png?v=1" alt="Absolut Vodka — 'Absolut Hyakutake' Ad" loading="lazy">
-        <img data-src="assets/Comet-Hyakutake.jpg?v=1" alt="">
-      </div>
-      <figcaption><strong>Absolut Vodka 'Absolut Hyakutake' Ad</strong></figcaption>
-    </figure>
-
-    <!-- Mon Sablé – luxury skincare & fragrance system -->
-    <figure class="work fade" style="--delay:.215s">
-      <div class="media slider tight-slider" data-interval="5200">
-        <img src="assets/01-Mon-Sable-Logo-Presentation.png" alt="Mon Sablé – primary logo and brand presentation" loading="lazy" />
-        <img data-src="assets/Mon-Sable-Logo-2.png" alt="Mon Sablé – logo variant with alternate monogram" />
-        <img data-src="assets/Mon-Sable-Logo-3.png" alt="Mon Sablé – logo variant with alternate lockup" />
-        <img data-src="assets/02-Perfume-Bottle-Clear.png" alt="Mon Sablé – clear perfume bottle packaging" />
-        <img data-src="assets/03-Perfume-Bottle-Frosted.png" alt="Mon Sablé – frosted perfume bottle packaging" />
-        <img data-src="assets/04-Shopping-Bag.png" alt="Mon Sablé – branded shopping bag" />
-        <img data-src="assets/05-Lipstick-Black-and-Gold.png" alt="Mon Sablé – lipstick packaging in black and gold" />
-        <img data-src="assets/06-Face-Cream-Jar.png" alt="Mon Sablé – face cream jar design" />
-        <img data-src="assets/07-Candle.png" alt="Mon Sablé – scented candle and box packaging" />
-        <img data-src="assets/08-Soap.png" alt="Mon Sablé – boxed luxury soap packaging" />
-        <img data-src="assets/09-Frosted-Bottles.png" alt="Mon Sablé – frosted skincare bottle lineup" />
-        <img data-src="assets/10-3DSMax-Signage.png" alt="Mon Sablé – 3D storefront signage rendering" />
-        <img data-src="assets/11-Letterhead-Suite.png" alt="Mon Sablé – letterhead, card, and envelope system" />
-        <img data-src="assets/12-Mon-Sable-Storefront.png" alt="Mon Sablé – storefront exterior with signage" />
-      </div>
-      <figcaption>
-        <strong>Mon Sablé — luxury skincare & fragrance packaging system</strong>
-      </figcaption>
-    </figure>
-
-    <figure class="work fade" style="--delay:.23s"><div class="media"><video src="assets/07-Canary-Tape-Logomotion.mp4" autoplay muted loop playsinline preload="metadata"></video></div><figcaption><strong>Canary Tape Records Animated Logo</strong></figcaption></figure>
-
-    <!-- Extreme Products Group – Elite Fitness packaging -->
-    <figure class="work fade" style="--delay:.27s">
-      <div class="media">
-        <img src="assets/ExtremeProductsGroup.jpg" alt="Extreme Products Group – Elite Fitness weight bench packaging design" loading="lazy" />
-      </div>
-      <figcaption>
-        <strong>Extreme Products Group — Elite Fitness weight bench packaging</strong>
-      </figcaption>
-    </figure>
-
-    <!-- CC Storyboard — UFO (5-image carousel) -->
-    <figure class="work fade" style="--delay:.275s">
-      <div class="media slider" data-interval="5200">
-        <img src="assets/IMAGE-01-CC-UFO.png" alt="CC Storyboard — UFO frame 1" loading="lazy" />
-        <img data-src="assets/IMAGE-02-CC-UFO.png" alt="CC Storyboard — UFO frame 2" />
-        <img data-src="assets/IMAGE-03-CC-UFO.png" alt="CC Storyboard — UFO frame 3" />
-        <img data-src="assets/IMAGE-04-CC-UFO.png" alt="CC Storyboard — UFO frame 4" />
-        <img data-src="assets/IMAGE-05-CC-UFO.png" alt="CC Storyboard — UFO frame 5" />
-      </div>
-      <figcaption>
-        <strong>CC case-study storyboard — created with ComfyUI, ControlNet, Illustrator & Photoshop</strong>
-      </figcaption>
-    </figure>
-
-    <!-- CC Storyboard — Buddies (5-image carousel) -->
-    <figure class="work fade" style="--delay:.285s">
-      <div class="media slider" data-interval="5200">
-        <img src="assets/IMAGE-01-NORMAL.png" alt="CC Storyboard — Buddies frame 1" loading="lazy" />
-        <img data-src="assets/IMAGE-02-NORMAL.png" alt="CC Storyboard — Buddies frame 2" />
-        <img data-src="assets/IMAGE-03-NORMAL.png" alt="CC Storyboard — Buddies frame 3" />
-        <img data-src="assets/IMAGE-04-NORMAL.png" alt="CC Storyboard — Buddies frame 4" />
-        <img data-src="assets/IMAGE-05-NORMAL.png" alt="CC Storyboard — Buddies frame 5" />
-      </div>
-      <figcaption>
-        <strong>CC case-study storyboard — created with ComfyUI, ControlNet, Illustrator & Photoshop</strong>
-      </figcaption>
-    </figure>
-
-    <figure class="work fade" style="--delay:.29s">
-      <div class="media slider" data-interval="5400" id="slider-kickscreamer">
-        <img src="assets/09-Honkytonk-Nebula-Album-Cover.png?v=2" alt="Kickscreamer Trio — Honkytonk Nebula Front Cover" loading="lazy">
-        <img data-src="assets/Kickscreamer-Trio-Honkytonk-Nebula-Album-Back-Cover.png?v=2" alt="">
-        <img data-src="assets/Kickscreamer-Trio-Color-Palette.png?v=2" alt="">
-      </div>
-      <figcaption><strong>Kickscreamer Trio Honkytonk Nebula Album Cover</strong></figcaption>
-    </figure>
-
-    <!-- Common Grounds – character logo series -->
-    <figure class="work fade common-grounds" style="--delay:.32s">
-      <div class="media slider cg-slider no-ar" data-interval="5200">
-        <img src="assets/01-Common-Grounds.jpg" alt="Common Grounds logo – primary lockup" loading="lazy" />
-        <img data-src="assets/02-Common-Grounds.jpg" alt="Common Grounds logo – alternate layout" />
-        <img data-src="assets/03-Common-Grounds.jpg" alt="Common Grounds logo – mug application" />
-        <img data-src="assets/01-Abe-Lincoln.png" alt="Common Grounds character logo – Abraham Lincoln" />
-        <img data-src="assets/02-Aliens.png" alt="Common Grounds character logo – aliens" />
-        <img data-src="assets/03-Bob-Ross.png" alt="Common Grounds character logo – Bob Ross" />
-        <img data-src="assets/04-Cleopatra.png" alt="Common Grounds character logo – Cleopatra" />
-        <img data-src="assets/05-Cool-Morning-Dude.png" alt="Common Grounds character logo – Cool Morning Dude" />
-        <img data-src="assets/06-Dracula.png" alt="Common Grounds character logo – Dracula" />
-        <img data-src="assets/07-George-Washington.png" alt="Common Grounds character logo – George Washington" />
-        <img data-src="assets/08-Nelson-Mandela.png" alt="Common Grounds character logo – Nelson Mandela" />
-        <img data-src="assets/09-Oscar-Wilde.png" alt="Common Grounds character logo – Oscar Wilde" />
-        <img data-src="assets/10-Pablo-Escobar.png" alt="Common Grounds character logo – Pablo Escobar" />
-        <img data-src="assets/11-Queen-Victoria.png" alt="Common Grounds character logo – Queen Victoria" />
-        <img data-src="assets/12-Volodymyr-Zelenskyy.png" alt="Common Grounds character logo – Volodymyr Zelenskyy" />
-      </div>
-      <figcaption>
-        <strong>Common Grounds — character logo and brand explorations</strong>
-      </figcaption>
-    </figure>
-
-    <!-- Cliffline (now a 3-image carousel) -->
-    <figure class="work fade" style="--delay:.35s">
-      <div class="media slider" data-interval="5200">
-        <img src="assets/11-Cliffline-Logo.png" alt="Cliffline — Logo" loading="lazy" />
-        <img data-src="assets/Cliffline-Logo-2.png" alt="Cliffline — Logo variant 2" />
-        <img data-src="assets/Cliffline-Logo-3.png" alt="Cliffline — Logo variant 3" />
-      </div>
-      <figcaption><strong>Cliffline Retailers Logo</strong></figcaption>
-    </figure>
-
-    <!-- nAItive Series Carousel -->
-    <figure class="work fade" style="--delay:.295s">
-      <div class="media slider" data-interval="5200">
-        <img src="assets/01-nAItive-cover.jpg" alt="nAItive Series – Cover" loading="lazy" />
-        <img data-src="assets/02-Mountain-Spirits-Ga'an.jpg" alt="nAItive Series – Mountain Spirits (Ga'an)" />
-        <img data-src="assets/03-Palhik-Mana.jpg" alt="nAItive Series – Palhik Mana" />
-        <img data-src="assets/04-The-Wiindigoo.jpg" alt="nAItive Series – The Wiindigoo" />
-        <img data-src="assets/05-Black-God.jpg" alt="nAItive Series – Black God" />
-        <img data-src="assets/06-Tohono-O'odham.jpg" alt="nAItive Series – Tohono O'odham" />
-        <img data-src="assets/07-Green-Corn-Ceremony-Tsalagi.jpg" alt="nAItive Series – Green Corn Ceremony (Tsalagi)" />
-      </div>
-      <figcaption>
-        <strong>nAItive series — coffee table book imagery created using DALL·E, ComfyUI, ControlNet & Photoshop</strong>
-      </figcaption>
-    </figure>
-
-    <!-- Bauhaus Face Animated Loop — robust single block -->
-    <figure class="work fade" style="--delay:.38s">
-      <div class="media">
-        <video id="bauhaus" muted loop playsinline autoplay preload="metadata" poster="./assets/13-SCC-Vig-Program.png" style="display:block; max-width:100%; height:auto; background:#f7f8f9">
-          Sorry, your browser can’t play this video.
-        </video>
-      </div>
-      <figcaption><strong>Bauhaus Face Animated Loop</strong></figcaption>
-    </figure>
-
-    <script>
-    (() => {
-      const v = document.getElementById('bauhaus');
-      if (!v) return;
-
-      const q = 'v=7';
-      const candidates = [
-        './assets/12-Bauhaus-Face-Loop.mp4?' + q,
-        './assets/12%20Bauhaus-Face-Loop.mp4?' + q,
-        './assets/12-Bauhaus-Face-Loop.mov?' + q,
-        './assets/12%20Bauhaus-Face-Loop.mov?' + q
-      ];
-
-      let i = 0;
-
-      function tryNext() {
-        if (i >= candidates.length) return;
-        const url = candidates[i++];
-        v.src = url;
-        v.load();
-      }
-
-      v.addEventListener('error', tryNext);
-      v.addEventListener('loadedmetadata', () => {
-        v.muted = true;
-        v.play().catch(() => {});
-      }, { once: true });
-
-      tryNext();
-    })();
-    </script>
-
-    <figure class="work fade" style="--delay:.41s"><div class="media"><img src="assets/13-SCC-Vig-Program.png" alt="SCC Vig Program" loading="lazy" /></div><figcaption><strong>Scottsdale Community College Alex Ketley Program Announcement</strong></figcaption></figure>
-
-    <figure class="work fade" style="--delay:.44s">
-      <div class="media slider" data-interval="5200">
-        <img src="assets/14-Soft-Science-Album-Cover.png?v=1" alt="AM Orbit — Soft Science Front Cover" loading="lazy">
-        <img data-src="assets/Soft-Science-Back-Cover.png?v=1" alt="">
-        <img data-src="assets/Soft-Science-Color-Palette.png?v=1" alt="">
-      </div>
-      <figcaption><strong>AM Orbit — Soft Science Album Cover</strong></figcaption>
-    </figure>
-
-    <!-- 15 -->
-    <figure class="work work-15 fade" style="--delay:.47s">
-      <div class="media">
-        <div class="embed-square">
-          <iframe src="https://fastidious-malabi-cc7032.netlify.app" title="Tru Infusion — In-store Animation" loading="lazy"></iframe>
+        <div class="cta-row fade" style="--delay:.25s;">
+          <a class="btn" href="assets/Chris-Chattom-Resume.pdf"
+   target="_blank" rel="noopener noreferrer">
+  Download Résumé (PDF)
+</a>
         </div>
-      </div>
-      <figcaption><strong>Tru Infusion in-store Animation</strong></figcaption>
-    </figure>
+      </div> <!-- close .intro -->
+    </header>
 
-    <!-- 16 -->
-    <figure class="work fade" style="--delay:.50s">
-      <div class="media slider" data-interval="5600">
-        <img src="assets/16-CFH.jpg?v=1" alt="Cookies from Home — Logos and Tin Designs" loading="lazy">
-        <img data-src="assets/CFH-2.jpg?v=1" alt="">
-        <img data-src="assets/CFH-3.jpg?v=1" alt="">
-      </div>
-      <figcaption><strong>Cookies from Home — Logos and Tin Designs</strong></figcaption>
-    </figure>
-
-    <!-- 17 -->
-    <figure class="work fade" style="--delay:.53s">
-      <div class="media">
-        <video src="assets/17-Fibonacci-Curve.mp4" autoplay muted loop playsinline preload="metadata"></video>
-      </div>
-      <figcaption><strong>Fibonacci Curve Animated Loop</strong></figcaption>
-    </figure>
-
-    <!-- 18 -->
-    <figure class="work fade" style="--delay:.56s">
-      <div class="media">
-        <img src="assets/18-The-Firefly's-Arrival.jpg" alt="The Firefly's Arrival" loading="lazy" />
-      </div>
-      <figcaption><strong>"The Firefly’s Arrival" Hand Illustration using Wax, Charcoal, and Graphite</strong></figcaption>
-    </figure>
-  </section>
-
-  <!-- CONTACT -->
-  <section id="contact" class="contact-card" aria-label="Contact Chris">
-    <h2>Get in touch</h2>
-
-    <form id="contactForm" class="contact-grid" autocomplete="on" novalidate>
-      <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
-
-      <label>Name
-        <input type="text" name="name" placeholder="Your name" required autocapitalize="words" autocomplete="name" />
-      </label>
-
-      <label>Subject
-        <input type="text" name="subject" placeholder="Subject" required autocomplete="subject" />
-      </label>
-
-      <label>Message
-        <textarea name="message" placeholder="Say hello…" required minlength="5" autocomplete="off"></textarea>
-      </label>
-
-      <div class="contact-actions">
-        <button class="btn" type="submit" id="sendBtn">Send message</button>
-      </div>
-      <div class="contact-foot">
-        <a class="back-top" href="#top" aria-label="Back to top">Back to top ↑</a>
-      </div>
-    </form>
-  </section>
-
-  <footer>
     <hr class="rule" />
-    <div>© <span id="y"></span> Chris Chattom • <span class="small">Phoenix, AZ</span></div>
-  </footer>
-</div>
 
-<!-- CONTACT toast -->
-<div id="flash" class="flash" role="status" aria-live="polite"></div>
+    <section class="gallery" aria-label="Selected Works">
+  <!-- Portfolio pieces -->
+  <figure class="work fade" style="--delay:.05s"><div class="media"><video src="assets/01-Chattom-Design-Logomotion.mp4" autoplay muted loop playsinline preload="metadata"></video></div><figcaption><strong>Chattom Design Animated Logo</strong></figcaption></figure>
 
-<!-- Lightbox overlay -->
-<div class="lb-overlay" id="lb">
-  <div class="lb-frame">
-    <button class="lb-close" id="lbClose" aria-label="Close">✕</button>
-    <img id="lbImg" alt="">
-    <div class="lb-cap" id="lbCap" aria-live="polite"></div>
+  <figure class="work fade" style="--delay:.08s"><div class="media"><img src="assets/08-Barry-Goldwater-Spread.jpg" alt="Barry Goldwater — Spread" loading="lazy" /></div><figcaption><strong>Barry Goldwater feature for Times Media Group</strong></figcaption></figure>
+
+  <figure class="work fade" style="--delay:.11s">
+    <div class="media slider hyakutake-slider" data-interval="5400">
+      <img src="assets/02-Cactus-Gospel-Album-Cover.png?v=1" alt="Cactus Gospel — Front cover" loading="lazy">
+      <img data-src="assets/Cactus-Gospel-Album-Back-Cover.png?v=1" alt="">
+      <img data-src="assets/Cactus-Gospel-Sunbird-Static-Color-Palette.png?v=1" alt="">
+    </div>
+    <figcaption><strong>Cactus Gospel Album Cover</strong></figcaption>
+  </figure>
+
+  <figure class="work fade" style="--delay:.14s"><div class="media"><img src="assets/03-Paloma-Picasso.jpg" alt="Paloma Picasso — Advertising/Design" loading="lazy" /></div><figcaption><strong>Paloma Picasso Catalog Cover</strong></figcaption></figure>
+
+  <!-- CoralStation 3D Flyaround -->
+  <figure class="work fade" style="--delay:.17s">
+    <div class="media">
+      <video
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="metadata"
+        poster=""
+        style="display:block; max-width:100%; height:auto; background:#f7f8f9">
+        <!-- URL-encode the space in the filename; include a second source just in case -->
+        <source src="assets/CoralStation-360%20Flyaround-640x640.mp4" type="video/mp4">
+        <source src="assets/CoralStation-360 Flyaround-640x640.mp4" type="video/mp4">
+        Sorry, your browser can’t play this video.
+      </video>
+    </div>
+    <figcaption>
+      <strong>CoralStation™ Quantum Computer concept design built in Blender 3D and After Effects</strong>
+    </figcaption>
+  </figure>
+      <!-- CoralStation – from sketch to finished model (10-image carousel) -->
+<figure class="work fade" style="--delay:.135s">
+
+  <!-- Intro line that fades with the figure -->
+  <div class="figure-intro">
+    <strong>Every design begins as an idea. Here’s how CoralStation™ evolved from concept to reality.</strong>
   </div>
+
+  <div class="media slider" data-interval="5200">
+    <img data-src="assets/01-CoralStation-Drawing.jpg" alt="CoralStation – initial sketch" loading="lazy" />
+    <img data-src="assets/02-CoralStation-Prototype-1.jpg" alt="CoralStation – early vector prototype" />
+    <img data-src="assets/03-CoralStation-Prototype-2.jpg" alt="CoralStation – prototype refinement" />
+    <img data-src="assets/04-CoralStation-Prototype-3.jpg" alt="CoralStation – mesh exploration" />
+    <img data-src="assets/05-CoralStation-ComfyUI-1.jpg" alt="CoralStation – ComfyUI concept pass 1" />
+    <img data-src="assets/06-CoralStation-ComfyUI-2.jpg" alt="CoralStation – ComfyUI concept pass 2 (annotated)" />
+    <img data-src="assets/07-CoralStation-ComfyUI-3.jpg" alt="CoralStation – ComfyUI concept pass 3" />
+    <img data-src="assets/08-CoralStation-Blender-1.jpg" alt="CoralStation – Blender scene setup" />
+    <img data-src="assets/09-CoralStation-Blender-2.jpg" alt="CoralStation – Blender camera & lights" />
+    <img data-src="assets/10-Final-Shot.jpg" alt="CoralStation – final render" />
+  </div>
+  <figcaption>
+    <strong>Creating the CoralStation™ — from sketch to finished 3D model</strong>
+  </figcaption>
+</figure>
+      <figure class="work fade" style="--delay:.14s">
+  <div class="media slider tight-slider" data-interval="5400">
+    <img src="assets/04-El-Camino-del-Sol-Cover.png?v=1" 
+         alt="El Camino del Sol — Front Cover" loading="lazy">
+    <img data-src="assets/El-Camino-del-Sol-Back-Cover.png?v=1" alt="">
+    <img data-src="assets/El-Camino-del-Sol-Color-Palette.png?v=1" alt="">
+  </div>
+  <figcaption><strong>El Camino del Sol Album Cover</strong></figcaption>
+</figure>
+
+      <figure class="work fade" style="--delay:.17s">
+    <div class="media slider hyakutake-slider no-ar" data-interval="5600">
+    <img src="assets/01-Proximity.png" alt="Proximity — Gestalt principle illustrated by cats" class="active">
+    <img src="assets/02-Similarity.png" alt="Similarity — Gestalt principle illustrated by cats">
+    <img src="assets/03-Continuity.png" alt="Continuity — Gestalt principle illustrated by cats">
+    <img src="assets/04-Closure.png" alt="Closure — Gestalt principle illustrated by cats">
+    <img src="assets/05-Figure-Ground.png" alt="Figure–Ground — Gestalt principle illustrated by cats">
+    <img src="assets/06-Common-Fate.png" alt="Common Fate — Gestalt principle illustrated by cats">
+    <img src="assets/07-Symmetry.png" alt="Symmetry — Gestalt principle illustrated by cats">
+    <img src="assets/08-Common-Region.png" alt="Common Region — Gestalt principle illustrated by cats">
+  </div>
+  <figcaption>
+    <strong>THE CAT-ALYST OF PERCEPTION: GESTALT PRINCIPLES ILLUSTRATED</strong>
+  </figcaption>
+</figure>
+     <figure class="work fade" style="--delay:.20s">
+  <div class="media slider hyakutake-slider no-ar" data-interval="5600">
+    <img src="assets/06-Absolut-Hyakutake-Ad.png?v=1" 
+         alt="Absolut Vodka — 'Absolut Hyakutake' Ad" loading="lazy">
+    <img data-src="assets/Comet-Hyakutake.jpg?v=1" alt="">
+  </div>
+  <figcaption><strong>Absolut Vodka 'Absolut Hyakutake' Ad</strong></figcaption>
+</figure>
+                  <!-- Mon Sablé – luxury skincare & fragrance system -->
+      <figure class="work fade" style="--delay:.215s">
+        <div class="media slider tight-slider" data-interval="5200">
+          <img src="assets/01-Mon-Sable-Logo-Presentation.png"
+               alt="Mon Sablé – primary logo and brand presentation" loading="lazy" />
+          <img data-src="assets/Mon-Sable-Logo-2.png"
+               alt="Mon Sablé – logo variant with alternate monogram" />
+          <img data-src="assets/Mon-Sable-Logo-3.png"
+               alt="Mon Sablé – logo variant with alternate lockup" />
+          <img data-src="assets/02-Perfume-Bottle-Clear.png"
+               alt="Mon Sablé – clear perfume bottle packaging" />
+          <img data-src="assets/03-Perfume-Bottle-Frosted.png"
+               alt="Mon Sablé – frosted perfume bottle packaging" />
+          <img data-src="assets/04-Shopping-Bag.png"
+               alt="Mon Sablé – branded shopping bag" />
+          <img data-src="assets/05-Lipstick-Black-and-Gold.png"
+               alt="Mon Sablé – lipstick packaging in black and gold" />
+          <img data-src="assets/06-Face-Cream-Jar.png"
+               alt="Mon Sablé – face cream jar design" />
+          <img data-src="assets/07-Candle.png"
+               alt="Mon Sablé – scented candle and box packaging" />
+          <img data-src="assets/08-Soap.png"
+               alt="Mon Sablé – boxed luxury soap packaging" />
+          <img data-src="assets/09-Frosted-Bottles.png"
+               alt="Mon Sablé – frosted skincare bottle lineup" />
+          <img data-src="assets/10-3DSMax-Signage.png"
+               alt="Mon Sablé – 3D storefront signage rendering" />
+          <img data-src="assets/11-Letterhead-Suite.png"
+               alt="Mon Sablé – letterhead, card, and envelope system" />
+          <img data-src="assets/12-Mon-Sable-Storefront.png"
+               alt="Mon Sablé – storefront exterior with signage" />
+        </div>
+        <figcaption>
+          <strong>Mon Sablé — luxury skincare & fragrance packaging system</strong>
+        </figcaption>
+      </figure>
+      <figure class="work fade" style="--delay:.23s"><div class="media"><video src="assets/07-Canary-Tape-Logomotion.mp4" autoplay muted loop playsinline preload="metadata"></video></div><figcaption><strong>Canary Tape Records Animated Logo</strong></figcaption></figure>
+            <!-- Extreme Products Group – Elite Fitness packaging -->
+      <figure class="work fade" style="--delay:.27s">
+        <div class="media">
+          <img src="assets/ExtremeProductsGroup.jpg"
+               alt="Extreme Products Group – Elite Fitness weight bench packaging design"
+               loading="lazy" />
+        </div>
+        <figcaption>
+          <strong>Extreme Products Group — Elite Fitness weight bench packaging</strong>
+        </figcaption>
+      </figure>
+      <!-- CC Storyboard — UFO (5-image carousel) -->
+<figure class="work fade" style="--delay:.275s">
+  <div class="media slider" data-interval="5200">
+    <img src="assets/IMAGE-01-CC-UFO.png" alt="CC Storyboard — UFO frame 1" loading="lazy" />
+    <img data-src="assets/IMAGE-02-CC-UFO.png" alt="CC Storyboard — UFO frame 2" />
+    <img data-src="assets/IMAGE-03-CC-UFO.png" alt="CC Storyboard — UFO frame 3" />
+    <img data-src="assets/IMAGE-04-CC-UFO.png" alt="CC Storyboard — UFO frame 4" />
+    <img data-src="assets/IMAGE-05-CC-UFO.png" alt="CC Storyboard — UFO frame 5" />
+  </div>
+  <figcaption>
+    <strong>CC case-study storyboard — created with ComfyUI, ControlNet, Illustrator & Photoshop</strong>
+  </figcaption>
+</figure>
+      <!-- CC Storyboard — Buddies (5-image carousel) -->
+<figure class="work fade" style="--delay:.285s">
+  <div class="media slider" data-interval="5200">
+    <img src="assets/IMAGE-01-NORMAL.png" alt="CC Storyboard — Buddies frame 1" loading="lazy" />
+    <img data-src="assets/IMAGE-02-NORMAL.png" alt="CC Storyboard — Buddies frame 2" />
+    <img data-src="assets/IMAGE-03-NORMAL.png" alt="CC Storyboard — Buddies frame 3" />
+    <img data-src="assets/IMAGE-04-NORMAL.png" alt="CC Storyboard — Buddies frame 4" />
+    <img data-src="assets/IMAGE-05-NORMAL.png" alt="CC Storyboard — Buddies frame 5" />
+  </div>
+  <figcaption>
+    <strong>CC case-study storyboard — created with ComfyUI, ControlNet, Illustrator & Photoshop</strong>
+  </figcaption>
+</figure>
+      <figure class="work fade" style="--delay:.29s">
+  <div class="media slider" data-interval="5400" id="slider-kickscreamer">
+    <img src="assets/09-Honkytonk-Nebula-Album-Cover.png?v=2"
+         alt="Kickscreamer Trio — Honkytonk Nebula Front Cover" loading="lazy">
+    <img data-src="assets/Kickscreamer-Trio-Honkytonk-Nebula-Album-Back-Cover.png?v=2" alt="">
+    <img data-src="assets/Kickscreamer-Trio-Color-Palette.png?v=2" alt="">
+  </div>
+  <figcaption><strong>Kickscreamer Trio Honkytonk Nebula Album Cover</strong></figcaption>
+</figure>
+
+            <!-- Common Grounds – character logo series -->
+      <figure class="work fade common-grounds" style="--delay:.32s">
+          <div class="media slider cg-slider no-ar" data-interval="5200">
+          <img src="assets/01-Common-Grounds.jpg"
+               alt="Common Grounds logo – primary lockup" loading="lazy" />
+          <img data-src="assets/02-Common-Grounds.jpg"
+               alt="Common Grounds logo – alternate layout" />
+          <img data-src="assets/03-Common-Grounds.jpg"
+               alt="Common Grounds logo – mug application" />
+
+          <img data-src="assets/01-Abe-Lincoln.png"
+               alt="Common Grounds character logo – Abraham Lincoln" />
+          <img data-src="assets/02-Aliens.png"
+               alt="Common Grounds character logo – aliens" />
+          <img data-src="assets/03-Bob-Ross.png"
+               alt="Common Grounds character logo – Bob Ross" />
+          <img data-src="assets/04-Cleopatra.png"
+               alt="Common Grounds character logo – Cleopatra" />
+          <img data-src="assets/05-Cool-Morning-Dude.png"
+               alt="Common Grounds character logo – Cool Morning Dude" />
+          <img data-src="assets/06-Dracula.png"
+               alt="Common Grounds character logo – Dracula" />
+          <img data-src="assets/07-George-Washington.png"
+               alt="Common Grounds character logo – George Washington" />
+          <img data-src="assets/08-Nelson-Mandela.png"
+               alt="Common Grounds character logo – Nelson Mandela" />
+          <img data-src="assets/09-Oscar-Wilde.png"
+               alt="Common Grounds character logo – Oscar Wilde" />
+          <img data-src="assets/10-Pablo-Escobar.png"
+               alt="Common Grounds character logo – Pablo Escobar" />
+          <img data-src="assets/11-Queen-Victoria.png"
+               alt="Common Grounds character logo – Queen Victoria" />
+          <img data-src="assets/12-Volodymyr-Zelenskyy.png"
+               alt="Common Grounds character logo – Volodymyr Zelenskyy" />
+        </div>
+        <figcaption>
+          <strong>Common Grounds — character logo and brand explorations</strong>
+        </figcaption>
+      </figure>
+
+      <!-- Cliffline (now a 3-image carousel) -->
+<figure class="work fade" style="--delay:.35s">
+  <div class="media slider" data-interval="5200">
+    <img src="assets/11-Cliffline-Logo.png" alt="Cliffline — Logo" loading="lazy" />
+    <img data-src="assets/Cliffline-Logo-2.png" alt="Cliffline — Logo variant 2" />
+    <img data-src="assets/Cliffline-Logo-3.png" alt="Cliffline — Logo variant 3" />
+  </div>
+  <figcaption><strong>Cliffline Retailers Logo</strong></figcaption>
+</figure>
+      <!-- nAItive Series Carousel -->
+<figure class="work fade" style="--delay:.295s">
+  <div class="media slider" data-interval="5200">
+    <img src="assets/01-nAItive-cover.jpg" alt="nAItive Series – Cover" loading="lazy" />
+    <img data-src="assets/02-Mountain-Spirits-Ga'an.jpg" alt="nAItive Series – Mountain Spirits (Ga'an)" />
+    <img data-src="assets/03-Palhik-Mana.jpg" alt="nAItive Series – Palhik Mana" />
+    <img data-src="assets/04-The-Wiindigoo.jpg" alt="nAItive Series – The Wiindigoo" />
+    <img data-src="assets/05-Black-God.jpg" alt="nAItive Series – Black God" />
+    <img data-src="assets/06-Tohono-O'odham.jpg" alt="nAItive Series – Tohono O'odham" />
+    <img data-src="assets/07-Green-Corn-Ceremony-Tsalagi.jpg" alt="nAItive Series – Green Corn Ceremony (Tsalagi)" />
+  </div>
+  <figcaption>
+    <strong>nAItive series — coffee table book imagery created using DALL·E, ComfyUI, ControlNet & Photoshop</strong>
+  </figcaption>
+</figure>
+
+      <!-- Bauhaus Face Animated Loop — robust single block -->
+      <figure class="work fade" style="--delay:.38s">
+        <div class="media">
+          <video id="bauhaus" muted loop playsinline autoplay preload="metadata"
+                 poster="./assets/13-SCC-Vig-Program.png"
+                 style="display:block; max-width:100%; height:auto; background:#f7f8f9">
+            Sorry, your browser can’t play this video.
+          </video>
+        </div>
+        <figcaption><strong>Bauhaus Face Animated Loop</strong></figcaption>
+      </figure>
+
+      <script>
+      (() => {
+        const v = document.getElementById('bauhaus');
+        if (!v) return;
+
+        // Candidate filenames to try (MP4 preferred), with cache-bust
+        const q = 'v=7';
+        const candidates = [
+          './assets/12-Bauhaus-Face-Loop.mp4?' + q,         // mp4 (hyphens)
+          './assets/12%20Bauhaus-Face-Loop.mp4?' + q,       // mp4 (space encoded – just in case)
+          './assets/12-Bauhaus-Face-Loop.mov?' + q,         // mov (hyphens)
+          './assets/12%20Bauhaus-Face-Loop.mov?' + q        // mov (space encoded)
+        ];
+
+        let i = 0;
+
+        function tryNext() {
+          if (i >= candidates.length) { return; }
+          const url = candidates[i++];
+          v.src = url;
+          v.load();
+        }
+
+        v.addEventListener('error', tryNext);
+        v.addEventListener('loadedmetadata', () => {
+          v.muted = true; // required for autoplay everywhere
+          v.play().catch(() => {});
+        }, { once: true });
+
+        tryNext();
+      })();
+      </script>
+
+      <figure class="work fade" style="--delay:.41s"><div class="media"><img src="assets/13-SCC-Vig-Program.png" alt="SCC Vig Program" loading="lazy" /></div><figcaption><strong>Scottsdale Community College Alex Ketley Program Announcement</strong></figcaption></figure>
+      <figure class="work fade" style="--delay:.44s">
+  <div class="media slider" data-interval="5200">
+    <img src="assets/14-Soft-Science-Album-Cover.png?v=1"
+         alt="AM Orbit — Soft Science Front Cover" loading="lazy">
+    <img data-src="assets/Soft-Science-Back-Cover.png?v=1" alt="">
+    <img data-src="assets/Soft-Science-Color-Palette.png?v=1" alt="">
+  </div>
+  <figcaption><strong>AM Orbit — Soft Science Album Cover</strong></figcaption>
+</figure>
+
+      <!-- 15 -->
+      <figure class="work work-15 fade" style="--delay:.47s">
+        <div class="media">
+          <div class="embed-square">
+            <iframe src="https://fastidious-malabi-cc7032.netlify.app" title="Tru Infusion — In-store Animation" loading="lazy"></iframe>
+          </div>
+        </div>
+        <figcaption><strong>Tru Infusion in-store Animation</strong></figcaption>
+      </figure>
+
+      <!-- 16 -->
+      <figure class="work fade" style="--delay:.50s">
+  <div class="media slider" data-interval="5600">
+    <img src="assets/16-CFH.jpg?v=1" 
+         alt="Cookies from Home — Logos and Tin Designs" loading="lazy">
+    <img data-src="assets/CFH-2.jpg?v=1" alt="">
+    <img data-src="assets/CFH-3.jpg?v=1" alt="">
+  </div>
+  <figcaption><strong>Cookies from Home — Logos and Tin Designs</strong></figcaption>
+</figure>
+
+      <!-- 17 -->
+      <figure class="work fade" style="--delay:.53s">
+        <div class="media">
+          <video src="assets/17-Fibonacci-Curve.mp4" autoplay muted loop playsinline preload="metadata"></video>
+        </div>
+        <figcaption><strong>Fibonacci Curve Animated Loop</strong></figcaption>
+      </figure>
+
+      <!-- 18 -->
+      <figure class="work fade" style="--delay:.56s">
+        <div class="media">
+          <img src="assets/18-The-Firefly's-Arrival.jpg" alt="The Firefly's Arrival" loading="lazy" />
+        </div>
+        <figcaption><strong>"The Firefly’s Arrival" Hand Illustration using Wax, Charcoal, and Graphite</strong></figcaption>
+      </figure>
+    </section>
+
+    <!-- CONTACT: minimal form -->
+    <section id="contact" class="contact-card" aria-label="Contact Chris">
+      <h2>Get in touch</h2>
+
+      <form id="contactForm" class="contact-grid" autocomplete="on" novalidate>
+        <!-- Honeypot to reduce spam -->
+        <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
+
+        <label>Name
+          <input type="text" name="name" placeholder="Your name" required
+                 autocapitalize="words" autocomplete="name" />
+        </label>
+
+        <label>Subject
+          <input type="text" name="subject" placeholder="Subject" required
+                 autocomplete="subject" />
+        </label>
+
+        <label>Message
+          <textarea name="message" placeholder="Say hello…" required minlength="5"
+                    autocomplete="off"></textarea>
+        </label>
+
+        <div class="contact-actions">
+          <button class="btn" type="submit" id="sendBtn">Send message</button>
+        </div>
+<div class="contact-foot">
+  <a class="back-top" href="#top" aria-label="Back to top">Back to top ↑</a>
 </div>
 
-<!-- Homepage lightbox script (desktop only) -->
+      </form>
+    </section>
+    <!-- /CONTACT -->
+
+    <footer>
+      <hr class="rule" />
+      <div>© <span id="y"></span> Chris Chattom • <span class="small">Phoenix, AZ</span></div>
+    </footer>
+  </div>
+
+  <!-- CONTACT toast -->
+  <div id="flash" class="flash" role="status" aria-live="polite"></div>
+
+  <!-- Lightbox overlay (homepage) -->
+  <div class="lb-overlay" id="lb">
+    <div class="lb-frame">
+      <button class="lb-close" id="lbClose" aria-label="Close">✕</button>
+      <img id="lbImg" alt="">
+      <div class="lb-cap" id="lbCap" aria-live="polite"></div>
+    </div>
+  </div>
+
+  <!-- Homepage lightbox script (desktop only) -->
 <script>
 (function(){
   const overlay = document.getElementById('lb');
@@ -930,7 +852,7 @@ img, picture, figure {
   const btn = document.getElementById('lbClose');
 
   function openLB(src, caption, alt){
-    img.src = src;
+    img.src = src; 
     img.alt = alt || caption || '';
     cap.textContent = caption || '';
     overlay.classList.add('show');
@@ -944,10 +866,11 @@ img, picture, figure {
     document.body.style.overflow = '';
   }
 
+  // ✅ Only enable lightbox on devices with hover + fine pointer (desktop)
   const allowLightbox = matchMedia('(hover: hover) and (pointer: fine)').matches;
 
   document.addEventListener('click', (e)=>{
-    if (!allowLightbox) return;
+    if (!allowLightbox) return; // disables lightbox on phones/tablets
     const fig = e.target.closest('figure[data-lightbox]');
     if(fig){
       const displayImg = fig.querySelector('img');
@@ -964,63 +887,51 @@ img, picture, figure {
 })();
 </script>
 
-<!-- Existing page script -->
-<script>
-document.getElementById('y').textContent = new Date().getFullYear();
-const revealEls=document.querySelectorAll('.fade');
-const io=new IntersectionObserver((entries)=>{
-  entries.forEach(e=>{
-    if(e.isIntersecting){
-      const el=e.target;
-      const d=el.style.getPropertyValue('--delay')||'0s';
-      el.style.transitionDelay=d;
-      el.classList.add('revealed');
-      io.unobserve(el);
+  <!-- Existing page script (unchanged) -->
+  <script>
+    document.getElementById('y').textContent = new Date().getFullYear();
+    const revealEls=document.querySelectorAll('.fade');
+    const io=new IntersectionObserver((entries)=>{entries.forEach(e=>{if(e.isIntersecting){const el=e.target;const d=el.style.getPropertyValue('--delay')||'0s';el.style.transitionDelay=d;el.classList.add('revealed');io.unobserve(el);}});},{rootMargin:'0px 0px -10% 0px',threshold:0.05});
+    revealEls.forEach(el=>io.observe(el));
+
+    // CONTACT: AJAX submission to FormSubmit (no reload)
+    const form = document.getElementById('contactForm');
+    const flash = document.getElementById('flash');
+    const sendBtn = document.getElementById('sendBtn');
+
+    function showFlash(msg, ok=true){
+      flash.textContent = msg;
+      flash.classList.remove('error','show');
+      if(!ok) flash.classList.add('error');
+      requestAnimationFrame(()=>{ flash.classList.add('show'); });
+      setTimeout(()=> flash.classList.remove('show'), 2800);
     }
-  });
-},{rootMargin:'0px 0px -10% 0px',threshold:0.05});
-revealEls.forEach(el=>io.observe(el));
 
-const form = document.getElementById('contactForm');
-const flash = document.getElementById('flash');
-const sendBtn = document.getElementById('sendBtn');
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fd = new FormData(form);
+      if(!fd.get('name') || !fd.get('subject') || !fd.get('message')){
+        showFlash('Please fill in all fields.', false);
+        return;
+      }
+      sendBtn.disabled = true; sendBtn.textContent = 'Sending…';
 
-function showFlash(msg, ok=true){
-  flash.textContent = msg;
-  flash.classList.remove('error','show');
-  if(!ok) flash.classList.add('error');
-  requestAnimationFrame(()=>{ flash.classList.add('show'); });
-  setTimeout(()=> flash.classList.remove('show'), 2800);
-}
-
-form?.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const fd = new FormData(form);
-  if(!fd.get('name') || !fd.get('subject') || !fd.get('message')){
-    showFlash('Please fill in all fields.', false);
-    return;
-  }
-  sendBtn.disabled = true;
-  sendBtn.textContent = 'Sending…';
-
-  try {
-    const res = await fetch('https://formsubmit.co/ajax/chattom@gmail.com', {
-      method: 'POST',
-      headers: { 'Accept': 'application/json' },
-      body: fd
+      try {
+        const res = await fetch('https://formsubmit.co/ajax/chattom@gmail.com', {
+          method: 'POST',
+          headers: { 'Accept': 'application/json' },
+          body: fd
+        });
+        if(!res.ok){ throw new Error('Network response was not ok'); }
+        form.reset();
+        showFlash('Message sent — thanks!');
+      } catch (err){
+        showFlash('Hmm, something went wrong. Try again?', false);
+      } finally {
+        sendBtn.disabled = false; sendBtn.textContent = 'Send message';
+      }
     });
-    if(!res.ok){ throw new Error('Network response was not ok'); }
-    form.reset();
-    showFlash('Message sent — thanks!');
-  } catch (err){
-    showFlash('Hmm, something went wrong. Try again?', false);
-  } finally {
-    sendBtn.disabled = false;
-    sendBtn.textContent = 'Send message';
-  }
-});
-
-(function robustAnchorScroll(){
+    (function robustAnchorScroll(){
   if (location.hash !== '#contact') return;
   const contactEl = document.getElementById('contact');
   if (!contactEl) return;
@@ -1046,6 +957,7 @@ form?.addEventListener('submit', async (e) => {
 
   const scrollNow = () => contactEl.scrollIntoView({ behavior:'smooth', block:'start' });
 
+  // initial nudge
   scrollNow();
 
   Promise.allSettled(mediaAbove.map(wait)).then(() => {
@@ -1056,9 +968,8 @@ form?.addEventListener('submit', async (e) => {
 
   window.addEventListener('load', () => setTimeout(scrollNow, 0));
 })();
-</script>
-
-<script>
+  </script>
+  <script>
 (function ensureAnchorVisible(){
   function jump(){
     if (location.hash === '#contact') {
@@ -1071,29 +982,35 @@ form?.addEventListener('submit', async (e) => {
   setTimeout(jump, 500);
 })();
 </script>
-
-<script>
+  <script>
 /* Global “no-save” deterrents (scroll-safe on touch) */
 (function () {
+  // 1) Block right-click / long-press context menu on images
   document.addEventListener('contextmenu', function (e) {
     if (e.target.closest('img, picture, figure')) {
       e.preventDefault();
     }
   }, { capture: true });
 
+  // 2) Stop native drag-start on images
   document.addEventListener('dragstart', function (e) {
     if (e.target.closest('img, picture, figure')) {
       e.preventDefault();
     }
   }, { capture: true });
 
+  // 3) Make sure all images are non-draggable
   document.querySelectorAll('img').forEach(img => {
     img.setAttribute('draggable', 'false');
   });
+
+  // IMPORTANT:
+  // Do NOT preventDefault on touchstart — that breaks normal scrolling
+  // on phones/tablets. The contextmenu handler above already cancels
+  // long-press “Save Image” menus, so scrolling remains smooth.
 })();
 </script>
-
-<script>
+  <script>
 /* Tiny auto-fade slider (honors reduced motion) */
 (function(){
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -1102,6 +1019,7 @@ form?.addEventListener('submit', async (e) => {
     const imgs = Array.from(slider.querySelectorAll('img'));
     if (imgs.length <= 1) return;
 
+    // dots
     const dots = document.createElement('div');
     dots.className = 'slider-dots';
     imgs.forEach((_, n) => {
@@ -1110,109 +1028,96 @@ form?.addEventListener('submit', async (e) => {
       dots.appendChild(d);
     });
     slider.appendChild(dots);
+    // ADD — arrow buttons
+const nav = document.createElement('div');
+nav.className = 'slider-nav';
+const prevBtn = document.createElement('button');
+prevBtn.className = 'slider-btn prev';
+prevBtn.type = 'button';
+prevBtn.setAttribute('aria-label', 'Previous image');
+prevBtn.innerHTML = '‹';
 
-    const nav = document.createElement('div');
-    nav.className = 'slider-nav';
+const nextBtn = document.createElement('button');
+nextBtn.className = 'slider-btn next';
+nextBtn.type = 'button';
+nextBtn.setAttribute('aria-label', 'Next image');
+nextBtn.innerHTML = '›';
 
-    const prevBtn = document.createElement('button');
-    prevBtn.className = 'slider-btn prev';
-    prevBtn.type = 'button';
-    prevBtn.setAttribute('aria-label', 'Previous image');
-    prevBtn.innerHTML = '‹';
+nav.append(prevBtn, nextBtn);
+slider.appendChild(nav);
 
-    const nextBtn = document.createElement('button');
-    nextBtn.className = 'slider-btn next';
-    nextBtn.type = 'button';
-    nextBtn.setAttribute('aria-label', 'Next image');
-    nextBtn.innerHTML = '›';
+// make slider focusable for keyboard arrows
+slider.setAttribute('tabindex', '0');
 
-    nav.append(prevBtn, nextBtn);
-    slider.appendChild(nav);
-    slider.setAttribute('tabindex', '0');
 
-    let i = 0;
-    let timer = null;
+    let i = 0, timer = null;
     const interval = parseInt(slider.dataset.interval, 10) || 5200;
-
-    function ensureLoaded(img){
-      if (img.dataset.src && !img.getAttribute('src')) {
-        img.src = img.dataset.src;
-      }
-    }
-
-    function fitToImage(img){
-      if (!img) return;
-      const apply = () => {
-        const sliderWidth = slider.clientWidth;
-        if (!sliderWidth || !img.naturalWidth || !img.naturalHeight) return;
-        const height = Math.round(sliderWidth * (img.naturalHeight / img.naturalWidth));
-        slider.style.height = height + 'px';
-      };
-
-      if (img.complete && img.naturalWidth) {
-        apply();
-      } else {
-        img.addEventListener('load', apply, { once:true });
-        img.addEventListener('error', () => {
-          slider.style.height = '320px';
-        }, { once:true });
-      }
-    }
 
     function show(n){
       imgs[i].classList.remove('active');
       dots.children[i]?.classList.remove('active');
-
       i = (n + imgs.length) % imgs.length;
-      ensureLoaded(imgs[i]);
-      fitToImage(imgs[i]);
 
+      if (imgs[i].dataset.src && !imgs[i].src) imgs[i].src = imgs[i].dataset.src;
       imgs[i].classList.add('active');
       dots.children[i]?.classList.add('active');
     }
+    function start(){ if (!reduce){ stop(); timer = setInterval(()=>show(i+1), interval); } }
+    function stop(){ if (timer){ clearInterval(timer); timer = null; } }
 
-    function start(){
-      if (!reduce){
-        stop();
-        timer = setInterval(()=>show(i+1), interval);
-      }
-    }
-
-    function stop(){
-      if (timer){
-        clearInterval(timer);
-        timer = null;
-      }
-    }
-
-    ensureLoaded(imgs[0]);
+    // init
     imgs[0].classList.add('active');
-    fitToImage(imgs[0]);
+if (!imgs[0].src) { imgs[0].src = imgs[0].dataset.src || ''; }
+       /* --- Lock container aspect ratio to the first image (prevents vertical jump) --- */
+    (function lockAspect() {
+      const sliderEl = slider; // use the existing slider variable
+      if (!sliderEl || !imgs[0]) return;
+
+      // Skip AR locking for sliders marked "no-ar" (Common Grounds)
+      if (sliderEl.classList.contains('no-ar')) return;
+
+      function setAR(w, h) {
+    if (!w || !h) return;
+    if ('aspectRatio' in document.documentElement.style) {
+      sliderEl.style.aspectRatio = `${w} / ${h}`;
+    } else {
+      const apply = () => { sliderEl.style.height = (sliderEl.clientWidth * (h / w)) + 'px'; };
+      apply();
+      window.addEventListener('resize', apply, { passive: true });
+    }
+  }
+
+  if (imgs[0].complete && imgs[0].naturalWidth) {
+    setAR(imgs[0].naturalWidth, imgs[0].naturalHeight);
+  } else {
+    imgs[0].addEventListener('load', () => setAR(imgs[0].naturalWidth, imgs[0].naturalHeight), { once: true });
+    imgs[0].addEventListener('error', () => setAR(1200, 1200), { once: true });
+  }
+})();
 
     slider.addEventListener('mouseenter', stop);
     slider.addEventListener('mouseleave', start);
     slider.addEventListener('focusin', stop);
     slider.addEventListener('focusout', start);
 
-    function goPrev(){ stop(); show(i - 1); setTimeout(start, 1600); }
-    function goNext(){ stop(); show(i + 1); setTimeout(start, 1600); }
+    // ADD — click/keyboard handlers
+function goPrev(){ stop(); show(i - 1); setTimeout(start, 1600); }
+function goNext(){ stop(); show(i + 1); setTimeout(start, 1600); }
 
-    prevBtn.addEventListener('click', goPrev);
-    nextBtn.addEventListener('click', goNext);
+prevBtn.addEventListener('click', goPrev);
+nextBtn.addEventListener('click', goNext);
 
-    slider.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowLeft') { e.preventDefault(); goPrev(); }
-      if (e.key === 'ArrowRight'){ e.preventDefault(); goNext(); }
-    });
+slider.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowLeft') { e.preventDefault(); goPrev(); }
+  if (e.key === 'ArrowRight'){ e.preventDefault(); goNext(); }
+});
 
-    window.addEventListener('resize', () => fitToImage(imgs[i]), { passive: true });
 
     start();
   });
 })();
 </script>
-
-<script>
+  <script>
 (function(){
   const el = document.querySelector('.figure-intro');
   if (!el) return;
@@ -1229,7 +1134,8 @@ form?.addEventListener('submit', async (e) => {
         io.unobserve(entry.target);
       }
     });
-  }, { root: null, rootMargin: '0px 0px -10% 0px', threshold: 0.3 });
+  }, { root: null, rootMargin: '0px 0px -10% 0px', threshold: 0.3 }
+);
 
   io.observe(el);
 })();
